@@ -14,6 +14,7 @@ sunlar var:
 /okundumu
 /iftar
 /sahur
+/bugunkandilmi
 /yo [kelime]
 `
 }
