@@ -20,9 +20,9 @@ var holidays = []h{
 	{"Cocuk Bayrami", newdate("23 Apr 2015"), day},
 	{"Isci Bayrami", newdate("01 May 2015"), day},
 	{"Genclik Bayrami", newdate("19 May 2015"), day},
-	{"Ramazan Bayrami", newdate("17 Jul 2015"), 12*time.Hour + 3*day},
+	{"Ramazan Bayrami", newdate("18 Jul 2015"), 3 * day},
 	{"Zafer Bayrami", newdate("30 Aug 2015"), day},
-	{"Kurban Bayrami", newdate("24 Sep 2015"), 12*time.Hour + 4*day},
+	{"Kurban Bayrami", newdate("25 Sep 2015"), 4 * day},
 	{"Cumhuriyet Bayrami", newdate("29 Oct 2015"), day},
 }
 
@@ -73,5 +73,4 @@ func holiday(args ...string) string {
 	}
 
 	return "yakinlarda tatil gorunmuyor :("
-
 }

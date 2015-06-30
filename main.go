@@ -19,8 +19,7 @@ var commandMap = map[string]command{}
 
 func register(name string, command command) {
 	if _, ok := commandMap[name]; ok {
-		log.Println("panic: command '%s' is already registered", name)
-		return
+		log.Fatalf("panic: command '%s' is already registered", name)
 	}
 
 	commandMap[name] = command
