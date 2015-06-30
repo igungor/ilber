@@ -104,6 +104,5 @@ func forecast(locations ...string) string {
 
 	}
 
-	printdebug("%v", forecast)
 	return forecast.String()
 }

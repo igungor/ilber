@@ -90,7 +90,6 @@ func theaters(args ...string) string {
 	}
 
 	movies := movie.Filter("3D")
-	printdebug("%v\n", movies)
 
 	return movies.String()
 }
