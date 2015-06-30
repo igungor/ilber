@@ -90,8 +90,9 @@ func okundumu(args ...string) string {
 	loc, _ := time.LoadLocation("Europe/Istanbul")
 
 	now := time.Now().In(loc)
+	nowstr := now.Format(timeFormat)
 
-	timepair, ok := callTime[now.Format(timeFormat)]
+	timepair, ok := callTime[nowstr]
 	if !ok {
 		return "galiba oruc bitti"
 	}
@@ -101,7 +102,11 @@ func okundumu(args ...string) string {
 	}
 
 	if now.Before(timepair.sahur) {
-		return "okundu"
+		return "sahur daha okunmadi"
+	}
+
+	if now.After(timepair.sahur) && now.Hour() < 6 {
+		return "sahur okundu da daha iftara cok var"
 	}
 
 	// after sahur and before iftar, hence NO
