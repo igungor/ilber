@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var (
@@ -37,6 +38,7 @@ type Forecast struct {
 
 func (f Forecast) String() string {
 	var icon string
+	now := time.Now()
 
 	if len(f.Weather) == 0 {
 		return ""
@@ -44,21 +46,25 @@ func (f Forecast) String() string {
 
 	switch f.Weather[0].Status {
 	case "Clear":
-		icon = "☀"
+		if 6 < now.Hour() && now.Hour() < 18 { // for istanbul
+			icon = "☀"
+		} else {
+			icon = "☽"
+		}
 	case "Clouds":
 		icon = "☁"
 	case "Rain":
 		icon = "☔"
 	case "Fog":
-		icon = ""
+		icon = "▒"
 	case "Mist":
-		icon = ""
+		icon = "░"
 	case "Haze":
-		icon = ""
+		icon = "░"
 	case "Snow":
-		icon = "☃"
+		icon = "❄"
 	case "Thunderstorm":
-		icon = "⛈"
+		icon = "⚡"
 	default:
 		icon = ""
 	}

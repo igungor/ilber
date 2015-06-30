@@ -48,10 +48,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	printdebug("incoming message: %#v\n", u)
+	printdebug("message coming from: %#v\n", u.Message.From.Username)
 
 	if u.Message.Text == "" {
-		log.Printf("no incoming message text: %#v\n", u)
+		log.Printf("no message text: %#v\n", u)
 		return
 	}
 
