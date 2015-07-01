@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	weatherURL = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric"
+	baseURL = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric"
 )
 
 const (
@@ -82,7 +82,7 @@ func forecast(locations ...string) string {
 		location = strings.Join(locations, " ")
 	}
 
-	url := fmt.Sprintf(weatherURL, location)
+	url := fmt.Sprintf(baseURL, location)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("weather error: %v\n", err)

@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	dakickToken = os.Getenv("DAKICK_TOKEN")
-	dakickURL   = "https://api.dakick.com/api/v1/movies/in-theaters?location_ids=207&per_page=15"
+	token   = os.Getenv("DAKICK_TOKEN")
+	baseURL = "https://api.dakick.com/api/v1/movies/in-theaters?location_ids=207&per_page=15"
 )
 
 func init() {
-	if dakickToken == "" {
+	if token == "" {
 		log.Println("DAKICK_TOKEN must be set")
 		return
 	}
@@ -70,18 +70,18 @@ func (m Movie) String() string {
 }
 
 func theaters(args ...string) string {
-	if dakickToken == "" {
+	if token == "" {
 		log.Println("DAKICK_TOKEN must be set")
 		return ""
 	}
 
 	var client http.Client
-	req, err := http.NewRequest("GET", dakickURL, nil)
+	req, err := http.NewRequest("GET", baseURL, nil)
 	if err != nil {
 		log.Printf("theaters request error: %v\n", err)
 		return ""
 	}
-	req.Header.Set("X-DAKICK-API-TOKEN", dakickToken)
+	req.Header.Set("X-DAKICK-API-TOKEN", token)
 
 	resp, err := client.Do(req)
 	if err != nil {
