@@ -66,6 +66,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	result := dispatch(command, args...)
 
+	setAction(u.Message.Chat.ID, "typing")
 	sendMessage(u.Message.Chat.ID, result)
 }
 

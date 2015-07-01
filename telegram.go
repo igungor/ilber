@@ -21,10 +21,11 @@ type (
 	}
 
 	Message struct {
-		From User
-		Chat GroupChat
-		Date int
-		Text string
+		From  User
+		Chat  GroupChat
+		Date  int
+		Text  string
+		Photo []PhotoSize
 	}
 
 	User struct {
@@ -38,16 +39,22 @@ type (
 		ID    int `json:"id"`
 		Title string
 	}
+
+	PhotoSize struct {
+		FileID   string `json:"file_id"`
+		Width    int    `json:"width"`
+		Height   int    `json:"height"`
+		FileSize int    `json:"file_size"`
+	}
 )
 
 func sendMessage(chatID int, text string) {
-	u, _ := url.Parse(baseURL + "/sendMessage")
-	v := u.Query()
-	v.Set("chat_id", strconv.Itoa(chatID))
-	v.Set("text", text)
-	u.RawQuery = v.Encode()
+	urlvalues := url.Values{
+		"chat_id": {strconv.Itoa(chatID)},
+		"text":    {text},
+	}
 
-	resp, err := http.Get(u.String())
+	resp, err := http.PostForm(baseURL+"/sendMessage", urlvalues)
 	if err != nil {
 		log.Println(err)
 		return
@@ -62,13 +69,12 @@ func setAction(chatID int, action string) {
 	// action: upload_{audio,video,document}
 	// action: find_location
 
-	u, _ := url.Parse(baseURL + "/sendChatAction")
-	v := u.Query()
-	v.Set("chat_id", strconv.Itoa(chatID))
-	v.Set("action", action)
-	u.RawQuery = v.Encode()
+	urlvalues := url.Values{
+		"chat_id": {strconv.Itoa(chatID)},
+		"action":  {action},
+	}
 
-	resp, err := http.Get(u.String())
+	resp, err := http.PostForm(baseURL+"/sendChatAction", urlvalues)
 	if err != nil {
 		log.Println(err)
 		return
