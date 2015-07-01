@@ -142,6 +142,8 @@ func sahur(args ...string) string {
 	nowstr := now.Format(timeFormat)
 
 	timepair, ok := callTime[nowstr]
+	fmt.Println(now, nowstr, timepair)
+
 	if !ok {
 		return "galiba oruc bitti"
 	}

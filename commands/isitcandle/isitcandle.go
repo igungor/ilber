@@ -9,7 +9,6 @@ import (
 
 func init() {
 	ilberbot.RegisterCommand("/bugunkandilmi", isitcandle)
-	ilberbot.RegisterCommand("/nezamankandil", wheniscandle)
 }
 
 const timeformat = "2 Jan 2006"
@@ -40,21 +39,4 @@ func isitcandle(args ...string) string {
 
 	return fmt.Sprintf("Evet, bugun %v\n", v)
 
-}
-
-func wheniscandle(args ...string) string {
-	now := time.Now().UTC()
-
-	for k, v := range dasCandles {
-		t, _ := time.Parse(timeformat, k)
-
-		if now.Format(timeformat) == k {
-			return fmt.Sprintf("Bugun %v", v)
-		}
-
-		if now.Before(t) {
-			return fmt.Sprintf("En yakin kandil %v (%v)", v, k)
-		}
-	}
-	return "yakinlarda kandil yok hocam"
 }
