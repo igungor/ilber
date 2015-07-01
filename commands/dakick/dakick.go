@@ -18,6 +18,11 @@ var (
 )
 
 func init() {
+	if dakickToken == "" {
+		log.Println("DAKICK_TOKEN must be set")
+		return
+	}
+
 	ilberbot.RegisterCommand("/vizyon", theaters)
 }
 
