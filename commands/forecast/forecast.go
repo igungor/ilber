@@ -1,4 +1,4 @@
-package main
+package forecast
 
 import (
 	"encoding/json"
@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/igungor/ilberbot"
 )
 
 var (
@@ -20,7 +22,7 @@ const (
 )
 
 func init() {
-	register("/hava", forecast)
+	ilberbot.RegisterCommand("/hava", forecast)
 }
 
 // openweathermap response

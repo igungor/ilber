@@ -1,9 +1,13 @@
-package main
+package whoami
 
-import "math/rand"
+import (
+	"math/rand"
+
+	"github.com/igungor/ilberbot"
+)
 
 func init() {
-	register("/benkimim", whoami)
+	ilberbot.RegisterCommand("/benkimim", whoami)
 }
 
 var answers = []string{

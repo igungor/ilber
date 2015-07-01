@@ -1,4 +1,4 @@
-package main
+package ilberbot
 
 import (
 	"log"
@@ -13,34 +13,40 @@ var (
 	baseURL = "https://api.telegram.org/bot" + token
 )
 
+func init() {
+	if token == "" {
+		log.Fatal("ILBERBOT_TOKEN must be set")
+	}
+}
+
 // Telegram Bot Response
 type (
-	Update struct {
+	TelegramUpdate struct {
 		UpdateID int `json:"update_id"`
-		Message  Message
+		Message  TelegramMessage
 	}
 
-	Message struct {
-		From  User
-		Chat  GroupChat
+	TelegramMessage struct {
+		From  TelegramUser
+		Chat  TelegramGroupChat
 		Date  int
 		Text  string
-		Photo []PhotoSize
+		Photo []TelegramPhotoSize
 	}
 
-	User struct {
+	TelegramUser struct {
 		ID        int    `json:"id"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
 		Username  string `json:"username"`
 	}
 
-	GroupChat struct {
+	TelegramGroupChat struct {
 		ID    int `json:"id"`
 		Title string
 	}
 
-	PhotoSize struct {
+	TelegramPhotoSize struct {
 		FileID   string `json:"file_id"`
 		Width    int    `json:"width"`
 		Height   int    `json:"height"`
@@ -48,7 +54,7 @@ type (
 	}
 )
 
-func sendMessage(chatID int, text string) {
+func SendMessage(chatID int, text string) {
 	urlvalues := url.Values{
 		"chat_id": {strconv.Itoa(chatID)},
 		"text":    {text},
@@ -60,11 +66,9 @@ func sendMessage(chatID int, text string) {
 		return
 	}
 	defer resp.Body.Close()
-
-	printdebug("sendMessage status: %v\n", resp.Status)
 }
 
-func setAction(chatID int, action string) {
+func SetAction(chatID int, action string) {
 	// action: typing
 	// action: upload_{audio,video,document}
 	// action: find_location
@@ -80,6 +84,4 @@ func setAction(chatID int, action string) {
 		return
 	}
 	defer resp.Body.Close()
-
-	printdebug("setAction status: %v\n", resp.Status)
 }

@@ -1,4 +1,4 @@
-package main
+package dakick
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/igungor/ilberbot"
 )
 
 var (
@@ -16,7 +18,7 @@ var (
 )
 
 func init() {
-	register("/vizyon", theaters)
+	ilberbot.RegisterCommand("/vizyon", theaters)
 }
 
 // dakick response

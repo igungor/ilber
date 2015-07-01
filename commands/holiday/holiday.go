@@ -1,24 +1,26 @@
-package main
+package holiday
 
 import (
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/igungor/ilberbot"
 )
 
 func init() {
 	sort.Sort(byDate(holidays))
 
-	register("/tatil", holiday)
+	ilberbot.RegisterCommand("/tatil", holiday)
 }
 
 var day = 24 * time.Hour
 
 var holidays = []h{
 	// 2015
-	{"Yilbasi tatili", newdate("01 Jan 2015"), day},
+	{"Yilbasi tatili", newdate("1 Jan 2015"), day},
 	{"Cocuk Bayrami", newdate("23 Apr 2015"), day},
-	{"Isci Bayrami", newdate("01 May 2015"), day},
+	{"Isci Bayrami", newdate("1 May 2015"), day},
 	{"Genclik Bayrami", newdate("19 May 2015"), day},
 	{"Ramazan Bayrami", newdate("18 Jul 2015"), 3 * day},
 	{"Zafer Bayrami", newdate("30 Aug 2015"), day},
@@ -39,7 +41,7 @@ func (d byDate) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 func (d byDate) Less(i, j int) bool { return d[i].date.Before(d[j].date) }
 
 func newdate(date string) time.Time {
-	const timeformat = "_2 Jan 2006"
+	const timeformat = "2 Jan 2006"
 
 	t, _ := time.Parse(timeformat, date)
 
@@ -55,7 +57,7 @@ func in(date, start, end time.Time) bool {
 }
 
 func holiday(args ...string) string {
-	const timeformat = "_2 Jan 2006"
+	const timeformat = "2 Jan 2006"
 
 	now := time.Now().UTC()
 

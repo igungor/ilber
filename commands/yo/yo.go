@@ -1,4 +1,4 @@
-package main
+package yo
 
 import (
 	"encoding/json"
@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/igungor/ilberbot"
 )
 
 func init() {
-	register("/yo", image)
+	ilberbot.RegisterCommand("/yo", image)
 }
 
 var (

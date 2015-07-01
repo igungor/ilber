@@ -1,12 +1,13 @@
-package main
+package cipetpet
 
-import "math/rand"
-import "time"
+import (
+	"math/rand"
+
+	"github.com/igungor/ilberbot"
+)
 
 func init() {
-	rand.Seed(time.Now().Unix())
-
-	register("/cipetpet", cipetpet)
+	ilberbot.RegisterCommand("/cipetpet", cipetpet)
 }
 
 var cirling = []string{

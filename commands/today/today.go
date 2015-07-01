@@ -1,12 +1,14 @@
-package main
+package today
 
 import (
 	"fmt"
 	"time"
+
+	"github.com/igungor/ilberbot"
 )
 
 func init() {
-	register("/bugun", today)
+	ilberbot.RegisterCommand("/bugun", today)
 }
 
 type weekday time.Weekday

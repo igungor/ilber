@@ -1,21 +1,24 @@
-package main
+package iftar
 
 import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/igungor/ilberbot"
 )
 
 func init() {
-	register("/okundumu", okundumu)
-	register("/iftar", iftar)
-	register("/sahur", sahur)
+	ilberbot.RegisterCommand("/okundumu", okundumu)
+	ilberbot.RegisterCommand("/iftar", iftar)
+	ilberbot.RegisterCommand("/sahur", sahur)
+
 	fill()
 }
 
 const (
-	timeFormat     = "_2 Jan 2006"
-	timeFormatLong = "_2 Jan 2006 15:04"
+	timeFormat     = "2 Jan 2006"
+	timeFormatLong = "2 Jan 2006 15:04"
 )
 
 var no = []string{
@@ -120,6 +123,11 @@ func iftar(args ...string) string {
 	nowstr := now.Format(timeFormat)
 
 	timepair, ok := callTime[nowstr]
+
+	fmt.Printf("now: %q\n", now)
+	fmt.Printf("nowstr: %q\n", nowstr)
+	fmt.Println("timepair: ", timepair)
+
 	if !ok {
 		return "galiba oruc bitti"
 	}

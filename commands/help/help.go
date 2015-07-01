@@ -1,7 +1,11 @@
-package main
+package help
+
+import (
+	"github.com/igungor/ilberbot"
+)
 
 func init() {
-	register("/help", help)
+	ilberbot.RegisterCommand("/help", help)
 }
 
 func help(args ...string) string {
