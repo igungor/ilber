@@ -19,6 +19,8 @@ bugunkandilmi - is it candle?
 vizyon - sinema felan
 hava - nem fena nem
 yo - yigit ozgur seysi
+tatil - ne zaman
 benkimim - ilber!
+echo - cok cahilsin
 `
 }
