@@ -57,7 +57,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	command := asciifold(keywords[0])
 
 	if strings.HasSuffix(command, "@"+botname) {
-		command = strings.TrimRight(command, "@"+botname)
+		command = strings.TrimSuffix(command, "@"+botname)
 	}
 
 	var args []string
