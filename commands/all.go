@@ -3,6 +3,7 @@ package commands
 import (
 	_ "github.com/igungor/ilberbot/commands/cipetpet"
 	_ "github.com/igungor/ilberbot/commands/dakick"
+	_ "github.com/igungor/ilberbot/commands/echo"
 	_ "github.com/igungor/ilberbot/commands/forecast"
 	_ "github.com/igungor/ilberbot/commands/help"
 	_ "github.com/igungor/ilberbot/commands/holiday"
