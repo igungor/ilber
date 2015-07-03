@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/igungor/ilberbot"
@@ -14,6 +15,10 @@ import (
 )
 
 const botname = "ilberbot"
+
+var (
+	reImage = regexp.MustCompile(`(https?:\/\/.*\.(?:png|jpg|jpeg|gif|PNG|JPG|JPEG|GIF))`)
+)
 
 // flags
 var (
@@ -55,6 +60,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	keywords := strings.Fields(u.Message.Text)
 	command := asciifold(keywords[0])
+	chatID := u.Message.Chat.ID
 
 	if strings.HasSuffix(command, "@"+botname) {
 		command = strings.TrimSuffix(command, "@"+botname)
@@ -69,7 +75,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	result := ilberbot.Dispatch(command, args...)
 
-	ilberbot.SendMessage(u.Message.Chat.ID, result)
+	if reImage.MatchString(result) {
+		go ilberbot.SetAction(chatID, "upload_photo")
+		ilberbot.SendPhoto(chatID, result)
+		return
+	}
+
+	go ilberbot.SetAction(chatID, "typing")
+	ilberbot.SendMessage(chatID, result)
 }
 
 func main() {

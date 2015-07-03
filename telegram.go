@@ -1,7 +1,10 @@
 package ilberbot
 
 import (
+	"bytes"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -84,4 +87,36 @@ func SetAction(chatID int, action string) {
 		return
 	}
 	defer resp.Body.Close()
+}
+
+func SendPhoto(chatID int, url string) {
+	r, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer r.Body.Close()
+
+	var buf bytes.Buffer
+
+	w := multipart.NewWriter(&buf)
+
+	part, err := w.CreateFormFile("photo", "image.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	io.Copy(part, r.Body)
+
+	w.WriteField("chat_id", strconv.Itoa(chatID))
+
+	contenttype := w.FormDataContentType()
+	if err := w.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	r, err = http.Post(baseURL+"/sendPhoto", contenttype, &buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer r.Body.Close()
 }
