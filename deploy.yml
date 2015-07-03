@@ -1,0 +1,16 @@
+---
+
+- hosts: aws
+  user: ubuntu
+  sudo: yes
+  gather_facts: no
+
+  tasks:
+    - name: deploy package
+      copy: src=debian/0.1/ilberbot_0.1_amd64.deb dest=/home/ubuntu/ mode=0644
+
+    - name: install package
+      apt: deb=/home/ubuntu/ilberbot_0.1_amd64.deb force=yes state=present
+
+    - name: restart service
+      service: name=ilberbot state=restarted
