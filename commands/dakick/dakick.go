@@ -2,101 +2,54 @@ package dakick
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strings"
+	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/igungor/ilberbot"
 )
 
 var (
-	token   = os.Getenv("DAKICK_TOKEN")
-	baseURL = "https://api.dakick.com/api/v1/movies/in-theaters?location_ids=207&per_page=15"
+	near            = "Kadıköy/İstanbul"
+	baseURL         = "http://www.google.com/movies?near=" + near
+	client          = http.Client{Timeout: 10 * time.Second}
+	chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
 )
 
 func init() {
-	if token == "" {
-		log.Println("DAKICK_TOKEN must be set")
-		return
-	}
-
-	ilberbot.RegisterCommand("/vizyon", theaters)
+	ilberbot.RegisterCommand("/vizyon", movies)
 }
 
-// dakick response
-type (
-	Movie struct {
-		Results []Result
+func movies(args ...string) string {
+	req, _ := http.NewRequest("GET", baseURL, nil)
+	req.Header.Set("User-Agent", chromeUserAgent)
+
+	r, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	defer r.Body.Close()
+
+	doc, err := goquery.NewDocumentFromResponse(r)
+	if err != nil {
+		log.Println(err)
+		return ""
 	}
 
-	Result struct {
-		Name string
-		AKA  string `json:"aka"`
-	}
-)
-
-func (m Movie) Filter(criteria string) Movie {
-	var results []Result
-	for _, movie := range m.Results {
-		if strings.Contains(movie.Name, criteria) {
-			continue
-		}
-		results = append(results, movie)
-	}
-
-	return Movie{results}
-}
-
-func (m Movie) String() string {
 	var buf bytes.Buffer
-
 	buf.WriteString("🎦 Istanbul'da vizyon filmleri\n")
-	for _, movie := range m.Results {
-		if len(movie.Name) > 30 {
-			movie.Name = movie.Name[:30] + "…"
-		}
 
-		if movie.AKA != "" {
-			buf.WriteString(fmt.Sprintf("- %v (%v)\n", movie.AKA, movie.Name))
-		} else {
-			buf.WriteString(fmt.Sprintf("- %v\n", movie.Name))
+	doc.Find(".theater .desc .name a").Each(func(_ int, s *goquery.Selection) {
+		fmt.Println(s.Text())
+		if s.Text() == "Cinemaximum Nautilus" {
+			s.Closest(".theater").Find(".showtimes .name").Each(func(_ int, sel *goquery.Selection) {
+				buf.WriteString(fmt.Sprintf("- %v\n", sel.Text()))
+			})
 		}
-	}
+	})
 
 	return buf.String()
-}
-
-func theaters(args ...string) string {
-	if token == "" {
-		log.Println("DAKICK_TOKEN must be set")
-		return ""
-	}
-
-	var client http.Client
-	req, err := http.NewRequest("GET", baseURL, nil)
-	if err != nil {
-		log.Printf("theaters request error: %v\n", err)
-		return ""
-	}
-	req.Header.Set("X-DAKICK-API-TOKEN", token)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Printf("theaters client.do error: %v\n", err)
-		return ""
-	}
-	defer resp.Body.Close()
-
-	var movie Movie
-	if err := json.NewDecoder(resp.Body).Decode(&movie); err != nil {
-		log.Printf("decode error: %v", err)
-		return ""
-	}
-
-	movies := movie.Filter("3D")
-
-	return movies.String()
 }
