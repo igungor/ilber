@@ -2,6 +2,7 @@ package ilberbot
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -89,12 +90,16 @@ func SetAction(chatID int, action string) {
 	defer resp.Body.Close()
 }
 
-func SendPhoto(chatID int, url string) {
+func SendPhoto(chatID int, url string) error {
 	r, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		return fmt.Errorf("Fetching '%v' failed", url)
+	}
 
 	var buf bytes.Buffer
 
@@ -102,7 +107,7 @@ func SendPhoto(chatID int, url string) {
 
 	part, err := w.CreateFormFile("photo", "image.jpg")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	io.Copy(part, r.Body)
@@ -111,12 +116,14 @@ func SendPhoto(chatID int, url string) {
 
 	contenttype := w.FormDataContentType()
 	if err := w.Close(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	r, err = http.Post(baseURL+"/sendPhoto", contenttype, &buf)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer r.Body.Close()
+
+	return nil
 }
