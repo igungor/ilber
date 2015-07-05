@@ -1,4 +1,4 @@
-package dakick
+package movie
 
 import (
 	"bytes"
