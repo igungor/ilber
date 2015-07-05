@@ -91,6 +91,9 @@ func SetAction(chatID int, action string) {
 }
 
 func SendPhoto(chatID int, url string) error {
+	// set status to "sending photo..."
+	go SetAction(chatID, "upload_photo")
+
 	r, err := http.Get(url)
 	if err != nil {
 		return err

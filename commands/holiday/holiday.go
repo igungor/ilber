@@ -68,8 +68,8 @@ func holiday(args ...string) string {
 
 		if now.Before(t.date) {
 			return fmt.Sprintf(
-				"En yakin tatil zamani %v - %v (%v gun)",
-				t.date.Format("_2 Jan"), t.name, t.duration.String(),
+				"En yakin tatil %v - %v (%v gun)",
+				t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24,
 			)
 		}
 	}

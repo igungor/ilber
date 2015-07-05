@@ -76,7 +76,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	result := ilberbot.Dispatch(command, args...)
 
 	if reImage.MatchString(result) {
-		go ilberbot.SetAction(chatID, "upload_photo")
 		if err := ilberbot.SendPhoto(chatID, result); err != nil {
 			log.Printf("Error while sending photo: %v\n", err)
 			return
@@ -84,7 +83,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go ilberbot.SetAction(chatID, "typing")
 	ilberbot.SendMessage(chatID, result)
 }
 
