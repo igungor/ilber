@@ -15,7 +15,7 @@ func init() {
 }
 
 var (
-	baseURL = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0"
+	baseURL = "https://ajax.googleapis.com/ajax/services/search/images"
 )
 
 type Response struct {
@@ -39,6 +39,7 @@ func image(args ...string) string {
 	u, _ := url.Parse(baseURL)
 	v := u.Query()
 	v.Set("q", "Yiğit+Özgür+"+arg)
+	v.Set("v", "1.0")
 	u.RawQuery = v.Encode()
 
 	resp, err := http.Get(u.String())

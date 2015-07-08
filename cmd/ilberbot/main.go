@@ -16,14 +16,14 @@ import (
 
 const botname = "ilberbot"
 
-var (
-	reImage = regexp.MustCompile(`(https?:\/\/.*\.(?:png|jpg|jpeg|gif|PNG|JPG|JPEG|GIF))`)
-)
-
 // flags
 var (
 	debug = flag.Bool("debug", true, "enable debug")
 	port  = flag.String("port", "1985", "port")
+)
+
+var (
+	reImage = regexp.MustCompile(`(https?:\/\/.*\.(?:png|jpg|jpeg|gif|PNG|JPG|JPEG|GIF))`)
 )
 
 func printdebug(format string, args ...interface{}) {
