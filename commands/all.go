@@ -1,6 +1,7 @@
 package commands
 
 import (
+	_ "github.com/igungor/ilberbot/commands/caps"
 	_ "github.com/igungor/ilberbot/commands/cipetpet"
 	_ "github.com/igungor/ilberbot/commands/echo"
 	_ "github.com/igungor/ilberbot/commands/forecast"
