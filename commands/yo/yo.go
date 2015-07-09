@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	ilberbot.RegisterCommand("/yo", image)
+	ilberbot.RegisterCommand("/yo", yo)
 }
 
 var (
@@ -28,7 +28,7 @@ type Image struct {
 	UnescapedURL string `json:"unescapedURL"`
 }
 
-func image(args ...string) string {
+func yo(args ...string) string {
 	if args == nil {
 		log.Println("image: no argument supplied")
 		return ""
