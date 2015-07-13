@@ -2,6 +2,7 @@ package ilberbot
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -25,6 +26,12 @@ func init() {
 
 // Telegram Bot Response
 type (
+	TelegramResult struct {
+		OK          bool   `json:"ok"`
+		ErrorCode   int    `json:"error_code"`
+		Description string `json:"description"`
+	}
+
 	TelegramUpdate struct {
 		UpdateID int `json:"update_id"`
 		Message  TelegramMessage
@@ -58,7 +65,7 @@ type (
 	}
 )
 
-func SendMessage(chatID int, text string) {
+func SendMessage(chatID int, text string) error {
 	urlvalues := url.Values{
 		"chat_id": {strconv.Itoa(chatID)},
 		"text":    {text},
@@ -66,13 +73,22 @@ func SendMessage(chatID int, text string) {
 
 	resp, err := http.PostForm(baseURL+"/sendMessage", urlvalues)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
+
+	var r TelegramResult
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return err
+	}
+	if r.OK {
+		return nil
+	}
+
+	return fmt.Errorf("%v (errcode: %v)", r.Description, r.ErrorCode)
 }
 
-func SetAction(chatID int, action string) {
+func SetAction(chatID int, action string) error {
 	// action: typing
 	// action: upload_{audio,video,document}
 	// action: find_location
@@ -84,23 +100,32 @@ func SetAction(chatID int, action string) {
 
 	resp, err := http.PostForm(baseURL+"/sendChatAction", urlvalues)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
+
+	var r TelegramResult
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return err
+	}
+	if r.OK {
+		return nil
+	}
+
+	return fmt.Errorf("%v (errcode: %v)", r.Description, r.ErrorCode)
 }
 
 func SendPhoto(chatID int, url string) error {
 	// set status to "sending photo..."
 	go SetAction(chatID, "upload_photo")
 
-	r, err := http.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer resp.Body.Close()
 
-	if r.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Fetching '%v' failed", url)
 	}
 
@@ -113,7 +138,7 @@ func SendPhoto(chatID int, url string) error {
 		return err
 	}
 
-	io.Copy(part, r.Body)
+	io.Copy(part, resp.Body)
 
 	w.WriteField("chat_id", strconv.Itoa(chatID))
 
@@ -122,11 +147,19 @@ func SendPhoto(chatID int, url string) error {
 		return err
 	}
 
-	r, err = http.Post(baseURL+"/sendPhoto", contenttype, &buf)
+	resp, err = http.Post(baseURL+"/sendPhoto", contenttype, &buf)
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer resp.Body.Close()
 
-	return nil
+	var r TelegramResult
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return err
+	}
+	if r.OK {
+		return nil
+	}
+
+	return fmt.Errorf("%v (errcode: %v)", r.Description, r.ErrorCode)
 }
