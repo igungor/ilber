@@ -55,10 +55,12 @@ func yo(args ...string) string {
 		return ""
 	}
 
-	if len(response.ResponseData.Results) == 0 {
+	results := response.ResponseData.Results
+
+	if len(results) == 0 {
 		return "yok boyle bisi"
 	}
 
-	return response.ResponseData.Results[0].UnescapedURL
+	return results[0].UnescapedURL
 
 }

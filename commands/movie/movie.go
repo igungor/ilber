@@ -43,7 +43,6 @@ func movies(args ...string) string {
 	buf.WriteString("🎦 Istanbul'da vizyon filmleri\n")
 
 	doc.Find(".theater .desc .name a").Each(func(_ int, s *goquery.Selection) {
-		fmt.Println(s.Text())
 		if s.Text() == "Cinemaximum Nautilus" {
 			s.Closest(".theater").Find(".showtimes .name").Each(func(_ int, sel *goquery.Selection) {
 				buf.WriteString(fmt.Sprintf("- %v\n", sel.Text()))

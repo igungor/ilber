@@ -83,7 +83,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ilberbot.SendMessage(chatID, result)
+	if err := ilberbot.SendMessage(chatID, result); err != nil {
+		log.Printf("Error while sending message: %v\n", err)
+		return
+	}
 }
 
 func main() {
