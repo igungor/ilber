@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// Use upstream api if needed: http://www.imdb.com/xml/find?xml=1&nr=1&tt=on&q=lost
 	baseURL      = "http://www.omdbapi.com/"
 	imdbTitleURL = "http://www.imdb.com/title/"
 	client       = http.Client{Timeout: 10 * time.Second}
