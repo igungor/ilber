@@ -157,9 +157,10 @@ func SendPhoto(chatID int, url string) error {
 	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
 		return err
 	}
-	if r.OK {
-		return nil
+
+	if !r.OK {
+		return fmt.Errorf("%v (errcode: %v)", r.Description, r.ErrorCode)
 	}
 
-	return fmt.Errorf("%v (errcode: %v)", r.Description, r.ErrorCode)
+	return nil
 }
