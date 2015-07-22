@@ -10,6 +10,9 @@ import (
 	"regexp"
 	"strings"
 
+	_ "expvar"
+	_ "net/http/pprof"
+
 	"github.com/igungor/ilberbot"
 	_ "github.com/igungor/ilberbot/commands"
 )
