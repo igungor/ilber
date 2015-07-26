@@ -17,11 +17,13 @@ var (
 )
 
 const (
-	cityNum = 81
-	burdur  = 15
+	cityCount = 81
+	burdur    = 15
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	ilberbot.RegisterCommand("/hava", forecast)
 }
 
@@ -74,12 +76,12 @@ func (f Forecast) String() string {
 	return fmt.Sprintf("%v %v %.1f °C (%v)", icon, f.City, f.Temperature.Celsius, f.Weather[0].Description)
 }
 
-func forecast(locations ...string) string {
+func forecast(args ...string) string {
 	var location string
-	if locations == nil {
+	if args == nil {
 		location = "Istanbul"
 	} else {
-		location = strings.Join(locations, " ")
+		location = strings.Join(args, " ")
 	}
 
 	url := fmt.Sprintf(baseURL, location)
@@ -98,7 +100,7 @@ func forecast(locations ...string) string {
 
 	if forecast.String() == "" {
 		// burdur easter-egg.
-		if rand.Intn(cityNum) == burdur {
+		if rand.Intn(cityCount) == burdur {
 			return fmt.Sprintf("%v bulunamadi ama Burdur'da hava cok guzel.", location)
 		}
 
