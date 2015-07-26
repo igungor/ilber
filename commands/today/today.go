@@ -14,13 +14,13 @@ func init() {
 type weekday time.Weekday
 
 var days = [...]string{
-	"Pazar",
-	"Pazartesi",
-	"Sali",
-	"Carsamba",
-	"Persembe",
-	"Cuma",
-	"Cumartesi",
+	"pazar",
+	"pazartesi",
+	"sali",
+	"carsamba",
+	"persembe",
+	"cuma",
+	"cumartesi",
 }
 
 func (w weekday) String() string {
