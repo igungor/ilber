@@ -22,12 +22,12 @@ const (
 )
 
 var no = []string{
-	"okunmadi",
-	"hayir",
-	"Hayir",
-	"Hayir.",
-	"hayir.",
-	"hayir okunmadi",
+	"okunmadı",
+	"hayır",
+	"hayır.",
+	"Hayır",
+	"Hayır.",
+	"hayır okunmadı",
 	"no",
 	"no.",
 	"NO.",
