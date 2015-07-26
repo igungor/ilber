@@ -34,7 +34,7 @@ func isitcandle(args ...string) string {
 
 	v, ok := dasCandles[now]
 	if !ok {
-		return "bugun kandil degilmis"
+		return "hayır"
 	}
 
 	return fmt.Sprintf("Evet, bugun %v\n", v)
