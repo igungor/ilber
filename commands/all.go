@@ -7,7 +7,6 @@ import (
 	_ "github.com/igungor/ilberbot/commands/forecast"
 	_ "github.com/igungor/ilberbot/commands/help"
 	_ "github.com/igungor/ilberbot/commands/holiday"
-	_ "github.com/igungor/ilberbot/commands/iftar"
 	_ "github.com/igungor/ilberbot/commands/imdb"
 	_ "github.com/igungor/ilberbot/commands/isitcandle"
 	_ "github.com/igungor/ilberbot/commands/movie"
@@ -15,4 +14,6 @@ import (
 	_ "github.com/igungor/ilberbot/commands/today"
 	_ "github.com/igungor/ilberbot/commands/whoami"
 	_ "github.com/igungor/ilberbot/commands/yo"
+
+	// _ "github.com/igungor/ilberbot/commands/iftar"
 )
