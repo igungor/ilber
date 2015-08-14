@@ -16,6 +16,7 @@ bugunkandilmi - is it candle?
 vizyon - sinema felan
 hava - nem fena nem
 yo - yigit ozgur seysi
+img - resim filan ara
 caps - incicaps gibi degil gibi
 imdb - ayemdiibii
 tatil - ne zaman

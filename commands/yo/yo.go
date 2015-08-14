@@ -31,7 +31,7 @@ type Image struct {
 func yo(args ...string) string {
 	if args == nil {
 		log.Println("image: no argument supplied")
-		return ""
+		return "hangi karikaturu arıyosun? ör: /yo renk dans"
 	}
 
 	arg := strings.Join(args, "+")
@@ -58,7 +58,7 @@ func yo(args ...string) string {
 	results := response.ResponseData.Results
 
 	if len(results) == 0 {
-		return "yok boyle bisi"
+		return "böyle bişey yok"
 	}
 
 	return results[0].UnescapedURL
