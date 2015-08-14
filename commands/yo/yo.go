@@ -2,21 +2,37 @@ package yo
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/igungor/ilberbot"
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	ilberbot.RegisterCommand("/yo", yo)
 }
 
 var (
 	baseURL = "https://ajax.googleapis.com/ajax/services/search/images"
 )
+
+var examples = []string{
+	"renk dans",
+	"bağa mı didin",
+	"düşünemedi",
+	"lütfen olsun çünkü",
+	"harika adam",
+	"sipirmin",
+	"lanet olsun",
+	"flemenko",
+}
 
 type Response struct {
 	ResponseData struct {
@@ -31,7 +47,8 @@ type Image struct {
 func yo(args ...string) string {
 	if args == nil {
 		log.Println("image: no argument supplied")
-		return "hangi karikaturu arıyosun? ör: /yo renk dans"
+		term := examples[rand.Intn(len(examples))]
+		return fmt.Sprintf("hangi karikatürü arıyosun? ör: /yo %s", term)
 	}
 
 	arg := strings.Join(args, "+")
