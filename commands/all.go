@@ -8,6 +8,7 @@ import (
 	_ "github.com/igungor/ilberbot/commands/help"
 	_ "github.com/igungor/ilberbot/commands/holiday"
 	_ "github.com/igungor/ilberbot/commands/imdb"
+	_ "github.com/igungor/ilberbot/commands/img"
 	_ "github.com/igungor/ilberbot/commands/isitcandle"
 	_ "github.com/igungor/ilberbot/commands/movie"
 	_ "github.com/igungor/ilberbot/commands/ray"
