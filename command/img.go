@@ -38,7 +38,7 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := searchImage(args...)
 	if err != nil {
-		log.Println("(img) Error while searching image with given criteria: %v\n", args)
+		log.Printf("(img) Error while searching image with given criteria: %v\n", args)
 		return
 	}
 
