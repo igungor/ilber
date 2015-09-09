@@ -19,8 +19,9 @@ func init() {
 }
 
 var cmdForecast = &Command{
-	Name: "hava",
-	Run:  runForecast,
+	Name:      "hava",
+	ShortLine: "o değil de nem fena",
+	Run:       runForecast,
 }
 
 var forecastURL = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric"

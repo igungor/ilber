@@ -15,17 +15,18 @@ func init() {
 	register(cmdMovies)
 }
 
+var cmdMovies = &Command{
+	Name:      "vizyon",
+	ShortLine: "sinema filan",
+	Run:       runMovies,
+}
+
 var (
 	near            = "Kadıköy/İstanbul"
 	movieURL        = "http://www.google.com/movies?near=" + near
 	client          = http.Client{Timeout: 10 * time.Second}
 	chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
 )
-
-var cmdMovies = &Command{
-	Name: "vizyon",
-	Run:  runMovies,
-}
 
 func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 	req, _ := http.NewRequest("GET", movieURL, nil)

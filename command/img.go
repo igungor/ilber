@@ -18,12 +18,13 @@ func init() {
 	register(cmdImg)
 }
 
-const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
-
 var cmdImg = &Command{
-	Name: "img",
-	Run:  runImg,
+	Name:      "img",
+	ShortLine: "resim filan ara",
+	Run:       runImg,
 }
+
+const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
 
 var imgExamples = []string{
 	"burdur",

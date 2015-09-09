@@ -10,13 +10,13 @@ import (
 
 func init() {
 	sort.Sort(byDate(holidays))
-
 	register(cmdHoliday)
 }
 
 var cmdHoliday = &Command{
-	Name: "tatil",
-	Run:  runHoliday,
+	Name:      "tatil",
+	ShortLine: "ne zaman",
+	Run:       runHoliday,
 }
 
 var day = 24 * time.Hour

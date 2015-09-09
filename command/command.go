@@ -13,6 +13,9 @@ type Command struct {
 	// Name of the command
 	Name string
 
+	// Short description of the command
+	ShortLine string
+
 	// Run runs the command.
 	// The args are the arguments after the command name.
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)

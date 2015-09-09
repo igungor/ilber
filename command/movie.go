@@ -13,21 +13,23 @@ import (
 	"github.com/igungor/tlbot"
 )
 
-const (
-	// Use upstream api if needed: http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q=lost
-	movieAPIURL  = "http://www.omdbapi.com/"
-	imdbTitleURL = "http://www.imdb.com/title/"
-)
-
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	register(cmdMovie)
 }
 
 var cmdMovie = &Command{
-	Name: "imdb",
-	Run:  runMovie,
+	Name:      "imdb",
+	ShortLine: "ay-em-dii-bii",
+	Run:       runMovie,
 }
+
+const (
+	// Use upstream api if needed: http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q=lost
+	movieAPIURL  = "http://www.omdbapi.com/"
+	imdbTitleURL = "http://www.imdb.com/title/"
+)
+
 var movieExamples = []string{
 	"Spirited Away",
 	"Mulholland Dr",

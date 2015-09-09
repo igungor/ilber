@@ -12,8 +12,9 @@ func init() {
 }
 
 var cmdCandle = &Command{
-	Name: "bugunkandilmi",
-	Run:  runCandle,
+	Name:      "bugunkandilmi",
+	ShortLine: "is it candle?",
+	Run:       runCandle,
 }
 
 const timeformat = "2 Jan 2006"

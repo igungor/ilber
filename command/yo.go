@@ -15,8 +15,9 @@ func init() {
 }
 
 var cmdYo = &Command{
-	Name: "yo",
-	Run:  runYo,
+	Name:      "yo",
+	ShortLine: "yiğit özgür şeysi",
+	Run:       runYo,
 }
 
 var yoExamples = []string{
