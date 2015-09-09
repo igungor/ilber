@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -13,8 +12,6 @@ import (
 )
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
-
 	register(cmdForecast)
 }
 

@@ -3,14 +3,11 @@ package command
 import (
 	"fmt"
 	"log"
-	"math/rand"
-	"time"
 
 	"github.com/igungor/tlbot"
 )
 
 func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
 	register(cmdYo)
 }
 
@@ -35,7 +32,7 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
 	if len(args) == 0 {
-		term := yoExamples[rand.Intn(len(yoExamples))]
+		term := randChoice(yoExamples)
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
 		err := b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {

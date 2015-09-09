@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/igungor/tlbot"
@@ -24,7 +23,6 @@ var cmdMovies = &Command{
 var (
 	near            = "Kadıköy/İstanbul"
 	movieURL        = "http://www.google.com/movies?near=" + near
-	client          = http.Client{Timeout: 10 * time.Second}
 	chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
 )
 
@@ -32,7 +30,7 @@ func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 	req, _ := http.NewRequest("GET", movieURL, nil)
 	req.Header.Set("User-Agent", chromeUserAgent)
 
-	r, err := client.Do(req)
+	r, err := httpclient.Do(req)
 	if err != nil {
 		log.Println(err)
 		return

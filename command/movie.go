@@ -4,17 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/igungor/tlbot"
 )
 
 func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
 	register(cmdMovie)
 }
 
@@ -45,7 +42,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
 	if len(args) == 0 {
-		term := movieExamples[rand.Intn(len(movieExamples))]
+		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
 		err := b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
@@ -85,8 +82,6 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	r := imdbTitleURL + response.ID
-
-	// enable preview
-	b.SendMessage(msg.From, r, tlbot.ModeNone, true, nil)
+	r := fmt.Sprintf("[%v (%v) %v](%v)", response.Title, response.Year, response.Rating, imdbTitleURL+response.ID)
+	b.SendMessage(msg.From, r, tlbot.ModeMarkdown, true, nil)
 }
