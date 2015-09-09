@@ -57,7 +57,7 @@ func main() {
 			continue
 		}
 
-		// does the command even registered?
+		// is the command even registered?
 		cmd := command.Lookup(cmdname)
 		if cmd == nil {
 			continue
