@@ -57,13 +57,13 @@ func main() {
 			continue
 		}
 
-		// does it even exist?
+		// does the command even registered?
 		cmd := command.Lookup(cmdname)
 		if cmd == nil {
 			continue
 		}
 
-		// cool, run it!
+		// it is. cool, run it!
 		cmd.Run(&b, &msg)
 	}
 }
