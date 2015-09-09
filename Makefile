@@ -3,6 +3,9 @@ all: build
 build:
 	@`which go` build -v -o ilberbot cmd/ilberbot/main.go
 
+vet:
+	@`which go` vet ./...
+
 test:
 	@`which go` test ./...
 
