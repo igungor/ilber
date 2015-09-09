@@ -35,7 +35,7 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 
 	if len(args) == 0 {
 		term := yoExamples[rand.Intn(len(yoExamples))]
-		txt := fmt.Sprintf("hangi karikatürü arıyosun? örneğin: */yo %s*", term)
+		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
 		err := b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("(yo) Error while sending message: %v\n", err)
