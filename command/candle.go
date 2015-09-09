@@ -41,8 +41,8 @@ func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
 	if !ok {
 		txt = "hayır"
 	} else {
-		txt = fmt.Sprintf("Evet, bugün %v\n", v)
+		txt = fmt.Sprintf("Evet, bugün *%v*\n", v)
 	}
 
-	b.SendMessage(msg.From, txt, tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
 }
