@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	register(cmdMovie)
+	register(cmdMovies)
 }
 
 var (
@@ -22,12 +22,12 @@ var (
 	chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
 )
 
-var cmdMovie = &Command{
-	Name: "movie",
-	Run:  runMovie,
+var cmdMovies = &Command{
+	Name: "vizyon",
+	Run:  runMovies,
 }
 
-func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
+func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 	req, _ := http.NewRequest("GET", movieURL, nil)
 	req.Header.Set("User-Agent", chromeUserAgent)
 
