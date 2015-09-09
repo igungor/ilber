@@ -20,11 +20,11 @@ type Command struct {
 
 var commands = make(map[string]*Command)
 
-func register(name string, cmd *Command) {
+func register(cmd *Command) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	commands[name] = cmd
+	commands[cmd.Name] = cmd
 }
 
 // Lookup looks-up name from registered commands store and returns

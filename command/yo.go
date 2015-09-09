@@ -15,10 +15,15 @@ import (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	register("yo", cmdYo)
+	register(cmdYo)
 }
 
-var imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
+var cmdYo = &Command{
+	Name: "yo",
+	Run:  runYo,
+}
+
+const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
 
 var examples = []string{
 	"renk dans",
@@ -29,11 +34,6 @@ var examples = []string{
 	"sipirmin",
 	"lanet olsun",
 	"flemenko",
-}
-
-var cmdYo = &Command{
-	Name: "yo",
-	Run:  runYo,
 }
 
 func runYo(b *tlbot.Bot, msg *tlbot.Message) {
