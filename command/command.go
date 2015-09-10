@@ -15,7 +15,6 @@ type Command struct {
 	ShortLine string
 
 	// Run runs the command.
-	// The args are the arguments after the command name.
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
 
@@ -32,7 +31,7 @@ func register(cmd *Command) {
 }
 
 // Lookup looks-up name from registered commands store and returns
-// corresponding Command, if any.
+// corresponding Command if any.
 func Lookup(name string) *Command {
 	mu.Lock()
 	defer mu.Unlock()
