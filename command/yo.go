@@ -22,9 +22,9 @@ var yoExamples = []string{
 	"bağa mı didin",
 	"düşünemedi",
 	"lütfen olsun çünkü",
-	"harika adam",
+	"geldi yine",
 	"sipirmin",
-	"lanet olsun",
+	"lanet olsun sana",
 	"flemenko",
 }
 
