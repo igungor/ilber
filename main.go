@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/igungor/ilberbot/command"
 	"github.com/igungor/tlbot"
 )
@@ -17,6 +18,7 @@ var (
 	webhook = flag.String("webhook", "", "webhook url")
 	host    = flag.String("host", "", "host to listen to")
 	port    = flag.String("port", "1985", "port to listen to")
+	debug   = flag.Bool("d", false, "debug mode (*very* verbose)")
 )
 
 func usage() {
@@ -49,8 +51,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	if *debug {
+		spew.Config.DisableMethods = true
+	}
+
 	messages := b.Listen(net.JoinHostPort(*host, *port))
 	for msg := range messages {
+		spew.Dump(msg)
 		// is message a command?
 		cmdname := msg.Command()
 		if cmdname == "" {
