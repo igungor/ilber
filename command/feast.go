@@ -115,27 +115,27 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.From, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 
 	if now.After(timepair.iftar) {
-		b.SendMessage(msg.From, "okundu", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "okundu", tlbot.ModeNone, false, nil)
 		return
 	}
 
 	if now.Before(timepair.sahur) {
-		b.SendMessage(msg.From, "sahur henuz okunmadi", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "sahur henuz okunmadi", tlbot.ModeNone, false, nil)
 		return
 	}
 
 	if now.After(timepair.sahur) && now.Hour() < 6 {
-		b.SendMessage(msg.From, "sahur okundu da daha iftara cok var", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "sahur okundu da daha iftara cok var", tlbot.ModeNone, false, nil)
 		return
 	}
 
 	// after sahur and before iftar, hence NO
-	b.SendMessage(msg.From, randChoice(noes), tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, randChoice(noes), tlbot.ModeNone, false, nil)
 }
 
 func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
@@ -146,11 +146,11 @@ func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.From, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 
-	b.SendMessage(msg.From, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
 }
 
 func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
@@ -161,9 +161,9 @@ func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.From, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 
-	b.SendMessage(msg.From, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
 }

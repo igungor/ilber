@@ -44,5 +44,5 @@ func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = fmt.Sprintf("Evet, bugün *%v*\n", v)
 	}
 
-	b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
+	b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 }

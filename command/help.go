@@ -38,5 +38,5 @@ func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
 	for _, cmd := range cmds {
 		buf.WriteString(fmt.Sprintf("*%v* - %v\n", cmd.Name, cmd.ShortLine))
 	}
-	b.SendMessage(msg.From, buf.String(), tlbot.ModeMarkdown, false, nil)
+	b.SendMessage(msg.Chat, buf.String(), tlbot.ModeMarkdown, false, nil)
 }

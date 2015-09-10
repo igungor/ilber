@@ -67,16 +67,16 @@ func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
 
 	for _, t := range holidays {
 		if in(now, t.date, t.date.Add(t.duration)) {
-			b.SendMessage(msg.From, fmt.Sprintf("Bugun %v", t.name), tlbot.ModeNone, false, nil)
+			b.SendMessage(msg.Chat, fmt.Sprintf("Bugun %v", t.name), tlbot.ModeNone, false, nil)
 			return
 		}
 
 		if now.Before(t.date) {
 			txt := fmt.Sprintf("En yakin tatil %v - %v (%v gun)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
-			b.SendMessage(msg.From, txt, tlbot.ModeNone, false, nil)
+			b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
 			return
 		}
 	}
 
-	b.SendMessage(msg.From, "yakinlarda tatil gorunmuyor :(", tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, "yakinlarda tatil gorunmuyor :(", tlbot.ModeNone, false, nil)
 }

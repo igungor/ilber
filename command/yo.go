@@ -34,7 +34,7 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 	if len(args) == 0 {
 		term := randChoice(yoExamples)
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
-		err := b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
+		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("(yo) Error while sending message: %v\n", err)
 		}
@@ -51,5 +51,5 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	photo := tlbot.Photo{File: tlbot.File{FileURL: u}}
-	b.SendPhoto(msg.From, photo, "", nil)
+	b.SendPhoto(msg.Chat, photo, "", nil)
 }

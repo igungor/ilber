@@ -20,5 +20,5 @@ var cmdEcho = &Command{
 func runEcho(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	txt := fmt.Sprintf("*%v*", strings.Join(args, " "))
-	b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
+	b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 }

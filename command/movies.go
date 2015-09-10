@@ -54,5 +54,5 @@ func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	})
 
-	b.SendMessage(msg.From, buf.String(), tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, buf.String(), tlbot.ModeNone, false, nil)
 }

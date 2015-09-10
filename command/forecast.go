@@ -96,9 +96,9 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if forecast.String() == "" {
-		b.SendMessage(msg.From, fmt.Sprintf("%v bulunamadi.", location), tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, fmt.Sprintf("%v bulunamadi.", location), tlbot.ModeNone, false, nil)
 		return
 	}
 
-	b.SendMessage(msg.From, forecast.String(), tlbot.ModeMarkdown, false, nil)
+	b.SendMessage(msg.Chat, forecast.String(), tlbot.ModeMarkdown, false, nil)
 }

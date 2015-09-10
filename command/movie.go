@@ -44,7 +44,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	if len(args) == 0 {
 		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
-		err := b.SendMessage(msg.From, txt, tlbot.ModeMarkdown, false, nil)
+		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("(movie) Error while sending message: %v\n", err)
 		}
@@ -83,5 +83,5 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	r := fmt.Sprintf("[%v (%v) %v](%v)", response.Title, response.Year, response.Rating, imdbTitleURL+response.ID)
-	b.SendMessage(msg.From, r, tlbot.ModeMarkdown, true, nil)
+	b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
 }

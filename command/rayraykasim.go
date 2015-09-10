@@ -13,5 +13,5 @@ var cmdRayRay = &Command{
 }
 
 func runRayRay(b *tlbot.Bot, msg *tlbot.Message) {
-	b.SendMessage(msg.From, "malifalitiko!", tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, "malifalitiko!", tlbot.ModeNone, false, nil)
 }
