@@ -6,8 +6,6 @@ import (
 	"github.com/igungor/tlbot"
 )
 
-var mu sync.Mutex
-
 // A Command is an implementation of a bot command.
 type Command struct {
 	// Name of the command
@@ -21,7 +19,10 @@ type Command struct {
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
 
-var commands = make(map[string]*Command)
+var (
+	mu       sync.Mutex
+	commands = make(map[string]*Command)
+)
 
 func register(cmd *Command) {
 	mu.Lock()
