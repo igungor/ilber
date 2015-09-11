@@ -40,12 +40,10 @@ const (
 )
 
 var noes = []string{
-	"okunmadı",
 	"hayır",
 	"hayır.",
 	"Hayır",
 	"Hayır.",
-	"hayır okunmadı",
 	"no",
 	"no.",
 	"NO.",
@@ -53,6 +51,8 @@ var noes = []string{
 	"NO",
 	"nope",
 	"nicht",
+	"okunmadı",
+	"hayır okunmadı",
 }
 
 type timePair struct {
@@ -115,7 +115,7 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 
@@ -125,12 +125,12 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if now.Before(timepair.sahur) {
-		b.SendMessage(msg.Chat, "sahur henuz okunmadi", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "sahur henüz okunmadı", tlbot.ModeNone, false, nil)
 		return
 	}
 
 	if now.After(timepair.sahur) && now.Hour() < 6 {
-		b.SendMessage(msg.Chat, "sahur okundu da daha iftara cok var", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "sahur okundu ama iftara daha çok var", tlbot.ModeNone, false, nil)
 		return
 	}
 
@@ -146,7 +146,7 @@ func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 
@@ -161,7 +161,7 @@ func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
 
 	timepair, ok := callTime[nowstr]
 	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruc bitti", tlbot.ModeNone, false, nil)
+		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
 		return
 	}
 

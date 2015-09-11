@@ -23,14 +23,14 @@ var day = 24 * time.Hour
 
 var holidays = []h{
 	// 2015
-	{"Yilbasi tatili", newdate("1 Jan 2015"), day},
-	{"Cocuk Bayrami", newdate("23 Apr 2015"), day},
-	{"Isci Bayrami", newdate("1 May 2015"), day},
-	{"Genclik Bayrami", newdate("19 May 2015"), day},
-	{"Ramazan Bayrami", newdate("18 Jul 2015"), 3 * day},
-	{"Zafer Bayrami", newdate("30 Aug 2015"), day},
-	{"Kurban Bayrami", newdate("25 Sep 2015"), 4 * day},
-	{"Cumhuriyet Bayrami", newdate("29 Oct 2015"), day},
+	{"Yılbaşı tatili", newdate("1 Jan 2015"), day},
+	{"Çocuk Bayramı", newdate("23 Apr 2015"), day},
+	{"İşçi Bayramı", newdate("1 May 2015"), day},
+	{"Gençlik Bayramı", newdate("19 May 2015"), day},
+	{"Ramazan Bayramı", newdate("18 Jul 2015"), 3 * day},
+	{"Zafer Bayramı", newdate("30 Aug 2015"), day},
+	{"Kurban Bayramı", newdate("25 Sep 2015"), 4 * day},
+	{"Cumhuriyet Bayramı", newdate("29 Oct 2015"), day},
 }
 
 type h struct {
@@ -67,16 +67,16 @@ func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
 
 	for _, t := range holidays {
 		if in(now, t.date, t.date.Add(t.duration)) {
-			b.SendMessage(msg.Chat, fmt.Sprintf("Bugun %v", t.name), tlbot.ModeNone, false, nil)
+			b.SendMessage(msg.Chat, fmt.Sprintf("Bugün %v", t.name), tlbot.ModeNone, false, nil)
 			return
 		}
 
 		if now.Before(t.date) {
-			txt := fmt.Sprintf("En yakin tatil %v - %v (%v gun)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
+			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
 			b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
 			return
 		}
 	}
 
-	b.SendMessage(msg.Chat, "yakinlarda tatil gorunmuyor :(", tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, "yakın zamanda tatil görünmüyör :(", tlbot.ModeNone, false, nil)
 }

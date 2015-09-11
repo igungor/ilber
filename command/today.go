@@ -34,6 +34,6 @@ func (w weekday) String() string {
 }
 
 func runToday(b *tlbot.Bot, msg *tlbot.Message) {
-	txt := fmt.Sprintf("bugun %v", weekday(time.Now().Weekday()).String())
+	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
 	b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
 }
