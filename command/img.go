@@ -19,8 +19,7 @@ var cmdImg = &Command{
 
 var imgExamples = []string{
 	"burdur",
-	"kapadoky",
-	"leblebi tozu",
+	"kapadokya",
 }
 
 func runImg(b *tlbot.Bot, msg *tlbot.Message) {
