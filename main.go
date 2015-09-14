@@ -71,6 +71,6 @@ func main() {
 		}
 
 		// it is. cool, run it!
-		cmd.Run(&b, &msg)
+		go cmd.Run(&b, &msg)
 	}
 }
