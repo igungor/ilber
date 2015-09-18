@@ -13,7 +13,7 @@ func init() {
 
 var cmdToday = &Command{
 	Name:      "bugun",
-	ShortLine: "bugun gunlerden ne?",
+	ShortLine: "bugün günlerden ne?",
 	Run:       runToday,
 }
 
