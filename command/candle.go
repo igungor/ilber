@@ -17,8 +17,6 @@ var cmdCandle = &Command{
 	Run:       runCandle,
 }
 
-const timeformat = "2 Jan 2006"
-
 var dasCandles = map[string]string{
 	"2 Jan 2015":  "Mevlid Kandili",
 	"23 Apr 2015": "Regaib Kandili",
@@ -35,6 +33,7 @@ var dasCandles = map[string]string{
 }
 
 func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
+	const timeformat = "2 Jan 2006"
 	var txt string
 	now := time.Now().UTC().Format(timeformat)
 	v, ok := dasCandles[now]

@@ -47,7 +47,6 @@ func (d byDate) Less(i, j int) bool { return d[i].date.Before(d[j].date) }
 
 func newdate(date string) time.Time {
 	const timeformat = "2 Jan 2006"
-
 	t, _ := time.Parse(timeformat, date)
 
 	return t
@@ -62,7 +61,6 @@ func in(date, start, end time.Time) bool {
 }
 
 func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
-	const timeformat = "2 Jan 2006"
 	now := time.Now().UTC()
 
 	for _, t := range holidays {

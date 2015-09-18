@@ -59,7 +59,7 @@ func searchImage(terms ...string) (string, error) {
 	return results[0].UnescapedURL, nil
 }
 
-// randChoice randomly choice an element from given elems
+// randChoice randomly choice an element from given elems.
 func randChoice(elems []string) string {
 	return elems[rand.Intn(len(elems))]
 }
