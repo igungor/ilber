@@ -78,5 +78,5 @@ func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	b.SendMessage(msg.Chat, "yakın zamanda tatil görünmüyör :(", tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat, "yakın zamanda tatil görünmüyör :(", tlbot.ModeMarkdown, false, nil)
 }
