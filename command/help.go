@@ -34,7 +34,7 @@ func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
 
 	sort.Sort(byName(cmds))
 
-	buf.WriteString("şunlar var:\n")
+	buf.WriteString("şunlar var:\n\n")
 	for _, cmd := range cmds {
 		buf.WriteString(fmt.Sprintf("*%v* - %v\n", cmd.Name, cmd.ShortLine))
 	}

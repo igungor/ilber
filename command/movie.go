@@ -82,6 +82,6 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	r := fmt.Sprintf("[%v (%v) %v](%v)", response.Title, response.Year, response.Rating, imdbTitleURL+response.ID)
+	r := fmt.Sprintf("[%v (%v) *%v*](%v)", response.Title, response.Year, response.Rating, imdbTitleURL+response.ID)
 	b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
 }
