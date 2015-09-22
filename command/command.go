@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -32,19 +31,13 @@ func register(cmd *Command) {
 	commands[cmd.Name] = cmd
 }
 
-// Lookup looks-up name from registered commands store and returns
+// Lookup looks-up name from registered commands and returns
 // corresponding Command if any.
 func Lookup(cmdname string) *Command {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// trim @botname if any
-	i := strings.Index(cmdname, "@")
-	fmt.Println(i, cmdname[i:], cmdname[:i])
-	if cmdname[i:] == botname {
-		cmdname = cmdname[:i]
-	}
-
+	cmdname = strings.TrimRight(cmdname, "@ilberbot")
 	cmd, ok := commands[cmdname]
 	if !ok {
 		return nil
