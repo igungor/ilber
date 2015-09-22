@@ -18,13 +18,17 @@ var cmdHelp = &Command{
 	Run:       runHelp,
 }
 
+func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
+	b.SendMessage(msg.Chat, help(), tlbot.ModeNone, false, nil)
+}
+
 type byName []*Command
 
 func (b byName) Len() int           { return len(b) }
 func (b byName) Less(i, j int) bool { return b[i].Name < b[j].Name }
 func (b byName) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 
-func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
+func help() string {
 	var buf bytes.Buffer
 
 	var cmds []*Command
@@ -36,7 +40,12 @@ func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
 
 	buf.WriteString("şunlar var:\n\n")
 	for _, cmd := range cmds {
-		buf.WriteString(fmt.Sprintf("*%v* - %v\n", cmd.Name, cmd.ShortLine))
+		// do not include private commands
+		if cmd.Private {
+			continue
+		}
+		buf.WriteString(fmt.Sprintf("/%v - %v\n", cmd.Name, cmd.ShortLine))
 	}
-	b.SendMessage(msg.Chat, buf.String(), tlbot.ModeMarkdown, false, nil)
+
+	return buf.String()
 }

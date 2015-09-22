@@ -15,6 +15,10 @@ type Command struct {
 	// Short description of the command
 	ShortLine string
 
+	// Some commands would like to stay private, such as easter eggs or
+	// built-in commands. Respect to their choices.
+	Private bool
+
 	// Run runs the command.
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
@@ -37,7 +41,7 @@ func Lookup(cmdname string) *Command {
 	mu.Lock()
 	defer mu.Unlock()
 
-	cmdname = strings.TrimRight(cmdname, "@ilberbot")
+	cmdname = strings.TrimSuffix(cmdname, "@ilberbot")
 	cmd, ok := commands[cmdname]
 	if !ok {
 		return nil
