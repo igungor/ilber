@@ -14,7 +14,10 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
+const (
+	botname        = "ilberbot"
+	imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
+)
 
 var httpclient = http.Client{Timeout: 10 * time.Second}
 

@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/igungor/tlbot"
@@ -32,11 +34,18 @@ func register(cmd *Command) {
 
 // Lookup looks-up name from registered commands store and returns
 // corresponding Command if any.
-func Lookup(name string) *Command {
+func Lookup(cmdname string) *Command {
 	mu.Lock()
 	defer mu.Unlock()
 
-	cmd, ok := commands[name]
+	// trim @botname if any
+	i := strings.Index(cmdname, "@")
+	fmt.Println(i, cmdname[i:], cmdname[:i])
+	if cmdname[i:] == botname {
+		cmdname = cmdname[:i]
+	}
+
+	cmd, ok := commands[cmdname]
 	if !ok {
 		return nil
 	}
