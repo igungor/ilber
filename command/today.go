@@ -22,9 +22,9 @@ type weekday time.Weekday
 var days = [...]string{
 	"pazar",
 	"pazartesi",
-	"sali",
-	"carsamba",
-	"persembe",
+	"salı",
+	"çarşamba",
+	"perşembe",
 	"cuma",
 	"cumartesi",
 }
