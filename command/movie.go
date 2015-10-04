@@ -91,5 +91,5 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	b.SendMessage(msg.Chat, "aradigin filmi bulamadim 🙈", tlbot.ModeMarkdown, true, nil)
+	b.SendMessage(msg.Chat, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 }
