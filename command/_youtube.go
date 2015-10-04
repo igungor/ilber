@@ -8,7 +8,7 @@ import (
 
 	"github.com/igungor/tlbot"
 	"google.golang.org/api/googleapi/transport"
-	"google.golang.org/api/youtube/v3"
+	youtube "google.golang.org/api/youtube/v3"
 )
 
 func init() {
@@ -24,15 +24,16 @@ var cmdYoutube = &Command{
 
 const youtubeApiKey = "FIXME:XXXXXXXXXXXXXXXXXXXXXXXX"
 
-var youtubeTransport = &http.Client{Transport: &transport.APIKey{Key: youtubeApiKey}}
+var youtubeclient = &http.Client{Transport: &transport.APIKey{Key: youtubeApiKey}}
 
 func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	query := strings.Join(args, "+")
 
-	service, err := youtube.New(youtubeTransport)
+	service, err := youtube.New(youtubeclient)
 	if err != nil {
-		log.Fatalf("(youtube) error creating new youtube client: %v", err)
+		log.Printf("(youtube) error creating new youtube client: %v", err)
+		return
 	}
 
 	call := service.Search.List("id").Type("video").Q(query).MaxResults(1)
