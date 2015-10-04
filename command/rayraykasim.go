@@ -9,7 +9,7 @@ func init() {
 var cmdRayRay = &Command{
 	Name:      "ray",
 	ShortLine: "malifalitiko!",
-	Private:   true,
+	Hidden:    true,
 	Run:       runRayRay,
 }
 

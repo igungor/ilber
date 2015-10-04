@@ -40,8 +40,8 @@ func help() string {
 
 	buf.WriteString("şunlar var:\n\n")
 	for _, cmd := range cmds {
-		// do not include private commands
-		if cmd.Private {
+		// do not include hidden commands
+		if cmd.Hidden {
 			continue
 		}
 		buf.WriteString(fmt.Sprintf("/%v - %v\n", cmd.Name, cmd.ShortLine))

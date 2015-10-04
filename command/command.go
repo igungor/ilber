@@ -9,15 +9,15 @@ import (
 
 // A Command is an implementation of a bot command.
 type Command struct {
-	// Name of the command
+	// Name of the command without the leading slash.
 	Name string
 
 	// Short description of the command
 	ShortLine string
 
-	// Some commands would like to stay private, such as easter eggs or
-	// built-in commands. Respect to their choices.
-	Private bool
+	// Hidden enables commands to be hidden from the /help output, such as
+	// Telegram's built-in commands and easter eggs.
+	Hidden bool
 
 	// Run runs the command.
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
