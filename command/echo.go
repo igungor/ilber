@@ -19,6 +19,9 @@ var cmdEcho = &Command{
 
 func runEcho(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
+	if len(args) == 0 {
+		args = []string{"çok cahilsin"}
+	}
 	txt := fmt.Sprintf("*%v*", strings.Join(args, " "))
 	b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 }
