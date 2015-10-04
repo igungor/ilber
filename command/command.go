@@ -44,6 +44,7 @@ func Lookup(cmdname string) *Command {
 	cmdname = strings.TrimSuffix(cmdname, "@ilberbot")
 	cmd, ok := commands[cmdname]
 	if !ok {
+		// TODO: may be add an autocorrect mechanism here? /idbm -> /imdb
 		return nil
 	}
 	return cmd
