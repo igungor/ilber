@@ -22,9 +22,11 @@ var cmdMovie = &Command{
 }
 
 const (
-	// Use upstream api if needed: http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q=lost
-	movieAPIURL  = "http://www.omdbapi.com/"
-	imdbTitleURL = "http://www.imdb.com/title/"
+	// the best search engine is still google.
+	// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
+	// themoviedb search engine was the most accurate yet still can't find any
+	// result if any release date is given in query terms.
+	movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
 )
 
 var movieExamples = []string{
@@ -55,8 +57,8 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, _ := url.Parse(movieAPIURL)
 	v := u.Query()
-	v.Set("t", arg)    // movie title
-	v.Set("r", "json") // return type
+	v.Set("v", "1.0")
+	v.Set("q", arg+"+movie")
 	u.RawQuery = v.Encode()
 
 	resp, err := http.Get(u.String())
@@ -67,21 +69,27 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	defer resp.Body.Close()
 
 	var response struct {
-		ID     string `json:"imdbID"`
-		Rating string `json:"imdbRating"`
-		Title  string
-		Year   string
+		ResponseData struct {
+			Results []struct {
+				URL   string `json:"url"`
+				Title string `json:"titleNoFormatting"`
+			}
+		}
 	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.Printf("(movie) Error while decoding movie response: %v\n", err)
 		return
 	}
 
-	if response.ID == "" {
-		log.Printf("(movie) No title found with given criteria: %v\n", arg)
-		return
+	for _, movie := range response.ResponseData.Results {
+		if strings.Contains(movie.URL, "imdb.com/title/tt") {
+			title := strings.TrimSuffix(movie.Title, " - IMDb")
+			r := fmt.Sprintf("[%v](%v)", title, movie.URL)
+			b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
+			return
+		}
 	}
 
-	r := fmt.Sprintf("[%v (%v) *%v*](%v)", response.Title, response.Year, response.Rating, imdbTitleURL+response.ID)
-	b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
+	b.SendMessage(msg.Chat, "aradigin filmi bulamadim 🙈", tlbot.ModeMarkdown, true, nil)
 }
