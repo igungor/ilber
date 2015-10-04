@@ -23,6 +23,8 @@ type Command struct {
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
 
+const autocorrect = true
+
 var (
 	mu       sync.Mutex
 	commands = make(map[string]*Command)
@@ -47,11 +49,15 @@ func Lookup(cmdname string) *Command {
 		return cmd
 	}
 
+	if !autocorrect {
+		return nil
+	}
+
 	//
 	// we don't have an exact match. try to guess the input.
 	//
 
-	// don't even bother single letter command inputs
+	// don't even bother on single letter command inputs
 	if len(cmdname) < 2 {
 		return nil
 	}
@@ -69,29 +75,29 @@ func Lookup(cmdname string) *Command {
 // distance returns the levenshtein distance between given strings.
 func distance(s1, s2 string) int {
 	var cost, lastdiag, olddiag int
-	len_s1 := len([]rune(s1))
-	len_s2 := len([]rune(s2))
+	s1len := len([]rune(s1))
+	s2len := len([]rune(s2))
 
-	column := make([]int, len_s1+1)
+	col := make([]int, s1len+1)
 
-	for y := 1; y <= len_s1; y++ {
-		column[y] = y
+	for y := 1; y <= s1len; y++ {
+		col[y] = y
 	}
 
-	for x := 1; x <= len_s2; x++ {
-		column[0] = x
+	for x := 1; x <= s2len; x++ {
+		col[0] = x
 		lastdiag = x - 1
-		for y := 1; y <= len_s1; y++ {
-			olddiag = column[y]
+		for y := 1; y <= s1len; y++ {
+			olddiag = col[y]
 			cost = 0
 			if s1[y-1] != s2[x-1] {
 				cost = 1
 			}
-			column[y] = min(column[y]+1, min(column[y-1]+1, lastdiag+cost))
+			col[y] = min(col[y]+1, min(col[y-1]+1, lastdiag+cost))
 			lastdiag = olddiag
 		}
 	}
-	return column[len_s1]
+	return col[s1len]
 }
 
 func min(a, b int) int {
