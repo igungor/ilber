@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
+
+	_ "net/http/pprof"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/igungor/ilberbot/command"
@@ -19,6 +22,7 @@ var (
 	host    = flag.String("host", "", "host to listen to")
 	port    = flag.String("port", "1985", "port to listen to")
 	debug   = flag.Bool("d", false, "debug mode (*very* verbose)")
+	profile = flag.Bool("p", true, "enable profiling")
 )
 
 func usage() {
@@ -50,9 +54,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("Webhook set to %v\n", *webhook)
 
 	if *debug {
 		spew.Config.DisableMethods = true
+	}
+
+	if *profile {
+		go func() {
+			log.Println("Exposing profile information on http://localhost:6969")
+			log.Printf("profile error:", http.ListenAndServe("localhost:6969", nil))
+		}()
 	}
 
 	messages := b.Listen(net.JoinHostPort(*host, *port))
