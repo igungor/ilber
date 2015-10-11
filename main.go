@@ -52,7 +52,7 @@ func main() {
 	b := tlbot.New(*token)
 	err := b.SetWebhook(*webhook)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error while setting webhook: %v", err)
 	}
 	log.Printf("Webhook set to %v\n", *webhook)
 
@@ -62,8 +62,8 @@ func main() {
 
 	if *profile {
 		go func() {
-			log.Println("Exposing profile information on http://localhost:6969")
-			log.Printf("profile error: %v", http.ListenAndServe("localhost:6969", nil))
+			log.Println("Exposing profile information on http://:6969")
+			log.Printf("profile error: %v", http.ListenAndServe(":6969", nil))
 		}()
 	}
 
