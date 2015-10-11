@@ -63,7 +63,7 @@ func main() {
 	if *profile {
 		go func() {
 			log.Println("Exposing profile information on http://localhost:6969")
-			log.Printf("profile error:", http.ListenAndServe("localhost:6969", nil))
+			log.Printf("profile error: %v", http.ListenAndServe("localhost:6969", nil))
 		}()
 	}
 
