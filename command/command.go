@@ -23,7 +23,7 @@ type Command struct {
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
 
-const autocorrect = true
+const autocorrect = false
 
 var (
 	mu       sync.Mutex
