@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -21,7 +23,53 @@ var cmdForecast = &Command{
 	Run:       runForecast,
 }
 
-var forecastURL = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric"
+const defaultCity = "Istanbul"
+
+var (
+	apikey      = os.Getenv("OPENWEATHERMAP_APPID")
+	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
+)
+
+func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
+	args := msg.Args()
+	var location string
+	if len(args) == 0 {
+		location = defaultCity
+	} else {
+		location = strings.Join(args, " ")
+	}
+
+	u, err := url.Parse(forecastURL)
+	if err != nil {
+		log.Printf("[forecast] Error while parsing URL '%v'. Err: %v", forecastURL, err)
+		return
+	}
+	params := u.Query()
+	params.Set("units", "metric")
+	params.Set("APPID", apikey)
+	params.Set("q", location)
+	u.RawQuery = params.Encode()
+
+	resp, err := http.Get(u.String())
+	if err != nil {
+		log.Printf("[forecast] Error while fetching forecast for location '%v'. Err: %v\n", location, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	var forecast Forecast
+	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
+		log.Printf("(forecast) Error while decoding response: %v\n", err)
+		return
+	}
+
+	if forecast.String() == "" {
+		b.SendMessage(msg.Chat, fmt.Sprintf("%v bulunamadı.", location), tlbot.ModeNone, false, nil)
+		return
+	}
+
+	b.SendMessage(msg.Chat, forecast.String(), tlbot.ModeMarkdown, false, nil)
+}
 
 // openweathermap response
 type Forecast struct {
@@ -70,35 +118,4 @@ func (f Forecast) String() string {
 	}
 
 	return fmt.Sprintf("%v %v *%.1f* °C", icon, f.City, f.Temperature.Celsius)
-}
-
-func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
-	args := msg.Args()
-	var location string
-	if len(args) == 0 {
-		location = "Istanbul"
-	} else {
-		location = strings.Join(args, " ")
-	}
-
-	url := fmt.Sprintf(forecastURL, location)
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Printf("(yo) Error while fetching forecast for location '%v'. Err: %v\n", location, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	var forecast Forecast
-	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
-		log.Printf("(forecast) Error while decoding response: %v\n", err)
-		return
-	}
-
-	if forecast.String() == "" {
-		b.SendMessage(msg.Chat, fmt.Sprintf("%v bulunamadı.", location), tlbot.ModeNone, false, nil)
-		return
-	}
-
-	b.SendMessage(msg.Chat, forecast.String(), tlbot.ModeMarkdown, false, nil)
 }
