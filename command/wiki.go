@@ -66,7 +66,15 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 
 	for _, article := range wikiResult.ResponseData.Results {
 		if strings.Contains(article.URL, "wikipedia.org/wiki/") {
-			b.SendMessage(msg.Chat, article.URL, tlbot.ModeNone, true, nil)
+			articleURL, err := url.QueryUnescape(article.URL)
+			if err != nil {
+				articleURL = article.URL
+			}
+			err = b.SendMessage(msg.Chat, articleURL, tlbot.ModeNone, true, nil)
+			if err != nil {
+				log.Printf("[wiki] Error while sending message. Err: %v\n", err)
+				return
+			}
 			return
 		}
 	}
