@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/igungor/tlbot"
 )
 
@@ -25,7 +26,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	var txt string
 	if len(args) == 0 {
-		err := b.SendMessage(msg.Chat, "neye referans vereyim? mesela bana bakın: */bkz Ilber Ortayli*", tlbot.ModeMarkdown, false, nil)
+		err := b.SendMessage(msg.Chat, "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*", tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("[wiki] Error while sending message '%v'. Err: %v\n", txt, err)
 		}
@@ -58,6 +59,9 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 		log.Printf("[wiki] Error while decoding response '%v'. Err: %v\n", res, err)
 		return
 	}
+
+	spew.Dump(res)
+	return
 
 	if len(res.Section.Items) == 0 {
 		b.SendMessage(msg.Chat, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
