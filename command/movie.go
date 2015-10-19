@@ -21,17 +21,14 @@ var cmdMovie = &Command{
 	Run:       runMovie,
 }
 
-const (
-	// the best search engine is still google.
-	// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
-	// themoviedb search engine was the most accurate yet still can't find any
-	// result if any release date is given in query terms.
-	movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
-)
+// the best search engine is still google.
+// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
+// themoviedb search engine was the most accurate yet still can't find any
+// result if any release date is given in query terms.
+const movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
 func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
-
 	if len(args) == 0 {
 		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
@@ -42,17 +39,17 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	arg := strings.Join(args, "+")
+	qs := strings.Join(args, "+")
 
 	u, _ := url.Parse(movieAPIURL)
-	v := u.Query()
-	v.Set("v", "1.0")
-	v.Set("q", arg+"+movie")
-	u.RawQuery = v.Encode()
+	params := u.Query()
+	params.Set("v", "1.0")
+	params.Set("q", qs+"+movie")
+	u.RawQuery = params.Encode()
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("(movie) Error while fetching movie with given criteria: %v\n", args)
+		log.Printf("[movie] Error while fetching movie with given criteria '%v'. Err: %v", qs, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -80,7 +77,11 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	b.SendMessage(msg.Chat, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+	err = b.SendMessage(msg.Chat, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+	if err != nil {
+		log.Printf("[movie] Error while sending message. Err: %v\n", err)
+		return
+	}
 }
 
 var movieExamples = []string{
