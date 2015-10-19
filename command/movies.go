@@ -1,5 +1,11 @@
 package command
 
+// TODO(ig): implement a cache mechanism.
+// Currently we do 3 HTTP calls concurrently for each `/vizyon` call. As a
+// side note, theaters refresh their movie list on every Friday night/Saturday
+// morning.  So it is better to invalidate caches before Saturday noon and
+// fetch a fresh movie list.
+
 import (
 	"bytes"
 	"fmt"
@@ -35,6 +41,8 @@ func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 	var mu sync.Mutex
 	movies := make(map[string]int)
 
+	// fetch is a closure to fetch the movies in given movieurl and save the
+	// result in movies map.
 	fetch := func(movieurl string, wg *sync.WaitGroup) {
 		defer wg.Done()
 
