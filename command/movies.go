@@ -1,11 +1,5 @@
 package command
 
-// TODO(ig): implement a cache mechanism.
-// Currently we do 3 HTTP calls concurrently for each `/vizyon` call. As a
-// side note, theaters refresh their movie list on every Friday night/Saturday
-// morning.  So it is better to invalidate caches before Saturday noon and
-// fetch a fresh movie list.
-
 import (
 	"bytes"
 	"fmt"
@@ -14,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/igungor/tlbot"
@@ -32,9 +27,67 @@ var cmdMovies = &Command{
 var (
 	movieURL        = "http://www.google.com/movies?near=Kadikoy,Istanbul&start="
 	chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
+	movieCache      = map[string][]string{}
 )
 
 func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
+	movies, err := fetchOrCache()
+	if err != nil {
+		log.Printf("[movies] Error while fetching movies: %v\n", err)
+		return
+	}
+
+	var buf bytes.Buffer
+	buf.WriteString(" 🎬 İstanbul'da vizyon filmleri\n")
+	for _, movie := range movies {
+		buf.WriteString(fmt.Sprintf("🔸 %v\n", movie))
+	}
+
+	err = b.SendMessage(msg.Chat, buf.String(), tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[movies] Error while sending message: %v\n", err)
+		return
+	}
+}
+
+func fetchOrCache() ([]string, error) {
+	now := time.Now().UTC()
+	year, week := now.ISOWeek()
+	// YYYYWW is our cache key. Theaters keep their movies for about a week. We
+	// don't need a fresh movie list every day or hour. Using year and ISO week
+	// gives us the convenience to avoid cache invalidation. everybody hates
+	// cache invalidation. thank you ISO week.
+	nowstr := fmt.Sprintf("%v%v", year, week)
+
+	// friday nights and saturday mornings are the times theaters renew their
+	// movie list. fetching new list on these days are a waste. just go to
+	// cache.
+	if now.Weekday() > time.Thursday {
+		movies, ok := movieCache[nowstr]
+		if !ok {
+			return nil, fmt.Errorf("unfortunately today is friday/saturday and the cache is empty. nothing to do")
+		}
+		return movies, nil
+	}
+
+	movies, ok := movieCache[nowstr]
+	if ok {
+		return movies, nil
+	}
+
+	// cache-miss. fetch a fresh list.
+	movies = fetchMovies()
+	if movies == nil {
+		return nil, fmt.Errorf("fetched new movies but the list came empty")
+	}
+
+	// put the new list in cache
+	movieCache[nowstr] = movies
+
+	return movies, nil
+}
+
+func fetchMovies() []string {
 	var wg sync.WaitGroup
 
 	// mu guards movies map access
@@ -81,21 +134,12 @@ func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 
 	// sort by map values. map values contain frequency of a movie by
 	// theater count. most frequent movie in a theater is most probably
-	// screened near the caller's home.
+	// screened near the caller's neighborhood.
 	vs := newValSorter(movies)
 	sort.Sort(vs)
 
-	var buf bytes.Buffer
-	buf.WriteString(" 🎬 İstanbul'da vizyon filmleri\n")
-	for _, movie := range vs.Keys {
-		buf.WriteString(fmt.Sprintf("🔸 %v\n", movie))
-	}
+	return vs.Keys
 
-	err := b.SendMessage(msg.Chat, buf.String(), tlbot.ModeNone, false, nil)
-	if err != nil {
-		log.Printf("[movies] Error while sending message. Err: %v\n", err)
-		return
-	}
 }
 
 // valsorter is used for sorting the map by value
