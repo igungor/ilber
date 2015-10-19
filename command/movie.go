@@ -29,17 +29,6 @@ const (
 	movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
 )
 
-var movieExamples = []string{
-	"Spirited Away",
-	"Mulholland Dr",
-	"Oldboy",
-	"Interstellar",
-	"12 Angry Men",
-	"Cidade de Deus",
-	"The Big Lebowski",
-	"There Will Be Blood",
-}
-
 func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
@@ -92,4 +81,15 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	b.SendMessage(msg.Chat, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+}
+
+var movieExamples = []string{
+	"Spirited Away",
+	"Mulholland Dr",
+	"Oldboy",
+	"Interstellar",
+	"12 Angry Men",
+	"Cidade de Deus",
+	"The Big Lebowski",
+	"There Will Be Blood",
 }
