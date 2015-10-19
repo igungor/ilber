@@ -1,11 +1,11 @@
-# ilberbot
+# ilber
 
-ilberbot is a multipurpose Telegram bot.
+ilber is a multi-purpose Telegram bot.
 
 ## installation
 
 ```sh
-go get github.com/igungor/ilberbot
+go get github.com/igungor/ilber
 ```
 
 ## license
