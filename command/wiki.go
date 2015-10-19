@@ -17,7 +17,7 @@ const wikiURL = "https://en.wikipedia.org/w/api.php"
 
 var cmdWiki = &Command{
 	Name:      "bkz",
-	ShortLine: "bakiniz cok ilginctir",
+	ShortLine: "bakınız çok ilginçtir",
 	Run:       runWiki,
 }
 
