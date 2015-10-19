@@ -1,8 +1,9 @@
 package command
 
 import (
-	"encoding/xml"
+	"encoding/json"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -13,13 +14,15 @@ func init() {
 	register(cmdWiki)
 }
 
-const wikiURL = "https://en.wikipedia.org/w/api.php"
-
 var cmdWiki = &Command{
 	Name:      "bkz",
 	ShortLine: "bakınız çok ilginçtir",
 	Run:       runWiki,
 }
+
+// the best search engine is still google.
+// Wikipedia API lacks multi-lingual search.
+const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
 func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
@@ -32,56 +35,45 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	u, err := url.Parse(wikiURL)
-	if err != nil {
-		log.Printf("[wiki] Error while parsing URL '%v'. Err: %v\n", wikiURL, err)
-		return
-	}
+	qs := strings.Join(args, "+")
 
-	qs := strings.Join(args, " ")
+	u, _ := url.Parse(wikiURL)
 	params := u.Query()
-	params.Set("action", "opensearch")
-	params.Set("format", "xml")
-	params.Set("search", qs)
+	params.Set("v", "1.0")
+	params.Set("q", "wikipedia+"+qs)
 	u.RawQuery = params.Encode()
 
-	resp, err := httpclient.Get(u.String())
+	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("[wiki] Error while fetching article for query '%v'. Err: %v\n", qs, err)
+		log.Printf("[wiki] Error while fetching reference with given criteria '%v'. Err: %v", qs, err)
 		return
 	}
 	defer resp.Body.Close()
 
-	var res result
-	err = xml.NewDecoder(resp.Body).Decode(&res)
+	var wikiResult struct {
+		ResponseData struct {
+			Results []struct {
+				URL   string `json:"url"`
+				Title string `json:"titleNoFormatting"`
+			}
+		}
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&wikiResult); err != nil {
+		log.Printf("[wiki] Error while decoding wiki response: %v\n", err)
+		return
+	}
+
+	for _, article := range wikiResult.ResponseData.Results {
+		if strings.Contains(article.URL, "wikipedia.org/wiki/") {
+			b.SendMessage(msg.Chat, article.URL, tlbot.ModeNone, true, nil)
+			return
+		}
+	}
+
+	err = b.SendMessage(msg.Chat, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 	if err != nil {
-		log.Printf("[wiki] Error while decoding response '%v'. Err: %v\n", res, err)
+		log.Printf("[wiki] Error while sending message. Err: %v\n", err)
 		return
 	}
-
-	if len(res.Section.Items) == 0 {
-		b.SendMessage(msg.Chat, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
-		return
-	}
-
-	article := res.Section.Items[0]
-	txt = article.URL
-	err = b.SendMessage(msg.Chat, txt, tlbot.ModeNone, true, nil)
-	if err != nil {
-		log.Printf("[wiki] Error while sending message to Telegram servers. Err: '%v'\nMessage: %v", err, txt)
-		return
-	}
-}
-
-// wikipedia api response
-type result struct {
-	XMLName xml.Name `xml:"SearchSuggestion"`
-	Section struct {
-		Items []struct {
-			Title       string `xml:"Text"`
-			URL         string `xml:"Url"`
-			Description string
-			Image       string
-		} `xml:"Item"`
-	} `xml:"Section"`
 }
