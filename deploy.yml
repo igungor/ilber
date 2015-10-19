@@ -7,13 +7,13 @@
 
   tasks:
     - name: deploy package
-      copy: src=release/0.1/ilberbot_0.1_amd64.deb dest=/home/ubuntu/ mode=0644
+      copy: src=release/0.1/ilber_0.1_amd64.deb dest=/home/ubuntu/ mode=0644
 
     - name: remove package
-      apt: name=ilberbot state=absent
+      apt: name=ilber state=absent
 
     - name: install package
-      apt: deb=/home/ubuntu/ilberbot_0.1_amd64.deb state=installed
+      apt: deb=/home/ubuntu/ilber_0.1_amd64.deb state=installed
 
     - name: restart service
-      service: name=ilberbot state=restarted
+      service: name=ilber state=restarted

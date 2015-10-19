@@ -11,7 +11,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/igungor/ilberbot/command"
+	"github.com/igungor/ilber/command"
 	"github.com/igungor/tlbot"
 )
 
@@ -26,9 +26,9 @@ var (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "ilberbot is a multi-purpose Telegram bot\n\n")
+	fmt.Fprintf(os.Stderr, "ilber is a multi-purpose Telegram bot\n\n")
 	fmt.Fprintf(os.Stderr, "usage:\n")
-	fmt.Fprintf(os.Stderr, "  ilberbot -token <insert-your-telegrambot-token> -webhook <insert-your-webhook-url>\n\n")
+	fmt.Fprintf(os.Stderr, "  ilber -token <insert-your-telegrambot-token> -webhook <insert-your-webhook-url>\n\n")
 	fmt.Fprintf(os.Stderr, "flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -36,7 +36,7 @@ func usage() {
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix("ilberbot: ")
+	log.SetPrefix("ilber: ")
 	flag.Usage = usage
 	flag.Parse()
 
