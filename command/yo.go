@@ -36,7 +36,7 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
 		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("(yo) Error while sending message: %v\n", err)
+			log.Printf("[yo] Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -46,10 +46,14 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := searchImage(terms...)
 	if err != nil {
-		log.Printf("(img) Error while searching image with given criteria: %v\n", args)
+		log.Printf("[yo] Error while searching image with given criteria: %v\n", args)
 		return
 	}
 
 	photo := tlbot.Photo{File: tlbot.File{FileURL: u}}
-	b.SendPhoto(msg.Chat, photo, "", nil)
+	err = b.SendPhoto(msg.Chat, photo, "", nil)
+	if err != nil {
+		log.Printf("[yo] Error while sending image: %v\n", err)
+		return
+	}
 }

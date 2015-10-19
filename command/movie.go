@@ -34,7 +34,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
 		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("(movie) Error while sending message: %v\n", err)
+			log.Printf("[movie] Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -72,7 +72,10 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		if strings.Contains(movie.URL, "imdb.com/title/tt") {
 			title := strings.TrimSuffix(movie.Title, " - IMDb")
 			r := fmt.Sprintf("[%v](%v)", title, movie.URL)
-			b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
+			err := b.SendMessage(msg.Chat, r, tlbot.ModeMarkdown, true, nil)
+			if err != nil {
+				log.Printf("[movie] Error while sending message. Err: %v\n", err)
+			}
 			return
 		}
 	}

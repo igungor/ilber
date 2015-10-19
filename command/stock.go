@@ -66,7 +66,10 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(records) != len(currencies) {
-		b.SendMessage(msg.Chat, "verdigin kurlardan biri ya da birkaci hatali", tlbot.ModeNone, false, nil)
+		err := b.SendMessage(msg.Chat, "verdigin kurlardan biri ya da birkaci hatali", tlbot.ModeNone, false, nil)
+		if err != nil {
+			log.Printf("[stock] Error while sending message. Err: %v\n", err)
+		}
 		return
 	}
 
@@ -74,5 +77,9 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 	for i, record := range records {
 		buf.WriteString(fmt.Sprintf("%v = %v ₺\n", currencies[i], record[1]))
 	}
-	b.SendMessage(msg.Chat, buf.String(), tlbot.ModeNone, false, nil)
+
+	err = b.SendMessage(msg.Chat, buf.String(), tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[stock] Error while sending message. Err: %v\n", err)
+	}
 }

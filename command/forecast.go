@@ -59,16 +59,20 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	var forecast Forecast
 	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
-		log.Printf("(forecast) Error while decoding response: %v\n", err)
+		log.Printf("[forecast] Error while decoding response: %v\n", err)
 		return
 	}
 
-	if forecast.String() == "" {
-		b.SendMessage(msg.Chat, fmt.Sprintf("%v bulunamadı.", location), tlbot.ModeNone, false, nil)
-		return
+	txt := forecast.String()
+	if txt == "" {
+		txt = fmt.Sprintf("%v bulunamadı.", location)
 	}
 
-	b.SendMessage(msg.Chat, forecast.String(), tlbot.ModeMarkdown, false, nil)
+	err = b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	if err != nil {
+		log.Printf("[forecast] Error while sending message. Err: %v\n", err)
+		return
+	}
 }
 
 // openweathermap response

@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/igungor/tlbot"
@@ -43,5 +44,9 @@ func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = fmt.Sprintf("Evet, bugün *%v*\n", v)
 	}
 
-	b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	if err != nil {
+		log.Printf("[bugunkandilmi] Error while sending message: %v\n", err)
+		return
+	}
 }

@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/igungor/tlbot"
@@ -114,28 +115,26 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 	nowstr := now.Format(timeFormat)
 
 	timepair, ok := callTime[nowstr]
-	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
-		return
+	var txt string
+	switch {
+	case !ok:
+		txt = "galiba oruç bitti"
+	case now.After(timepair.iftar):
+		txt = "okundu"
+	case now.After(timepair.sahur) && now.Hour() < 6:
+		txt = "sahur okundu ama iftara daha çok var"
+	case now.Before(timepair.sahur):
+		txt = "sahur henüz okunmadı"
+	default:
+		// after sahur and before iftar, hence NO
+		txt = randChoice(noes)
 	}
 
-	if now.After(timepair.iftar) {
-		b.SendMessage(msg.Chat, "okundu", tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[okundumu] Error while sending message. Err: %v\n", err)
 		return
 	}
-
-	if now.Before(timepair.sahur) {
-		b.SendMessage(msg.Chat, "sahur henüz okunmadı", tlbot.ModeNone, false, nil)
-		return
-	}
-
-	if now.After(timepair.sahur) && now.Hour() < 6 {
-		b.SendMessage(msg.Chat, "sahur okundu ama iftara daha çok var", tlbot.ModeNone, false, nil)
-		return
-	}
-
-	// after sahur and before iftar, hence NO
-	b.SendMessage(msg.Chat, randChoice(noes), tlbot.ModeNone, false, nil)
 }
 
 func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
@@ -145,12 +144,18 @@ func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
 	nowstr := now.Format(timeFormat)
 
 	timepair, ok := callTime[nowstr]
-	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
-		return
+	var txt string
+	if ok {
+		txt = timepair.iftar.Format("15:04")
+	} else {
+		txt = "galiba oruç bitti"
 	}
 
-	b.SendMessage(msg.Chat, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[iftar] Error while sending message. Err: %v\n", err)
+		return
+	}
 }
 
 func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
@@ -160,10 +165,16 @@ func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
 	nowstr := now.Format(timeFormat)
 
 	timepair, ok := callTime[nowstr]
-	if !ok {
-		b.SendMessage(msg.Chat, "galiba oruç bitti", tlbot.ModeNone, false, nil)
-		return
+	var txt string
+	if ok {
+		txt = timepair.sahur.Format("15:04")
+	} else {
+		txt = "galiba oruç bitti"
 	}
 
-	b.SendMessage(msg.Chat, timepair.iftar.Format("15:04"), tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[sahur] Error while sending message. Err: %v\n", err)
+		return
+	}
 }

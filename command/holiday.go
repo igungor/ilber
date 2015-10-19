@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
@@ -65,16 +66,26 @@ func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
 
 	for _, t := range holidays {
 		if in(now, t.date, t.date.Add(t.duration)) {
-			b.SendMessage(msg.Chat, fmt.Sprintf("Bugün %v", t.name), tlbot.ModeMarkdown, false, nil)
+			err := b.SendMessage(msg.Chat, fmt.Sprintf("Bugün %v", t.name), tlbot.ModeMarkdown, false, nil)
+			if err != nil {
+				log.Printf("[holiday] Error while sending message. Err: %v\n", err)
+			}
 			return
 		}
 
 		if now.Before(t.date) {
 			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
-			b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+			err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+			if err != nil {
+				log.Printf("[holiday] Error while sending message. Err: %v\n", err)
+			}
 			return
 		}
 	}
 
-	b.SendMessage(msg.Chat, "yakın zamanda tatil görünmüyör :(", tlbot.ModeMarkdown, false, nil)
+	err := b.SendMessage(msg.Chat, "yakın zamanda tatil görünmüyör :(", tlbot.ModeMarkdown, false, nil)
+	if err != nil {
+		log.Printf("[holiday] Error while sending message. Err: %v\n", err)
+		return
+	}
 }

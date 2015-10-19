@@ -1,6 +1,10 @@
 package command
 
-import "github.com/igungor/tlbot"
+import (
+	"log"
+
+	"github.com/igungor/tlbot"
+)
 
 func init() {
 	register(cmdRayRay)
@@ -14,5 +18,9 @@ var cmdRayRay = &Command{
 }
 
 func runRayRay(b *tlbot.Bot, msg *tlbot.Message) {
-	b.SendMessage(msg.Chat, "malifalitiko!", tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat, "malifalitiko!", tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("[rayraykasim] Error while sending message. Err: %v\n", err)
+		return
+	}
 }

@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -23,5 +24,9 @@ func runEcho(b *tlbot.Bot, msg *tlbot.Message) {
 		args = []string{"çok cahilsin"}
 	}
 	txt := fmt.Sprintf("*%v*", strings.Join(args, " "))
-	b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	if err != nil {
+		log.Printf("[echo] Error while sending message: %v\n", err)
+		return
+	}
 }
