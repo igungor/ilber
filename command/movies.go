@@ -88,8 +88,6 @@ func fetchOrCache() ([]string, error) {
 }
 
 func fetchMovies() []string {
-	var wg sync.WaitGroup
-
 	// mu guards movies map access
 	var mu sync.Mutex
 	movies := make(map[string]int)
@@ -125,6 +123,7 @@ func fetchMovies() []string {
 	}
 
 	// fetch 3 pages of theaters
+	var wg sync.WaitGroup
 	for i := 0; i < 3; i++ {
 		offset := strconv.Itoa(10 * i)
 		wg.Add(1)
@@ -132,14 +131,13 @@ func fetchMovies() []string {
 	}
 	wg.Wait()
 
-	// sort by map values. map values contain frequency of a movie by
+	// sort map by its values. map values contain frequency of a movie by
 	// theater count. most frequent movie in a theater is most probably
 	// screened near the caller's neighborhood.
 	vs := newValSorter(movies)
 	sort.Sort(vs)
 
 	return vs.Keys
-
 }
 
 // valsorter is used for sorting the map by value
