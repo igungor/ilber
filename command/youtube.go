@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -12,19 +13,20 @@ import (
 )
 
 func init() {
-	// register(cmdYoutube)
+	register(cmdYoutube)
 }
 
 var cmdYoutube = &Command{
 	Name:      "youtube",
 	ShortLine: "vidyo filanı",
-	Hide:      true,
+	Hidden:    true,
 	Run:       runYoutube,
 }
 
-const youtubeApiKey = "FIXME:XXXXXXXXXXXXXXXXXXXXXXXX"
-
-var youtubeclient = &http.Client{Transport: &transport.APIKey{Key: youtubeApiKey}}
+var (
+	youtubeApiKey = os.Getenv("ILBER_YOUTUBE_APIKEY")
+	youtubeclient = &http.Client{Transport: &transport.APIKey{Key: youtubeApiKey}}
+)
 
 func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
@@ -53,7 +55,7 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	video := response.Items[0]
 	v := fmt.Sprintf("https://youtube.com/watch?v=%v\n", video.Id.VideoId)
 
-	err := b.SendMessage(msg.Chat, v, tlbot.ModeMarkdown, true, nil)
+	err = b.SendMessage(msg.Chat, v, tlbot.ModeNone, true, nil)
 	if err != nil {
 		log.Printf("[youtube] Error while sending message. Err: %v\n", err)
 	}

@@ -26,7 +26,7 @@ var cmdForecast = &Command{
 const defaultCity = "Istanbul"
 
 var (
-	apikey      = os.Getenv("OPENWEATHERMAP_APPID")
+	apikey      = os.Getenv("ILBER_OPENWEATHERMAP_APPID")
 	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
 )
 
