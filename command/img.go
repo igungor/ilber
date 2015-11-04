@@ -17,11 +17,6 @@ var cmdImg = &Command{
 	Run:       runImg,
 }
 
-var imgExamples = []string{
-	"burdur",
-	"kapadokya",
-}
-
 func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
@@ -47,4 +42,9 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 		log.Printf("[img] Error while sending photo: %v\n", err)
 		return
 	}
+}
+
+var imgExamples = []string{
+	"burdur",
+	"kapadokya",
 }

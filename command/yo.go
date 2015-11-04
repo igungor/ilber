@@ -17,17 +17,6 @@ var cmdYo = &Command{
 	Run:       runYo,
 }
 
-var yoExamples = []string{
-	"renk dans",
-	"bağa mı didin",
-	"düşünemedi",
-	"lütfen olsun çünkü",
-	"geldi yine",
-	"sipirmin",
-	"lanet olsun sana",
-	"flemenko",
-}
-
 func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
@@ -56,4 +45,15 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 		log.Printf("[yo] Error while sending image: %v\n", err)
 		return
 	}
+}
+
+var yoExamples = []string{
+	"renk dans",
+	"bağa mı didin",
+	"düşünemedi",
+	"lütfen olsun çünkü",
+	"geldi yine",
+	"sipirmin",
+	"lanet olsun sana",
+	"flemenko",
 }
