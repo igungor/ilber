@@ -19,7 +19,7 @@ func init() {
 var cmdYoutube = &Command{
 	Name:      "youtube",
 	ShortLine: "vidyo filanı",
-	Hidden:    true,
+	Hidden:    false,
 	Run:       runYoutube,
 }
 
