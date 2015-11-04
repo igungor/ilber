@@ -29,16 +29,25 @@ var (
 )
 
 func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
-	args := msg.Args()
-	query := strings.Join(args, "+")
-
 	service, err := youtube.New(youtubeclient)
 	if err != nil {
 		log.Printf("[youtube] error creating new youtube client: %v", err)
 		return
 	}
 
-	call := service.Search.List("id").Type("video").Q(query).MaxResults(1)
+	args := msg.Args()
+	if len(args) == 0 {
+		term := randChoice(youtubeExamples)
+		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)
+		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+		if err != nil {
+			log.Printf("[movie] Error while sending message: %v\n", err)
+		}
+		return
+	}
+
+	qs := strings.Join(args, "+")
+	call := service.Search.List("id").Type("video").Q(qs).MaxResults(1)
 	response, err := call.Do()
 	if err != nil {
 		log.Printf("[youtube] Error making youtube search API call: %v", err)
@@ -59,4 +68,11 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Printf("[youtube] Error while sending message. Err: %v\n", err)
 	}
+}
+
+var youtubeExamples = []string{
+	"savas gayet boktan biseydir",
+	"sabri bey ne yapiyorsunuz",
+	"vecihi geliyor",
+	"yaz kızım 200 torba çimento",
 }
