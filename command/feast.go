@@ -130,7 +130,7 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = randChoice(noes)
 	}
 
-	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
 	if err != nil {
 		log.Printf("[okundumu] Error while sending message. Err: %v\n", err)
 		return
@@ -151,7 +151,7 @@ func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
 	if err != nil {
 		log.Printf("[iftar] Error while sending message. Err: %v\n", err)
 		return
@@ -172,7 +172,7 @@ func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	err := b.SendMessage(msg.Chat, txt, tlbot.ModeNone, false, nil)
+	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
 	if err != nil {
 		log.Printf("[sahur] Error while sending message. Err: %v\n", err)
 		return

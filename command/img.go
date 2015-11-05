@@ -23,7 +23,7 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)
-		err := b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("[img] Error while sending message: %v\n", err)
 		}
@@ -37,7 +37,7 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	photo := tlbot.Photo{File: tlbot.File{FileURL: u}}
-	err = b.SendPhoto(msg.Chat, photo, "", nil)
+	err = b.SendPhoto(msg.Chat.ID, photo, "", nil)
 	if err != nil {
 		log.Printf("[img] Error while sending photo: %v\n", err)
 		return

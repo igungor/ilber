@@ -19,7 +19,7 @@ var cmdHelp = &Command{
 }
 
 func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
-	b.SendMessage(msg.Chat, help(), tlbot.ModeNone, false, nil)
+	b.SendMessage(msg.Chat.ID, help(), tlbot.ModeNone, false, nil)
 }
 
 type byName []*Command

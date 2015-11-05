@@ -68,7 +68,7 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 		txt = fmt.Sprintf("%v bulunamadı.", location)
 	}
 
-	err = b.SendMessage(msg.Chat, txt, tlbot.ModeMarkdown, false, nil)
+	err = b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 	if err != nil {
 		log.Printf("[forecast] Error while sending message. Err: %v\n", err)
 		return

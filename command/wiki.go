@@ -28,7 +28,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	var txt string
 	if len(args) == 0 {
-		err := b.SendMessage(msg.Chat, "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*", tlbot.ModeMarkdown, false, nil)
+		err := b.SendMessage(msg.Chat.ID, "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*", tlbot.ModeMarkdown, false, nil)
 		if err != nil {
 			log.Printf("[wiki] Error while sending message '%v'. Err: %v\n", txt, err)
 		}
@@ -70,7 +70,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 			if err != nil {
 				articleURL = article.URL
 			}
-			err = b.SendMessage(msg.Chat, articleURL, tlbot.ModeNone, true, nil)
+			err = b.SendMessage(msg.Chat.ID, articleURL, tlbot.ModeNone, true, nil)
 			if err != nil {
 				log.Printf("[wiki] Error while sending message. Err: %v\n", err)
 				return
@@ -79,7 +79,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	err = b.SendMessage(msg.Chat, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+	err = b.SendMessage(msg.Chat.ID, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 	if err != nil {
 		log.Printf("[wiki] Error while sending message. Err: %v\n", err)
 		return
