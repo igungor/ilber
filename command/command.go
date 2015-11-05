@@ -23,9 +23,8 @@ type Command struct {
 	Run func(bot *tlbot.Bot, msg *tlbot.Message)
 }
 
-const autocorrect = false
-
 var (
+	// mu guards commands-map access
 	mu       sync.Mutex
 	commands = make(map[string]*Command)
 )
@@ -45,31 +44,10 @@ func Lookup(cmdname string) *Command {
 
 	cmdname = strings.TrimSuffix(cmdname, "@ilberbot")
 	cmd, ok := commands[cmdname]
-	if ok {
-		return cmd
-	}
-
-	if !autocorrect {
+	if !ok {
 		return nil
 	}
-
-	//
-	// we don't have an exact match. try to guess the input.
-	//
-
-	// don't even bother on single letter command inputs
-	if len(cmdname) < 2 {
-		return nil
-	}
-	// autocorrect based on levenshtein distance, if possible
-	for k := range commands {
-		if distance(cmdname, k) <= 2 {
-			return commands[k]
-		}
-	}
-
-	// at least we tried.
-	return nil
+	return cmd
 }
 
 // distance returns the levenshtein distance between given strings.
