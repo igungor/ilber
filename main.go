@@ -70,7 +70,12 @@ func main() {
 	messages := b.Listen(net.JoinHostPort(*host, *port))
 	for msg := range messages {
 		spew.Dump(msg)
-		// is message a command?
+
+		// react only to user sent messages
+		if msg.IsService() {
+			continue
+		}
+		// is message a bot command?
 		cmdname := msg.Command()
 		if cmdname == "" {
 			continue
