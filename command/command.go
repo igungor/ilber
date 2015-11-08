@@ -49,38 +49,3 @@ func Lookup(cmdname string) *Command {
 	}
 	return cmd
 }
-
-// distance returns the levenshtein distance between given strings.
-func distance(s1, s2 string) int {
-	var cost, lastdiag, olddiag int
-	s1len := len([]rune(s1))
-	s2len := len([]rune(s2))
-
-	col := make([]int, s1len+1)
-
-	for y := 1; y <= s1len; y++ {
-		col[y] = y
-	}
-
-	for x := 1; x <= s2len; x++ {
-		col[0] = x
-		lastdiag = x - 1
-		for y := 1; y <= s1len; y++ {
-			olddiag = col[y]
-			cost = 0
-			if s1[y-1] != s2[x-1] {
-				cost = 1
-			}
-			col[y] = min(col[y]+1, min(col[y-1]+1, lastdiag+cost))
-			lastdiag = olddiag
-		}
-	}
-	return col[s1len]
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
