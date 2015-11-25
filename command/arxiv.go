@@ -43,11 +43,14 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	qs := strings.Join(args, " ")
+	qs := strings.Join(args, "+")
 	params := u.Query()
 	params.Set("search_query", qs)
 	params.Set("max_results", "1")
-	u.RawQuery = params.Encode()
+	// unescape the escaped querystring. arxiv api doesn't recognize an escaped
+	// `+` character, resulting arbitrary documents to show up
+	rawquery, _ := url.QueryUnescape(params.Encode())
+	u.RawQuery = rawquery
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
