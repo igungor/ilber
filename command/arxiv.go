@@ -46,7 +46,7 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 
 	qs := strings.Join(args, " ")
 	params := u.Query()
-	params.Set("search_query", "all:"+qs)
+	params.Set("search_query", qs)
 	params.Set("max_results", "1")
 	u.RawQuery = params.Encode()
 
@@ -80,9 +80,14 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 			break
 		}
 	}
+	var categories []string
+	for _, category := range entry.Categories {
+		categories = append(categories, category.Term)
+	}
 
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("*title:* %v\n", entry.Title))
+	buf.WriteString(fmt.Sprintf("*categories:* %v\n", strings.Join(categories, ", ")))
 	buf.WriteString(fmt.Sprintf("*published:* %v\n", entry.Published.Format("2006-01-02")))
 	buf.WriteString(fmt.Sprint("*authors:*\n"))
 	for _, author := range entry.Authors {
