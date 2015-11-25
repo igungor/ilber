@@ -33,7 +33,7 @@ var (
 func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 	movies, err := fetchOrCache()
 	if err != nil {
-		log.Printf("[movies] Error while fetching movies: %v\n", err)
+		log.Printf("Error while fetching movies: %v\n", err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeNone, false, nil)
 	if err != nil {
-		log.Printf("[movies] Error while sending message: %v\n", err)
+		log.Printf("Error while sending message: %v\n", err)
 		return
 	}
 }
@@ -102,14 +102,14 @@ func fetchMovies() []string {
 
 		r, err := httpclient.Do(req)
 		if err != nil {
-			log.Printf("[movies] Error while fetching URL '%v'. Error: %v\n", movieurl, err)
+			log.Printf("Error while fetching URL '%v'. Error: %v\n", movieurl, err)
 			return
 		}
 		defer r.Body.Close()
 
 		doc, err := goquery.NewDocumentFromResponse(r)
 		if err != nil {
-			log.Printf("[movies] Error while fetching DOM from url '%v': %v\n", movieurl, err)
+			log.Printf("Error while fetching DOM from url '%v': %v\n", movieurl, err)
 			return
 		}
 

@@ -38,6 +38,6 @@ func runToday(b *tlbot.Bot, msg *tlbot.Message) {
 	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
 	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
 	if err != nil {
-		log.Printf("[today] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 	}
 }

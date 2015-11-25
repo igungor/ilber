@@ -29,18 +29,17 @@ var (
 
 func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
-
 	if len(args) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", tlbot.ModeNone, false, nil)
 		if err != nil {
-			log.Printf("[arxiv] Error while sending message: %v\n", err)
+			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
 
 	u, err := url.Parse(arxivURL)
 	if err != nil {
-		log.Printf("[arxiv] Error while parsing url '%v'. Err: %v", arxivURL, err)
+		log.Printf("Error while parsing url '%v'. Err: %v", arxivURL, err)
 		return
 	}
 
@@ -52,7 +51,7 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("[arxiv] Error while fetching arxiv document. Err: %v", err)
+		log.Printf("Error while fetching arxiv document. Err: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -60,14 +59,14 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 	var result atom.Feed
 	err = xml.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Error while decoding the response: %v", err)
 		return
 	}
 
 	if len(result.Entries) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", tlbot.ModeNone, false, nil)
 		if err != nil {
-			log.Printf("[arxiv] Error while sending message: %v\n", err)
+			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -97,6 +96,6 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeMarkdown, false, nil)
 	if err != nil {
-		log.Printf("[arxiv] Error while sending message: %v\n", err)
+		log.Printf("Error while sending message: %v\n", err)
 	}
 }

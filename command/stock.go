@@ -38,7 +38,7 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := url.Parse(financeURL)
 	if err != nil {
-		log.Printf("[stock] Error while parsing url '%v'. Err: %v", financeURL, err)
+		log.Printf("Error while parsing url '%v'. Err: %v", financeURL, err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("[stock] Error while fetching stock information. Err: %v", err)
+		log.Printf("Error while fetching stock information. Err: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -61,14 +61,14 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 	cr := csv.NewReader(resp.Body)
 	records, err := cr.ReadAll()
 	if err != nil {
-		log.Printf("[stock] Error while parsing stock information. Err: %v", err)
+		log.Printf("Error while parsing stock information. Err: %v", err)
 		return
 	}
 
 	if len(records) != len(currencies) {
 		err := b.SendMessage(msg.Chat.ID, "verdigin kurlardan biri ya da birkaci hatali", tlbot.ModeNone, false, nil)
 		if err != nil {
-			log.Printf("[stock] Error while sending message. Err: %v\n", err)
+			log.Printf("Error while sending message. Err: %v\n", err)
 		}
 		return
 	}
@@ -80,6 +80,6 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeNone, false, nil)
 	if err != nil {
-		log.Printf("[stock] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 	}
 }

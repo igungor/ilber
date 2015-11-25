@@ -41,7 +41,7 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := url.Parse(forecastURL)
 	if err != nil {
-		log.Printf("[forecast] Error while parsing URL '%v'. Err: %v", forecastURL, err)
+		log.Printf("Error while parsing URL '%v'. Err: %v", forecastURL, err)
 		return
 	}
 	params := u.Query()
@@ -52,14 +52,14 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("[forecast] Error while fetching forecast for location '%v'. Err: %v\n", location, err)
+		log.Printf("Error while fetching forecast for location '%v'. Err: %v\n", location, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	var forecast Forecast
 	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
-		log.Printf("[forecast] Error while decoding response: %v\n", err)
+		log.Printf("Error while decoding response: %v\n", err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 	if err != nil {
-		log.Printf("[forecast] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

@@ -46,7 +46,7 @@ func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 	if err != nil {
-		log.Printf("[bugunkandilmi] Error while sending message: %v\n", err)
+		log.Printf("Error while sending message: %v\n", err)
 		return
 	}
 }

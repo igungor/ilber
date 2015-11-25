@@ -31,7 +31,7 @@ var (
 func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	service, err := youtube.New(youtubeclient)
 	if err != nil {
-		log.Printf("[youtube] error creating new youtube client: %v", err)
+		log.Printf("Error creating new youtube client: %v", err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)
 		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("[movie] Error while sending message: %v\n", err)
+			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -50,13 +50,13 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	call := service.Search.List("id").Type("video").Q(qs).MaxResults(1)
 	response, err := call.Do()
 	if err != nil {
-		log.Printf("[youtube] Error making youtube search API call: %v", err)
+		log.Printf("Error making youtube search API call: %v", err)
 	}
 
 	if len(response.Items) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 		if err != nil {
-			log.Printf("[youtube] Error while sending message. Err: %v\n", err)
+			log.Printf("Error while sending message. Err: %v\n", err)
 		}
 		return
 	}
@@ -66,7 +66,7 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, v, tlbot.ModeNone, true, nil)
 	if err != nil {
-		log.Printf("[youtube] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 	}
 }
 

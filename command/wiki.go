@@ -30,7 +30,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 	if len(args) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*", tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("[wiki] Error while sending message '%v'. Err: %v\n", txt, err)
+			log.Printf("Error while sending message '%v'. Err: %v\n", txt, err)
 		}
 		return
 	}
@@ -45,7 +45,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("[wiki] Error while fetching reference with given criteria '%v'. Err: %v", qs, err)
+		log.Printf("Error while fetching reference with given criteria '%v'. Err: %v", qs, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -60,7 +60,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&wikiResult); err != nil {
-		log.Printf("[wiki] Error while decoding wiki response: %v\n", err)
+		log.Printf("Error while decoding wiki response: %v\n", err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 			}
 			err = b.SendMessage(msg.Chat.ID, articleURL, tlbot.ModeNone, true, nil)
 			if err != nil {
-				log.Printf("[wiki] Error while sending message. Err: %v\n", err)
+				log.Printf("Error while sending message. Err: %v\n", err)
 				return
 			}
 			return
@@ -81,7 +81,7 @@ func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, "aradığın referansı bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 	if err != nil {
-		log.Printf("[wiki] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

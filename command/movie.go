@@ -34,7 +34,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
 		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("[movie] Error while sending message: %v\n", err)
+			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -49,7 +49,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("[movie] Error while fetching movie with given criteria '%v'. Err: %v", qs, err)
+		log.Printf("Error while fetching movie with given criteria '%v'. Err: %v", qs, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -74,7 +74,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 			r := fmt.Sprintf("[%v](%v)", title, movie.URL)
 			err := b.SendMessage(msg.Chat.ID, r, tlbot.ModeMarkdown, true, nil)
 			if err != nil {
-				log.Printf("[movie] Error while sending message. Err: %v\n", err)
+				log.Printf("Error while sending message. Err: %v\n", err)
 			}
 			return
 		}
@@ -82,7 +82,7 @@ func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
 
 	err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
 	if err != nil {
-		log.Printf("[movie] Error while sending message. Err: %v\n", err)
+		log.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

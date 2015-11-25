@@ -10,7 +10,6 @@ import (
 
 	_ "net/http/pprof"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/igungor/ilber/command"
 	"github.com/igungor/tlbot"
 )
@@ -35,8 +34,8 @@ func usage() {
 }
 
 func main() {
-	log.SetFlags(0)
 	log.SetPrefix("ilber: ")
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Usage = usage
 	flag.Parse()
 
@@ -56,10 +55,6 @@ func main() {
 	}
 	log.Printf("Webhook set to %v\n", *webhook)
 
-	if *debug {
-		spew.Config.DisableMethods = true
-	}
-
 	if *profile {
 		go func() {
 			log.Println("Exposing profile information on http://:6969")
@@ -69,7 +64,7 @@ func main() {
 
 	messages := b.Listen(net.JoinHostPort(*host, *port))
 	for msg := range messages {
-		spew.Dump(msg)
+		log.Printf("%v\n", msg)
 
 		// react only to user sent messages
 		if msg.IsService() {
