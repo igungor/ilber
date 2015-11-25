@@ -31,7 +31,7 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
 	if len(args) == 0 {
-		err := b.SendMessage(msg.Chat.ID, "bos gecmeyelim", tlbot.ModeNone, false, nil)
+		err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", tlbot.ModeNone, false, nil)
 		if err != nil {
 			log.Printf("[arxiv] Error while sending message: %v\n", err)
 		}
@@ -65,7 +65,7 @@ func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(result.Entries) == 0 {
-		err := b.SendMessage(msg.Chat.ID, "sonuc bos geldi", tlbot.ModeNone, false, nil)
+		err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", tlbot.ModeNone, false, nil)
 		if err != nil {
 			log.Printf("[arxiv] Error while sending message: %v\n", err)
 		}
