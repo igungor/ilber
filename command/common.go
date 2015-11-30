@@ -16,6 +16,10 @@ func init() {
 
 const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
 
+// https://developers.google.com/image-search/v1/jsondevguide
+// imgsz=small|medium|large|xlarge restricts results to medium-sized images
+const imageSize = "large"
+
 var httpclient = http.Client{Timeout: 10 * time.Second}
 var validImageFormats = []string{"png", "jpg"}
 
@@ -31,6 +35,7 @@ func searchImage(terms ...string) (string, error) {
 	v := u.Query()
 	v.Set("q", keyword)
 	v.Set("v", "1.0")
+	v.Set("imgsz", imageSize)
 	u.RawQuery = v.Encode()
 
 	resp, err := http.Get(u.String())
@@ -63,7 +68,7 @@ func searchImage(terms ...string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("no valid image formatsa found for the given criteria: %v\n", keyword)
+	return "", fmt.Errorf("no valid image format found for the given criteria: %v\n", keyword)
 }
 
 // randChoice randomly choice an element from given elems.
