@@ -89,12 +89,12 @@ type Forecast struct {
 }
 
 func (f Forecast) String() string {
-	var icon string
-	now := time.Now()
-
 	if len(f.Weather) == 0 {
 		return ""
 	}
+
+	var icon string
+	now := time.Now()
 
 	switch f.Weather[0].Status {
 	case "Clear":
