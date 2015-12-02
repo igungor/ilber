@@ -1,27 +1,29 @@
 package command
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
-	"net/url"
+	"os"
 	"strings"
 	"time"
+
+	customsearch "google.golang.org/api/customsearch/v1"
+	"google.golang.org/api/googleapi/transport"
 )
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-const imageSearchURL = "https://ajax.googleapis.com/ajax/services/search/images"
+var (
+	imageApiKey       = os.Getenv("ILBER_IMAGESEARCH_APIKEY")
+	searchEngineID    = os.Getenv("ILBER_SEARCHENGINE_ID")
+	imageclient       = &http.Client{Transport: &transport.APIKey{Key: imageApiKey}}
+	validImageFormats = []string{"png", "jpg"}
 
-// https://developers.google.com/image-search/v1/jsondevguide
-// imgsz=small|medium|large|xlarge restricts results to medium-sized images
-const imageSize = "large"
-
-var httpclient = http.Client{Timeout: 10 * time.Second}
-var validImageFormats = []string{"png", "jpg"}
+	httpclient = &http.Client{Timeout: 10 * time.Second}
+)
 
 // searchImage retrives an image URL for given terms.
 func searchImage(terms ...string) (string, error) {
@@ -31,63 +33,25 @@ func searchImage(terms ...string) (string, error) {
 
 	keyword := strings.Join(terms, "+")
 
-	u, _ := url.Parse(imageSearchURL)
-	v := u.Query()
-	v.Set("q", keyword)
-	v.Set("v", "1.0")
-	v.Set("imgsz", imageSize)
-	u.RawQuery = v.Encode()
-
-	resp, err := http.Get(u.String())
+	service, err := customsearch.New(imageclient)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Error creating customsearch client: %v", err)
 	}
-	defer resp.Body.Close()
-
-	// datastructure of image search response
-	var response struct {
-		ResponseData struct {
-			Results []struct {
-				UnescapedURL string `json:"unescapedURL"`
-			} `json:"results"`
-		} `json:"responseData"`
+	cse := customsearch.NewCseService(service)
+	call := cse.List(keyword).Cx(searchEngineID).SearchType("image").Num(1)
+	resp, err := call.Do()
+	if err != nil {
+		return "", fmt.Errorf("Error making image search API call: %v", err)
 	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return "", err
+	if len(resp.Items) == 0 {
+		return "", fmt.Errorf("Could not find any image based on the given criteria: %v", keyword)
 	}
 
-	results := response.ResponseData.Results
-	if len(results) == 0 {
-		return "", fmt.Errorf("no results for the given criteria: %v\n", keyword)
-	}
-
-	for _, v := range results {
-		if validImage(v.UnescapedURL) {
-			return v.UnescapedURL, nil
-		}
-	}
-
-	return "", fmt.Errorf("no valid image format found for the given criteria: %v\n", keyword)
+	imageurl := resp.Items[0].Link
+	return imageurl, nil
 }
 
 // randChoice randomly choice an element from given elems.
 func randChoice(elems []string) string {
 	return elems[rand.Intn(len(elems))]
-}
-
-// validImage reports whether the given url string has a valid image format.
-func validImage(s string) bool {
-	// extract extension
-	i := strings.LastIndex(s, ".")
-	if i < 0 {
-		return false
-	}
-	ext := strings.ToLower(s[i+1:])
-	for _, format := range validImageFormats {
-		if ext == format {
-			return true
-		}
-	}
-	return false
 }
