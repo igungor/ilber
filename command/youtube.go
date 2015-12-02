@@ -51,6 +51,7 @@ func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {
 	response, err := call.Do()
 	if err != nil {
 		log.Printf("Error making youtube search API call: %v", err)
+		return
 	}
 
 	if len(response.Items) == 0 {
