@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	customsearch "google.golang.org/api/customsearch/v1"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/googleapi/transport"
 )
 
@@ -25,6 +27,8 @@ var (
 	httpclient = &http.Client{Timeout: 10 * time.Second}
 )
 
+var errImageSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
+
 // searchImage retrives an image URL for given terms.
 func searchImage(terms ...string) (string, error) {
 	if len(terms) == 0 {
@@ -38,13 +42,17 @@ func searchImage(terms ...string) (string, error) {
 		return "", fmt.Errorf("Error creating customsearch client: %v", err)
 	}
 	cse := customsearch.NewCseService(service)
-	call := cse.List(keyword).Cx(searchEngineID).SearchType("image").Num(1)
+	call := cse.List(keyword).Cx(searchEngineID).SearchType("image").Num(3)
 	resp, err := call.Do()
 	if err != nil {
-		return "", fmt.Errorf("Error making image search API call: %v", err)
+		concreteErr := err.(*googleapi.Error)
+		if concreteErr.Code == 403 && concreteErr.Message == "Daily Limit Exceeded" {
+			return "", errImageSearchQuotaExceeded
+		}
+		return "", fmt.Errorf("Error making image search API call for the given criteria: %v Err: %v", keyword, err)
 	}
 	if len(resp.Items) == 0 {
-		return "", fmt.Errorf("Could not find any image based on the given criteria: %v", keyword)
+		return "", fmt.Errorf("Could not find any image based for the given criteria: %v", keyword)
 	}
 
 	imageurl := resp.Items[0].Link

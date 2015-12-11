@@ -19,7 +19,6 @@ var cmdImg = &Command{
 
 func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
-
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)
@@ -32,7 +31,10 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := searchImage(args...)
 	if err != nil {
-		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
+		log.Printf("Error while searching image. Err: %v\n", err)
+		if err == errImageSearchQuotaExceeded {
+			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
+		}
 		return
 	}
 

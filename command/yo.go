@@ -35,7 +35,10 @@ func runYo(b *tlbot.Bot, msg *tlbot.Message) {
 
 	u, err := searchImage(terms...)
 	if err != nil {
-		log.Printf("Error while searching image with given criteria: %v\n", args)
+		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
+		if err == errImageSearchQuotaExceeded {
+			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
+		}
 		return
 	}
 
