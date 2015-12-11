@@ -66,7 +66,7 @@ func runStock(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(records) != len(currencies) {
-		err := b.SendMessage(msg.Chat.ID, "verdigin kurlardan biri ya da birkaci hatali", tlbot.ModeNone, false, nil)
+		err := b.SendMessage(msg.Chat.ID, "verdiğin kurlardan biri ya da birkaçı hatalı", tlbot.ModeNone, false, nil)
 		if err != nil {
 			log.Printf("Error while sending message. Err: %v\n", err)
 		}
