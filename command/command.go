@@ -33,6 +33,16 @@ func register(cmd *Command) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	if cmd.Name == "" {
+		panic("cannot register command with an empty name")
+	}
+	if cmd.Run == nil {
+		panic("cannot register command with an empty Run function value")
+	}
+	if _, ok := commands[cmd.Name]; ok {
+		panic("plugin already registered: " + cmd.Name)
+	}
+
 	commands[cmd.Name] = cmd
 }
 
