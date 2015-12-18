@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -24,8 +23,7 @@ var cmdYoutube = &Command{
 }
 
 var (
-	youtubeApiKey = os.Getenv("ILBER_YOUTUBE_APIKEY")
-	youtubeclient = &http.Client{Transport: &transport.APIKey{Key: youtubeApiKey}}
+	youtubeclient = &http.Client{Transport: &transport.APIKey{Key: googleAPIKey}}
 )
 
 func runYoutube(b *tlbot.Bot, msg *tlbot.Message) {

@@ -19,9 +19,9 @@ func init() {
 }
 
 var (
-	imageApiKey       = os.Getenv("ILBER_IMAGESEARCH_APIKEY")
+	googleAPIKey      = os.Getenv("ILBER_GOOGLE_APIKEY")
 	searchEngineID    = os.Getenv("ILBER_SEARCHENGINE_ID")
-	imageclient       = &http.Client{Transport: &transport.APIKey{Key: imageApiKey}}
+	imageclient       = &http.Client{Transport: &transport.APIKey{Key: googleAPIKey}}
 	validImageFormats = []string{"png", "jpg"}
 
 	httpclient = &http.Client{Timeout: 10 * time.Second}

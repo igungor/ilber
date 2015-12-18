@@ -26,8 +26,8 @@ var cmdForecast = &Command{
 const defaultCity = "Istanbul"
 
 var (
-	apikey      = os.Getenv("ILBER_OPENWEATHERMAP_APPID")
-	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
+	forecastAPIKey = os.Getenv("ILBER_OPENWEATHERMAP_APPID")
+	forecastURL    = "http://api.openweathermap.org/data/2.5/weather"
 )
 
 func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
@@ -46,7 +46,7 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 	params := u.Query()
 	params.Set("units", "metric")
-	params.Set("APPID", apikey)
+	params.Set("APPID", forecastAPIKey)
 	params.Set("q", location)
 	u.RawQuery = params.Encode()
 
