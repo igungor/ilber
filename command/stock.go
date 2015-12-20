@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -26,7 +27,7 @@ var (
 	financeURL        = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 )
 
-func runStock(b *tlbot.Bot, msg *tlbot.Message) {
+func runStock(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
 	var currencies []string

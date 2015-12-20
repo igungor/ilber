@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -19,25 +18,21 @@ func init() {
 }
 
 var (
-	googleAPIKey      = os.Getenv("ILBER_GOOGLE_APIKEY")
-	searchEngineID    = os.Getenv("ILBER_SEARCHENGINE_ID")
-	imageclient       = &http.Client{Transport: &transport.APIKey{Key: googleAPIKey}}
-	validImageFormats = []string{"png", "jpg"}
-
 	httpclient = &http.Client{Timeout: 10 * time.Second}
 )
 
 var errImageSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
 
 // searchImage retrives an image URL for given terms.
-func searchImage(terms ...string) (string, error) {
+func searchImage(apikey, searchEngineID string, terms ...string) (string, error) {
 	if len(terms) == 0 {
 		return "", fmt.Errorf("no search term given")
 	}
 
 	keyword := strings.Join(terms, "+")
 
-	service, err := customsearch.New(imageclient)
+	imageHTTPClient := &http.Client{Transport: &transport.APIKey{Key: apikey}}
+	service, err := customsearch.New(imageHTTPClient)
 	if err != nil {
 		return "", fmt.Errorf("Error creating customsearch client: %v", err)
 	}

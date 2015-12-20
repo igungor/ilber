@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 // A Command is an implementation of a bot command.
@@ -20,7 +21,7 @@ type Command struct {
 	Hidden bool
 
 	// Run runs the command.
-	Run func(bot *tlbot.Bot, msg *tlbot.Message)
+	Run func(context.Context, *tlbot.Bot, *tlbot.Message)
 }
 
 var (

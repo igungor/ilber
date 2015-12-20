@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -34,7 +35,7 @@ func (w weekday) String() string {
 	return days[w]
 }
 
-func runToday(b *tlbot.Bot, msg *tlbot.Message) {
+func runToday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
 	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
 	if err != nil {

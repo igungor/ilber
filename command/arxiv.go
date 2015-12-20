@@ -10,6 +10,7 @@ import (
 
 	"github.com/aaron-lebo/ocd/feeds/atom"
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -23,11 +24,9 @@ var cmdArxiv = &Command{
 	Run:       runArxiv,
 }
 
-var (
-	arxivURL = "http://export.arxiv.org/api/query"
-)
+const arxivURL = "http://export.arxiv.org/api/query"
 
-func runArxiv(b *tlbot.Bot, msg *tlbot.Message) {
+func runArxiv(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", tlbot.ModeNone, false, nil)

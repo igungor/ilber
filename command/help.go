@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -18,7 +19,7 @@ var cmdHelp = &Command{
 	Run:       runHelp,
 }
 
-func runHelp(b *tlbot.Bot, msg *tlbot.Message) {
+func runHelp(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	b.SendMessage(msg.Chat.ID, help(), tlbot.ModeNone, false, nil)
 }
 

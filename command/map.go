@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -22,7 +23,7 @@ var cmdMap = &Command{
 
 const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-func runMap(b *tlbot.Bot, msg *tlbot.Message) {
+func runMap(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		if err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", tlbot.ModeNone, false, nil); err != nil {
@@ -34,6 +35,7 @@ func runMap(b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	googleAPIKey := ctx.Value("googleAPIKey").(string)
 	place := strings.Join(args, " ")
 	params := u.Query()
 	params.Set("key", googleAPIKey)

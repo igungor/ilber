@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/context"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/igungor/tlbot"
 )
@@ -30,7 +32,7 @@ var (
 	movieCache      = map[string][]string{}
 )
 
-func runMovies(b *tlbot.Bot, msg *tlbot.Message) {
+func runMovies(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	movies, err := fetchOrCache()
 	if err != nil {
 		log.Printf("Error while fetching movies: %v\n", err)

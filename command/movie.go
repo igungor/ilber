@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -27,7 +28,7 @@ var cmdMovie = &Command{
 // result if any release date is given in query terms.
 const movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
-func runMovie(b *tlbot.Bot, msg *tlbot.Message) {
+func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		term := randChoice(movieExamples)

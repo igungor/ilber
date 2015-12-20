@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -24,7 +25,7 @@ var cmdWiki = &Command{
 // Wikipedia API lacks multi-lingual search.
 const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
-func runWiki(b *tlbot.Bot, msg *tlbot.Message) {
+func runWiki(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	var txt string
 	if len(args) == 0 {

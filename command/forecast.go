@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -23,14 +23,12 @@ var cmdForecast = &Command{
 	Run:       runForecast,
 }
 
-const defaultCity = "Istanbul"
-
-var (
-	forecastAPIKey = os.Getenv("ILBER_OPENWEATHERMAP_APPID")
-	forecastURL    = "http://api.openweathermap.org/data/2.5/weather"
+const (
+	defaultCity = "Istanbul"
+	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
 )
 
-func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
+func runForecast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	var location string
 	if len(args) == 0 {
@@ -44,6 +42,9 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 		log.Printf("Error while parsing URL '%v'. Err: %v", forecastURL, err)
 		return
 	}
+
+	forecastAPIKey := ctx.Value("openWeatherMapAppID").(string)
+
 	params := u.Query()
 	params.Set("units", "metric")
 	params.Set("APPID", forecastAPIKey)
@@ -67,7 +68,6 @@ func runForecast(b *tlbot.Bot, msg *tlbot.Message) {
 	if txt == "" {
 		txt = fmt.Sprintf("%v bulunamadı.", location)
 	}
-
 	err = b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
@@ -95,7 +95,6 @@ func (f Forecast) String() string {
 
 	var icon string
 	now := time.Now()
-
 	switch f.Weather[0].Status {
 	case "Clear":
 		if 6 < now.Hour() && now.Hour() < 18 { // for istanbul
@@ -120,6 +119,5 @@ func (f Forecast) String() string {
 	default:
 		icon = ""
 	}
-
 	return fmt.Sprintf("%v %v *%.1f* °C", icon, f.City, f.Temperature.Celsius)
 }

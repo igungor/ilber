@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -18,7 +19,7 @@ var cmdEcho = &Command{
 	Run:       runEcho,
 }
 
-func runEcho(b *tlbot.Bot, msg *tlbot.Message) {
+func runEcho(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		args = []string{"çok cahilsin"}

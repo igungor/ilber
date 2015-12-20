@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -17,7 +18,7 @@ var cmdImg = &Command{
 	Run:       runImg,
 }
 
-func runImg(b *tlbot.Bot, msg *tlbot.Message) {
+func runImg(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
@@ -29,7 +30,10 @@ func runImg(b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	u, err := searchImage(args...)
+	googleAPIKey := ctx.Value("googleAPIKey").(string)
+	searchEngineID := ctx.Value("googleSearchEngineID").(string)
+
+	u, err := searchImage(googleAPIKey, searchEngineID, args...)
 	if err != nil {
 		log.Printf("Error while searching image. Err: %v\n", err)
 		if err == errImageSearchQuotaExceeded {

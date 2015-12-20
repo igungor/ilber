@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -17,7 +18,7 @@ var cmdRayRay = &Command{
 	Run:       runRayRay,
 }
 
-func runRayRay(b *tlbot.Bot, msg *tlbot.Message) {
+func runRayRay(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	err := b.SendMessage(msg.Chat.ID, "malifalitiko!", tlbot.ModeNone, false, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)

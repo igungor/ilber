@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
+
+	"golang.org/x/net/context"
 
 	_ "net/http/pprof"
 
@@ -16,18 +19,13 @@ import (
 
 // flags
 var (
-	token   = flag.String("token", "", "telegram bot token")
-	webhook = flag.String("webhook", "", "webhook url")
-	host    = flag.String("host", "", "host to listen to")
-	port    = flag.String("port", "1985", "port to listen to")
-	debug   = flag.Bool("d", false, "debug mode (*very* verbose)")
-	profile = flag.Bool("p", true, "enable profiling")
+	flagConfig = flag.String("c", "./ilber.conf", "configuration file path")
 )
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "ilber is a multi-purpose Telegram bot\n\n")
 	fmt.Fprintf(os.Stderr, "usage:\n")
-	fmt.Fprintf(os.Stderr, "  ilber -token <insert-your-telegrambot-token> -webhook <insert-your-webhook-url>\n\n")
+	fmt.Fprintf(os.Stderr, "  ilber -c <path of ilber.conf>\n\n")
 	fmt.Fprintf(os.Stderr, "flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -39,30 +37,28 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	if *token == "" {
-		log.Printf("missing token parameter\n\n")
-		flag.Usage()
-	}
-	if *webhook == "" {
-		log.Printf("missing webhook parameter\n\n")
-		flag.Usage()
+	config, err := readConfig(*flagConfig)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "configuration error: %v\n", err)
+		os.Exit(1)
 	}
 
-	b := tlbot.New(*token)
-	err := b.SetWebhook(*webhook)
-	if err != nil {
+	b := tlbot.New(config.Token)
+	if err := b.SetWebhook(config.Webhook); err != nil {
 		log.Fatalf("error while setting webhook: %v", err)
 	}
-	log.Printf("Webhook set to %v\n", *webhook)
+	log.Printf("Webhook set to %v\n", config.Webhook)
 
-	if *profile {
+	if config.Profile {
 		go func() {
 			log.Println("Exposing profile information on http://:6969")
 			log.Printf("profile error: %v", http.ListenAndServe(":6969", nil))
 		}()
 	}
 
-	messages := b.Listen(net.JoinHostPort(*host, *port))
+	ctx := newCtxWithValues(config)
+
+	messages := b.Listen(net.JoinHostPort(config.Host, config.Port))
 	for msg := range messages {
 		log.Printf("%v\n", msg)
 
@@ -83,6 +79,46 @@ func main() {
 		}
 
 		// it is. cool, run it!
-		go cmd.Run(&b, &msg)
+		go cmd.Run(ctx, &b, &msg)
 	}
+}
+
+type Config struct {
+	Token   string `json:"token"`
+	Webhook string `json:"webhook"`
+	Host    string `json:"host"`
+	Port    string `json:"port"`
+	Debug   bool   `json:"debug"`
+	Profile bool   `json:"profile"`
+
+	GoogleAPIKey         string `json:"googleAPIKey"`
+	GoogleSearchEngineID string `json:"googleSearchEngineID"`
+	OpenweathermapAppId  string `json:"openWeatherMapAppID"`
+}
+
+func readConfig(configpath string) (config *Config, err error) {
+	f, err := os.Open(configpath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	if err := json.NewDecoder(f).Decode(&config); err != nil {
+		return nil, err
+	}
+	if config.Token == "" {
+		return nil, fmt.Errorf("token field can not be empty")
+	}
+	if config.Webhook == "" {
+		return nil, fmt.Errorf("webhook field can not be empty")
+	}
+	return config, nil
+}
+
+func newCtxWithValues(c *Config) context.Context {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "googleAPIKey", c.GoogleAPIKey)
+	ctx = context.WithValue(ctx, "googleSearchEngineID", c.GoogleSearchEngineID)
+	ctx = context.WithValue(ctx, "openWeatherMapAppID", c.OpenweathermapAppId)
+	return ctx
 }

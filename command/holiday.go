@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -61,7 +62,7 @@ func in(date, start, end time.Time) bool {
 	return date.After(start) && date.Before(end)
 }
 
-func runHoliday(b *tlbot.Bot, msg *tlbot.Message) {
+func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	now := time.Now().UTC()
 
 	for _, t := range holidays {

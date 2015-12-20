@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -108,7 +109,7 @@ func populate() {
 	}
 }
 
-func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
+func runPrayerCall(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)
@@ -137,7 +138,7 @@ func runPrayerCall(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 }
 
-func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
+func runFoodFast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)
@@ -158,7 +159,7 @@ func runFoodFast(b *tlbot.Bot, msg *tlbot.Message) {
 	}
 }
 
-func runFoodDawn(b *tlbot.Bot, msg *tlbot.Message) {
+func runFoodDawn(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)

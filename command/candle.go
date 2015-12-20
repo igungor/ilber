@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 func init() {
@@ -33,7 +34,7 @@ var dasCandles = map[string]string{
 	"11 Dec 2016": "Mevlid Kandili",
 }
 
-func runCandle(b *tlbot.Bot, msg *tlbot.Message) {
+func runCandle(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	const timeformat = "2 Jan 2006"
 	var txt string
 	now := time.Now().UTC().Format(timeformat)
