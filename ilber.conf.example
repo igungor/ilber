@@ -1,0 +1,11 @@
+{
+  "host": "",
+  "port": "1985",
+  "token": "",
+  "webhook": "",
+  "debug": false,
+  "profile": false,
+  "googleAPIKey": "",
+  "googleSearchEngineID": "",
+  "openWeatherMapAppID": ""
+}
