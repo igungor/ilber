@@ -8,6 +8,12 @@ ilber is a multi-purpose Telegram bot.
 go get github.com/igungor/ilber
 ```
 
+## run
+
+```sh
+ilber -c "path-to-ilber.conf"
+```
+
 ## license
 
 MIT. See LICENSE.
