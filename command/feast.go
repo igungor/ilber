@@ -99,7 +99,7 @@ var _callTime = map[string]struct {
 }
 
 func populate() {
-	loc, _ := time.LoadLocation("Europe/Istanbul")
+	loc, _ := time.LoadLocation(timezone)
 
 	for k, v := range _callTime {
 		iftar, _ := time.ParseInLocation(timeFormatLong, fmt.Sprintf("%v %v", k, v.iftar), loc)

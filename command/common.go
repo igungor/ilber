@@ -17,9 +17,7 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-var (
-	httpclient = &http.Client{Timeout: 10 * time.Second}
-)
+var httpclient = &http.Client{Timeout: 10 * time.Second}
 
 var errImageSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
 

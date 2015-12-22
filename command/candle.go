@@ -36,8 +36,9 @@ var dasCandles = map[string]string{
 
 func runCandle(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	const timeformat = "2 Jan 2006"
+	loc, _ := time.LoadLocation("Europe/Istanbul")
+	now := time.Now().In(loc).Format(timeformat)
 	var txt string
-	now := time.Now().UTC().Format(timeformat)
 	v, ok := dasCandles[now]
 	if !ok {
 		txt = "hayır"
