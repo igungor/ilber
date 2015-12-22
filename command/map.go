@@ -68,7 +68,10 @@ func runMap(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	firstPlace := places.Results[0]
-	location := tlbot.Location{firstPlace.Geometry.Location.Lat, firstPlace.Geometry.Location.Long}
+	location := tlbot.Location{
+		Lat:  firstPlace.Geometry.Location.Lat,
+		Long: firstPlace.Geometry.Location.Long,
+	}
 	if err := b.SendLocation(msg.Chat.ID, location, nil); err != nil {
 		log.Printf("Error sending location: %v\n", err)
 	}
