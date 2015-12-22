@@ -2,3 +2,4 @@ images/
 release/
 debian/
 cmd/ilber/ilber
+ilber.conf
