@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"os"
 
-	"golang.org/x/net/context"
-
 	_ "net/http/pprof"
 
 	"github.com/igungor/ilber/command"
 	"github.com/igungor/tlbot"
+	"golang.org/x/net/context"
 )
 
 // flags
