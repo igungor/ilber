@@ -16,4 +16,10 @@ release:
 deploy: release
 	@ansible-playbook deploy.yml
 
-.PHONY: all build vet test release deploy
+issues:
+	@hub issue
+	@ag --ignore=Makefile -s TODO || true
+	@ag --ignore=Makefile -s FIXME || true
+	@ag --ignore=Makefile -s println || true
+
+.PHONY: all build vet test release deploy issues
