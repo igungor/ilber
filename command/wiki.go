@@ -1,10 +1,7 @@
 package command
 
 import (
-	"encoding/json"
 	"log"
-	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -27,50 +24,31 @@ const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
 func runWiki(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
-	var txt string
 	if len(args) == 0 {
 		err := b.SendMessage(msg.Chat.ID, "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*", tlbot.ModeMarkdown, false, nil)
 		if err != nil {
-			log.Printf("Error while sending message '%v'. Err: %v\n", txt, err)
+			log.Printf("Error while sending message. Err: %v\n", err)
 		}
 		return
 	}
 
-	qs := strings.Join(args, "+")
+	googleAPIKey := ctx.Value("googleAPIKey").(string)
+	searchEngineID := ctx.Value("googleSearchEngineID").(string)
 
-	u, _ := url.Parse(wikiURL)
-	params := u.Query()
-	params.Set("v", "1.0")
-	params.Set("q", "wikipedia+"+qs)
-	u.RawQuery = params.Encode()
+	terms := []string{"wikipedia"}
+	terms = append(terms, args...)
 
-	resp, err := http.Get(u.String())
+	urls, err := search(googleAPIKey, searchEngineID, "", terms...)
 	if err != nil {
-		log.Printf("Error while fetching reference with given criteria '%v'. Err: %v", qs, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	var wikiResult struct {
-		ResponseData struct {
-			Results []struct {
-				URL   string `json:"url"`
-				Title string `json:"titleNoFormatting"`
-			}
+		log.Printf("Error while 'bkz' query. Err: %v\n", err)
+		if err == errSearchQuotaExceeded {
+			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
 		}
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&wikiResult); err != nil {
-		log.Printf("Error while decoding wiki response: %v\n", err)
 		return
 	}
 
-	for _, article := range wikiResult.ResponseData.Results {
-		if strings.Contains(article.URL, "wikipedia.org/wiki/") {
-			articleURL, err := url.QueryUnescape(article.URL)
-			if err != nil {
-				articleURL = article.URL
-			}
+	for _, articleURL := range urls {
+		if strings.Contains(articleURL, "wikipedia.org/wiki/") {
 			err = b.SendMessage(msg.Chat.ID, articleURL, tlbot.ModeNone, true, nil)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)

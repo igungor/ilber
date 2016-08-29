@@ -35,16 +35,16 @@ func runYo(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 
 	terms := []string{"Yiğit", "Özgür"}
 	terms = append(terms, args...)
-	u, err := searchImage(googleAPIKey, searchEngineID, terms...)
+	u, err := search(googleAPIKey, searchEngineID, "image", terms...)
 	if err != nil {
 		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
-		if err == errImageSearchQuotaExceeded {
+		if err == errSearchQuotaExceeded {
 			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
 		}
 		return
 	}
 
-	photo := tlbot.Photo{File: tlbot.File{FileURL: u}}
+	photo := tlbot.Photo{File: tlbot.File{FileURL: u[0]}}
 	err = b.SendPhoto(msg.Chat.ID, photo, "", nil)
 	if err != nil {
 		log.Printf("Error while sending image: %v\n", err)
