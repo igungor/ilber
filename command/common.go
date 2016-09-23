@@ -19,12 +19,12 @@ func init() {
 
 var httpclient = &http.Client{Timeout: 10 * time.Second}
 
-var errImageSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
+var errSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
 
 // searchImage retrives an image URL for given terms.
-func searchImage(apikey, searchEngineID string, terms ...string) (string, error) {
+func search(apikey, searchEngineID string, searchType string, terms ...string) ([]string, error) {
 	if len(terms) == 0 {
-		return "", fmt.Errorf("no search term given")
+		return nil, fmt.Errorf("no search term given")
 	}
 
 	keyword := strings.Join(terms, "+")
@@ -32,24 +32,33 @@ func searchImage(apikey, searchEngineID string, terms ...string) (string, error)
 	imageHTTPClient := &http.Client{Transport: &transport.APIKey{Key: apikey}}
 	service, err := customsearch.New(imageHTTPClient)
 	if err != nil {
-		return "", fmt.Errorf("Error creating customsearch client: %v", err)
+		return nil, fmt.Errorf("Error creating customsearch client: %v", err)
 	}
 	cse := customsearch.NewCseService(service)
-	call := cse.List(keyword).Cx(searchEngineID).SearchType("image").Num(3)
+
+	const imageCount = 3
+	call := cse.List(keyword).Cx(searchEngineID).Num(imageCount)
+	if searchType == "image" {
+		call = call.SearchType(searchType)
+	}
+
 	resp, err := call.Do()
 	if err != nil {
 		concreteErr := err.(*googleapi.Error)
 		if concreteErr.Code == 403 && concreteErr.Message == "Daily Limit Exceeded" {
-			return "", errImageSearchQuotaExceeded
+			return nil, errSearchQuotaExceeded
 		}
-		return "", fmt.Errorf("Error making image search API call for the given criteria: %v Err: %v", keyword, err)
+		return nil, fmt.Errorf("Error making image search API call for the given criteria: %v Err: %v", keyword, err)
 	}
 	if len(resp.Items) == 0 {
-		return "", fmt.Errorf("Could not find any image based for the given criteria: %v", keyword)
+		return nil, fmt.Errorf("Could not find any image based for the given criteria: %v", keyword)
 	}
 
-	imageurl := resp.Items[0].Link
-	return imageurl, nil
+	var urls []string
+	for _, url := range resp.Items {
+		urls = append(urls, url.Link)
+	}
+	return urls, nil
 }
 
 // randChoice randomly choice an element from given elems.

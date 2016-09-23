@@ -14,7 +14,9 @@ release:
 	@rmdir debian/
 
 deploy: release
-	@ansible-playbook deploy.yml
+	@scp release/0.1/ilber_*.deb ilber:
+	@ssh ilber 'sudo dpkg -i ilber_*.deb'
+	@ssh ilber 'sudo service ilber restart'
 
 issues:
 	@hub issue

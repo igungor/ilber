@@ -33,16 +33,16 @@ func runImg(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	googleAPIKey := ctx.Value("googleAPIKey").(string)
 	searchEngineID := ctx.Value("googleSearchEngineID").(string)
 
-	u, err := searchImage(googleAPIKey, searchEngineID, args...)
+	urls, err := search(googleAPIKey, searchEngineID, "image", args...)
 	if err != nil {
 		log.Printf("Error while searching image. Err: %v\n", err)
-		if err == errImageSearchQuotaExceeded {
+		if err == errSearchQuotaExceeded {
 			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
 		}
 		return
 	}
 
-	photo := tlbot.Photo{File: tlbot.File{FileURL: u}}
+	photo := tlbot.Photo{File: tlbot.File{FileURL: urls[0]}}
 	err = b.SendPhoto(msg.Chat.ID, photo, "", nil)
 	if err != nil {
 		log.Printf("Error while sending photo: %v\n", err)
