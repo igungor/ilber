@@ -13,13 +13,13 @@ import (
 )
 
 func init() {
-	register(cmdStock)
+	register(cmdExchange)
 }
 
-var cmdStock = &Command{
+var cmdExchange = &Command{
 	Name:      "kur",
 	ShortLine: "kurlar ne alemde?",
-	Run:       runStock,
+	Run:       runExchange,
 }
 
 var (
@@ -27,7 +27,7 @@ var (
 	financeURL        = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 )
 
-func runStock(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runExchange(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 
 	var currencies []string
@@ -54,7 +54,7 @@ func runStock(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("Error while fetching stock information. Err: %v", err)
+		log.Printf("Error while fetching exchange information. Err: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -62,7 +62,7 @@ func runStock(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	cr := csv.NewReader(resp.Body)
 	records, err := cr.ReadAll()
 	if err != nil {
-		log.Printf("Error while parsing stock information. Err: %v", err)
+		log.Printf("Error while parsing exchange information. Err: %v", err)
 		return
 	}
 
