@@ -24,15 +24,17 @@ var cmdHoliday = &Command{
 var day = 24 * time.Hour
 
 var holidays = []h{
-	// 2015
-	{"Yılbaşı tatili", newdate("1 Jan 2015"), day},
-	{"Çocuk Bayramı", newdate("23 Apr 2015"), day},
-	{"İşçi Bayramı", newdate("1 May 2015"), day},
-	{"Gençlik Bayramı", newdate("19 May 2015"), day},
-	{"Ramazan Bayramı", newdate("18 Jul 2015"), 3 * day},
-	{"Zafer Bayramı", newdate("30 Aug 2015"), day},
-	{"Kurban Bayramı", newdate("25 Sep 2015"), 4 * day},
-	{"Cumhuriyet Bayramı", newdate("29 Oct 2015"), day},
+	// 2017
+	{"Yılbaşı tatili", newdate("1 Jan 2017"), day},
+	{"Çocuk Bayramı", newdate("23 Apr 2017"), day},
+	{"İşçi Bayramı", newdate("1 May 2017"), day},
+	{"Gençlik Bayramı", newdate("19 May 2017"), day},
+	{"Ramazan Bayramı", newdate("24 Jun 2017"), 3 * day},
+	{"Demokrasi Şeysi", newdate("15 Jun 2017"), day},
+	{"Zafer Bayramı", newdate("30 Aug 2017"), day},
+	{"Kurban Bayramı", newdate("31 Aug 2017"), 12 * time.Hour},
+	{"Kurban Bayramı", newdate("1 Sep 2017"), 4 * day},
+	{"Cumhuriyet Bayramı", newdate("29 Oct 2017"), day + 12*time.Hour},
 }
 
 type h struct {
@@ -84,7 +86,7 @@ func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	err := b.SendMessage(msg.Chat.ID, "yakın zamanda tatil görünmüyör :(", tlbot.ModeMarkdown, false, nil)
+	err := b.SendMessage(msg.Chat.ID, "yakın zamanda tatil görünmüyor :(", tlbot.ModeMarkdown, false, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return
