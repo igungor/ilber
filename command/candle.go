@@ -20,18 +20,15 @@ var cmdCandle = &Command{
 }
 
 var dasCandles = map[string]string{
-	"2 Jan 2015":  "Mevlid Kandili",
-	"23 Apr 2015": "Regaib Kandili",
-	"15 May 2015": "Mirac Kandili",
-	"1 Jun 2015":  "Berat Kandili",
-	"13 Jul 2015": "Kadir Gecesi",
-	"22 Dec 2015": "Mevlid Kandili",
-
-	"7 Apr 2016":  "Regaib Kandili",
-	"3 Apr 2016":  "Mirac Kandili",
-	"21 May 2016": "Berat Kandili",
-	"1 Jul 2016":  "Kadir Gecesi",
+	// 2016
 	"11 Dec 2016": "Mevlid Kandili",
+
+	// 2017
+	"30 Mar 2017": "Regaib Kandili",
+	"23 Apr 2017": "Mirac Kandili",
+	"10 May 2017": "Berat Kandili",
+	"21 Jun 2017": "Kadir Gecesi",
+	"29 Nov 2017": "Mevlid Kandili",
 }
 
 func runCandle(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
