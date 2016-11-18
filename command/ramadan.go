@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-	populate()
-	register(cmdPrayerCall)
-	register(cmdFoodFast)
-	register(cmdFoodDawn)
+	// populate()
+	// register(cmdPrayerCall)
+	// register(cmdFoodFast)
+	// register(cmdFoodDawn)
 }
 
 var (
