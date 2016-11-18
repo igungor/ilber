@@ -12,18 +12,18 @@ import (
 )
 
 func init() {
-	register(cmdMap)
+	register(cmdLocation)
 }
 
-var cmdMap = &Command{
+var cmdLocation = &Command{
 	Name:      "konum",
 	ShortLine: "ne nerde",
-	Run:       runMap,
+	Run:       runLocation,
 }
 
 const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-func runMap(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		if err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", tlbot.ModeNone, false, nil); err != nil {
