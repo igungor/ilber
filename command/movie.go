@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	register(cmdMovie)
+	// register(cmdMovie)
 }
 
 var cmdMovie = &Command{
