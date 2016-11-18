@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	register(cmdMovies)
+	// register(cmdMovies)
 }
 
 var cmdMovies = &Command{
