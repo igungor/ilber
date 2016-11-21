@@ -82,7 +82,7 @@ func main() {
 	}
 }
 
-type Config struct {
+type config struct {
 	Token   string `json:"token"`
 	Webhook string `json:"webhook"`
 	Host    string `json:"host"`
@@ -95,7 +95,7 @@ type Config struct {
 	OpenweathermapAppId  string `json:"openWeatherMapAppID"`
 }
 
-func readConfig(configpath string) (config *Config, err error) {
+func readConfig(configpath string) (config *config, err error) {
 	f, err := os.Open(configpath)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func readConfig(configpath string) (config *Config, err error) {
 	return config, nil
 }
 
-func newCtxWithValues(c *Config) context.Context {
+func newCtxWithValues(c *config) context.Context {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "googleAPIKey", c.GoogleAPIKey)
 	ctx = context.WithValue(ctx, "googleSearchEngineID", c.GoogleSearchEngineID)

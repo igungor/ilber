@@ -21,7 +21,8 @@ var httpclient = &http.Client{Timeout: 10 * time.Second}
 
 var errSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
 
-// searchImage retrives an image URL for given terms.
+// search does a Google search with the given terms. searchType could be
+// "image" or empty string.
 func search(apikey, searchEngineID string, searchType string, terms ...string) ([]string, error) {
 	if len(terms) == 0 {
 		return nil, fmt.Errorf("no search term given")

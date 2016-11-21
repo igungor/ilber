@@ -1,11 +1,8 @@
 package command
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -13,7 +10,7 @@ import (
 )
 
 func init() {
-	// register(cmdMovie)
+	register(cmdMovie)
 }
 
 var cmdMovie = &Command{
@@ -21,12 +18,6 @@ var cmdMovie = &Command{
 	ShortLine: "ay-em-dii-bii",
 	Run:       runMovie,
 }
-
-// the best search engine is still google.
-// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
-// themoviedb search engine was the most accurate yet still can't find any
-// result if any release date is given in query terms.
-const movieAPIURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
 func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
@@ -40,40 +31,26 @@ func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	qs := strings.Join(args, "+")
+	googleAPIKey := ctx.Value("googleAPIKey").(string)
+	searchEngineID := ctx.Value("googleSearchEngineID").(string)
 
-	u, _ := url.Parse(movieAPIURL)
-	params := u.Query()
-	params.Set("v", "1.0")
-	params.Set("q", qs+"+movie")
-	u.RawQuery = params.Encode()
-
-	resp, err := http.Get(u.String())
+	// the best search engine is still google.
+	// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
+	// themoviedb search engine was the most accurate yet still can't find any
+	// result if any release date is given in query terms.
+	urls, err := search(googleAPIKey, searchEngineID, "", args...)
 	if err != nil {
-		log.Printf("Error while fetching movie with given criteria '%v'. Err: %v", qs, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	var response struct {
-		ResponseData struct {
-			Results []struct {
-				URL   string `json:"url"`
-				Title string `json:"titleNoFormatting"`
-			}
+		log.Printf("Error searching %v: %v\n", args, err)
+		if err == errSearchQuotaExceeded {
+			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
 		}
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		log.Printf("(movie) Error while decoding movie response: %v\n", err)
 		return
 	}
 
-	for _, movie := range response.ResponseData.Results {
-		if strings.Contains(movie.URL, "imdb.com/title/tt") {
-			title := strings.TrimSuffix(movie.Title, " - IMDb")
-			r := fmt.Sprintf("[%v](%v)", title, movie.URL)
-			err := b.SendMessage(msg.Chat.ID, r, tlbot.ModeMarkdown, true, nil)
+	for _, url := range urls {
+		if strings.Contains(url, "imdb.com/title/tt") {
+
+			err := b.SendMessage(msg.Chat.ID, url, tlbot.ModeNone, true, nil)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
@@ -97,4 +74,7 @@ var movieExamples = []string{
 	"Cidade de Deus",
 	"The Big Lebowski",
 	"There Will Be Blood",
+	"Ghost in the Shell",
+	"The Grey",
+	"Seven Samurai",
 }
