@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/igungor/tlbot"
@@ -27,64 +28,87 @@ var defaultCurrencies = []string{"USD", "EUR"}
 const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 
 func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
-	args := msg.Args()
-
-	var currencies []string
-	if args != nil {
-		currencies = args
-	} else {
-		currencies = defaultCurrencies
-	}
-
-	u, err := url.Parse(financeURL)
+	s, err := parseQuery(msg.Args())
 	if err != nil {
-		log.Printf("Error while parsing url '%v'. Err: %v", financeURL, err)
+		err = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu", tlbot.ModeNone, false, nil)
+		log.Printf("Error while sending message: %v\n", err)
 		return
 	}
 
-	var qs []string
-	for i, currency := range currencies {
-		currency = normalize(currency)
-		currencies[i] = currency
-		qs = append(qs, currency+"TRY=X")
+	err = b.SendMessage(msg.Chat.ID, s, tlbot.ModeNone, false, nil)
+	if err != nil {
+		log.Printf("Error while sending message. Err: %v\n", err)
+	}
+}
+
+func parseQuery(terms []string) (string, error) {
+	if terms == nil {
+		terms = defaultCurrencies
 	}
 
-	// query string be like: USDTRY=X,EURTRY=X
+	u, _ := url.Parse(financeURL)
 	params := u.Query()
-	params.Set("s", strings.Join(qs, ","))
-	u.RawQuery = params.Encode()
 
+	var isQuestion bool
+	var f float64
+
+	// check if the query is a calculation statement (contains 4 tokens):
+	// x EUR in TRY
+	// x dollars in pounds
+	// x dolar kaç lira
+	if len(terms) == 4 {
+		var err error
+		f, err = strconv.ParseFloat(terms[0], 32)
+		if err == nil {
+			isQuestion = true
+		}
+	}
+
+	currencies := make([]string, len(terms))
+	if isQuestion {
+		currencies[0], currencies[1] = normalize(terms[1]), normalize(terms[3])
+		params.Set("s", fmt.Sprintf("%v%v=X", currencies[0], currencies[1]))
+	} else {
+		// query string be like: USDTRY=X,EURTRY=X
+		var qs []string
+		for i, cur := range terms {
+			cur = normalize(cur)
+			currencies[i] = cur
+			qs = append(qs, cur+"TRY=X")
+		}
+		params.Set("s", strings.Join(qs, ","))
+	}
+
+	u.RawQuery = params.Encode()
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("Error while fetching currency information. Err: %v", err)
-		return
+		return "", fmt.Errorf("error fetching currencies: %v", err)
 	}
 	defer resp.Body.Close()
 
 	cr := csv.NewReader(resp.Body)
 	records, err := cr.ReadAll()
 	if err != nil {
-		log.Printf("Error while parsing currency information. Err: %v", err)
-		return
-	}
-
-	if len(records) != len(currencies) {
-		err := b.SendMessage(msg.Chat.ID, "verdiğin kurlardan biri ya da birkaçı hatalı", tlbot.ModeNone, false, nil)
-		if err != nil {
-			log.Printf("Error while sending message. Err: %v\n", err)
-		}
-		return
+		return "", fmt.Errorf("error reading csv: %v", err)
 	}
 
 	var buf bytes.Buffer
+	if isQuestion {
+		rate, err := strconv.ParseFloat(records[0][1], 32)
+		if err != nil {
+			return "", fmt.Errorf("error reading record as float: %v", err)
+		} else {
+			r := f * rate
+			buf.WriteString(fmt.Sprintf("%.2f %v = %.2f %v\n", f, currencies[0], r, currencies[1]))
+		}
+		return buf.String(), nil
+	}
+
 	for i, record := range records {
 		buf.WriteString(fmt.Sprintf("%v = %v ₺\n", currencies[i], record[1]))
 	}
 
-	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeNone, false, nil)
-	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
-	}
+	return buf.String(), nil
 }
 
 // popular currencies
