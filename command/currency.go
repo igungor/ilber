@@ -22,10 +22,9 @@ var cmdCurrency = &Command{
 	Run:       runCurrency,
 }
 
-var (
-	defaultCurrencies = []string{"USD", "EUR"}
-	financeURL        = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
-)
+var defaultCurrencies = []string{"USD", "EUR"}
+
+const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 
 func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
@@ -45,11 +44,14 @@ func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 
 	var qs []string
 	for i, currency := range currencies {
-		currencies[i] = strings.ToUpper(currency)
-		qs = append(qs, currency+"TRY=X,")
+		currency = normalize(currency)
+		currencies[i] = currency
+		qs = append(qs, currency+"TRY=X")
 	}
+
+	// query string be like: USDTRY=X,EURTRY=X
 	params := u.Query()
-	params.Set("s", strings.Join(qs, ""))
+	params.Set("s", strings.Join(qs, ","))
 	u.RawQuery = params.Encode()
 
 	resp, err := httpclient.Get(u.String())
@@ -83,4 +85,37 @@ func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 	}
+}
+
+// popular currencies
+var m = map[string]string{
+	"₺":     "TRY",
+	"lira":  "TRY",
+	"liras": "TRY",
+
+	"$":       "USD",
+	"dolar":   "USD",
+	"dollar":  "USD",
+	"dollars": "USD",
+
+	"€":     "EUR",
+	"euro":  "EUR",
+	"euros": "EUR",
+	"yuro":  "EUR",
+	"avro":  "EUR",
+
+	"£":        "GBP",
+	"pound":    "GBP",
+	"pounds":   "GBP",
+	"sterlin":  "GBP",
+	"sterlins": "GBP",
+}
+
+func normalize(s string) string {
+	sl := strings.ToLower(s)
+	currency, ok := m[sl]
+	if !ok {
+		return strings.ToUpper(s)
+	}
+	return currency
 }
