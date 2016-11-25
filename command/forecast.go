@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,7 +11,6 @@ import (
 	"time"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 func init() {

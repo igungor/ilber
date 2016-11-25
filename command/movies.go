@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,8 +10,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/igungor/tlbot"

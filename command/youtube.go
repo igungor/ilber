@@ -1,13 +1,13 @@
 package command
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
 )

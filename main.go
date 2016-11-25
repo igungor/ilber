@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/igungor/ilber/command"
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 // flags

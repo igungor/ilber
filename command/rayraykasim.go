@@ -1,10 +1,10 @@
 package command
 
 import (
+	"context"
 	"log"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 func init() {

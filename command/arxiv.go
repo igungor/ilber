@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/aaron-lebo/ocd/feeds/atom"
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 func init() {

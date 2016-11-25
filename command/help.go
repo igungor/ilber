@@ -2,11 +2,11 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"sort"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 func init() {

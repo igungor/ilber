@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"fmt"
 	"log"
@@ -10,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 func init() {
@@ -114,6 +114,7 @@ func parseQuery(terms []string) (string, error) {
 // popular currencies
 var m = map[string]string{
 	"₺":     "TRY",
+	"tl":    "TRY",
 	"lira":  "TRY",
 	"liras": "TRY",
 
@@ -121,6 +122,7 @@ var m = map[string]string{
 	"dolar":   "USD",
 	"dollar":  "USD",
 	"dollars": "USD",
+	"dolares": "USD",
 
 	"€":     "EUR",
 	"euro":  "EUR",

@@ -1,11 +1,11 @@
 package command
 
 import (
+	"context"
 	"strings"
 	"sync"
 
 	"github.com/igungor/tlbot"
-	"golang.org/x/net/context"
 )
 
 // A Command is an implementation of a bot command.
