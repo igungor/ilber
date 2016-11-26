@@ -30,8 +30,8 @@ const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	s, err := parseQuery(msg.Args())
 	if err != nil {
-		err = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu", tlbot.ModeNone, false, nil)
-		log.Printf("Error while sending message: %v\n", err)
+		log.Printf("Error parsing query: %v\n", err)
+		_ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu", tlbot.ModeNone, false, nil)
 		return
 	}
 

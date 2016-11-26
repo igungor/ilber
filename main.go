@@ -92,7 +92,7 @@ type config struct {
 
 	GoogleAPIKey         string `json:"googleAPIKey"`
 	GoogleSearchEngineID string `json:"googleSearchEngineID"`
-	OpenweathermapAppId  string `json:"openWeatherMapAppID"`
+	OpenweathermapAppID  string `json:"openWeatherMapAppID"`
 }
 
 func readConfig(configpath string) (config *config, err error) {
@@ -118,6 +118,6 @@ func newCtxWithValues(c *config) context.Context {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "googleAPIKey", c.GoogleAPIKey)
 	ctx = context.WithValue(ctx, "googleSearchEngineID", c.GoogleSearchEngineID)
-	ctx = context.WithValue(ctx, "openWeatherMapAppID", c.OpenweathermapAppId)
+	ctx = context.WithValue(ctx, "openWeatherMapAppID", c.OpenweathermapAppID)
 	return ctx
 }
