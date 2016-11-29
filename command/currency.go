@@ -28,14 +28,15 @@ var defaultCurrencies = []string{"USD", "EUR"}
 const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 
 func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+	opts := &tlbot.SendOptions{}
 	s, err := parseQuery(msg.Args())
 	if err != nil {
 		log.Printf("Error parsing query: %v\n", err)
-		_ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu", tlbot.ModeNone, false, nil)
+		_, _ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu", opts)
 		return
 	}
 
-	err = b.SendMessage(msg.Chat.ID, s, tlbot.ModeNone, false, nil)
+	_, err = b.SendMessage(msg.Chat.ID, s, opts)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 	}

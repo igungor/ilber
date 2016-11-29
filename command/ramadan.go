@@ -160,7 +160,7 @@ func runPrayerCall(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		txt = randChoice(noes)
 	}
 
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return
@@ -181,7 +181,7 @@ func runFoodFast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return
@@ -202,7 +202,7 @@ func runFoodDawn(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

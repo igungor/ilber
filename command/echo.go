@@ -25,7 +25,7 @@ func runEcho(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		args = []string{"çok cahilsin"}
 	}
 	txt := fmt.Sprintf("*%v*", strings.Join(args, " "))
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 		return

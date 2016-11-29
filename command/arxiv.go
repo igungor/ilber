@@ -28,8 +28,10 @@ const arxivURL = "http://export.arxiv.org/api/query"
 
 func runArxiv(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
+	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeNone}
 	if len(args) == 0 {
-		err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", tlbot.ModeNone, false, nil)
+		opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+		_, err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -66,7 +68,7 @@ func runArxiv(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(result.Entries) == 0 {
-		err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", tlbot.ModeNone, false, nil)
+		_, err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -96,7 +98,8 @@ func runArxiv(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 	buf.WriteString(fmt.Sprintf("*pdf:* %v", pdflink))
 
-	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeMarkdown, false, nil)
+	opts.ParseMode = tlbot.ModeMarkdown
+	_, err = b.SendMessage(msg.Chat.ID, buf.String(), opts)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 	}

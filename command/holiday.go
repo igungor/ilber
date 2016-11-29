@@ -66,10 +66,11 @@ func in(date, start, end time.Time) bool {
 
 func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	now := time.Now().UTC()
+	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
 
 	for _, t := range holidays {
 		if in(now, t.date, t.date.Add(t.duration)) {
-			err := b.SendMessage(msg.Chat.ID, fmt.Sprintf("Bugün %v", t.name), tlbot.ModeMarkdown, false, nil)
+			_, err := b.SendMessage(msg.Chat.ID, fmt.Sprintf("Bugün %v", t.name), opts)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
@@ -78,7 +79,7 @@ func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 
 		if now.Before(t.date) {
 			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
-			err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+			_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
@@ -86,7 +87,7 @@ func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	err := b.SendMessage(msg.Chat.ID, "yakın zamanda tatil görünmüyor :(", tlbot.ModeMarkdown, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, "yakın zamanda tatil görünmüyor :(", opts)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

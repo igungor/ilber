@@ -21,10 +21,12 @@ var cmdMovie = &Command{
 
 func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
+	opts := &tlbot.SendOptions{}
 	if len(args) == 0 {
 		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
-		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+		opts.ParseMode = tlbot.ModeMarkdown
+		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -42,15 +44,14 @@ func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Printf("Error searching %v: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
+			_, _ = b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, opts)
 		}
 		return
 	}
 
 	for _, url := range urls {
 		if strings.Contains(url, "imdb.com/title/tt") {
-
-			err := b.SendMessage(msg.Chat.ID, url, tlbot.ModeNone, true, nil)
+			_, err := b.SendMessage(msg.Chat.ID, url, opts)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
@@ -58,7 +59,8 @@ func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		}
 	}
 
-	err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+	opts.ParseMode = tlbot.ModeMarkdown
+	_, err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈", opts)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

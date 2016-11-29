@@ -19,7 +19,7 @@ var cmdRayRay = &Command{
 }
 
 func runRayRay(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
-	err := b.SendMessage(msg.Chat.ID, "malifalitiko!", tlbot.ModeNone, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, "malifalitiko!", nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

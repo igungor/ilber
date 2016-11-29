@@ -44,7 +44,7 @@ func runMovies(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		buf.WriteString(fmt.Sprintf("🔸 %v\n", movie))
 	}
 
-	err = b.SendMessage(msg.Chat.ID, buf.String(), tlbot.ModeNone, false, nil)
+	_, err = b.SendMessage(msg.Chat.ID, buf.String(), nil)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 		return

@@ -26,7 +26,8 @@ const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
-		if err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", tlbot.ModeNone, false, nil); err != nil {
+		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", nil)
+		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
@@ -61,7 +62,8 @@ func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(places.Results) == 0 {
-		if err := b.SendMessage(msg.Chat.ID, "bulamadim", tlbot.ModeNone, false, nil); err != nil {
+		_, err = b.SendMessage(msg.Chat.ID, "bulamadim", nil)
+		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
 		return
@@ -72,7 +74,8 @@ func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		Lat:  firstPlace.Geometry.Location.Lat,
 		Long: firstPlace.Geometry.Location.Long,
 	}
-	if err := b.SendLocation(msg.Chat.ID, location, nil); err != nil {
+	_, err = b.SendLocation(msg.Chat.ID, location, nil)
+	if err != nil {
 		log.Printf("Error sending location: %v\n", err)
 	}
 }

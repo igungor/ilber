@@ -37,7 +37,7 @@ func (w weekday) String() string {
 
 func runToday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeNone, false, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 	}

@@ -33,10 +33,11 @@ func runYoutube(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	args := msg.Args()
+	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(youtubeExamples)
 		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)
-		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -52,7 +53,7 @@ func runYoutube(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 
 	if len(response.Items) == 0 {
-		err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈", tlbot.ModeMarkdown, true, nil)
+		_, err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈", opts)
 		if err != nil {
 			log.Printf("Error while sending message. Err: %v\n", err)
 		}
@@ -62,7 +63,7 @@ func runYoutube(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	video := response.Items[0]
 	v := fmt.Sprintf("https://youtube.com/watch?v=%v\n", video.Id.VideoId)
 
-	err = b.SendMessage(msg.Chat.ID, v, tlbot.ModeNone, true, nil)
+	_, err = b.SendMessage(msg.Chat.ID, v, nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 	}

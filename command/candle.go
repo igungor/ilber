@@ -43,7 +43,8 @@ func runCandle(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		txt = fmt.Sprintf("Evet, bugün *%v*\n", v)
 	}
 
-	err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 		return

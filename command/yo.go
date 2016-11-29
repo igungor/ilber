@@ -20,10 +20,11 @@ var cmdYo = &Command{
 
 func runYo(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
+	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(yoExamples)
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
-		err := b.SendMessage(msg.Chat.ID, txt, tlbot.ModeMarkdown, false, nil)
+		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -39,13 +40,17 @@ func runYo(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, tlbot.ModeNone, false, nil)
+			_, _ = b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
 		}
 		return
 	}
 
-	photo := tlbot.Photo{File: tlbot.File{FileURL: u[0]}}
-	err = b.SendPhoto(msg.Chat.ID, photo, "", nil)
+	photo := tlbot.Photo{
+		File: tlbot.File{
+			URL: u[0],
+		},
+	}
+	_, err = b.SendPhoto(msg.Chat.ID, photo, nil)
 	if err != nil {
 		log.Printf("Error while sending image: %v\n", err)
 		return
