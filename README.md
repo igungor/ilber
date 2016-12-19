@@ -5,7 +5,7 @@ ilber is a multi-purpose Telegram bot.
 ## installation
 
 ```sh
-go get github.com/igungor/ilber
+go get -u github.com/igungor/ilber
 ```
 
 ## run
