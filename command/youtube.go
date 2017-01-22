@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
@@ -23,9 +24,12 @@ var cmdYoutube = &Command{
 	Run:       runYoutube,
 }
 
-func runYoutube(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
-	googleAPIKey := ctx.Value("googleAPIKey").(string)
-	youtubeHTTPClient := &http.Client{Transport: &transport.APIKey{Key: googleAPIKey}}
+func runYoutube(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+	youtubeHTTPClient := &http.Client{
+		Transport: &transport.APIKey{
+			Key: b.Config.GoogleAPIKey,
+		},
+	}
 	service, err := youtube.New(youtubeHTTPClient)
 	if err != nil {
 		log.Printf("Error creating new youtube client: %v", err)

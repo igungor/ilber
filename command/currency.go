@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -27,7 +28,7 @@ var defaultCurrencies = []string{"USD", "EUR"}
 
 const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 
-func runCurrency(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runCurrency(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	opts := &tlbot.SendOptions{}
 	s, err := parseQuery(msg.Args())
 	if err != nil {

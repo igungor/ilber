@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -18,7 +19,7 @@ var cmdRayRay = &Command{
 	Run:       runRayRay,
 }
 
-func runRayRay(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runRayRay(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	_, err := b.SendMessage(msg.Chat.ID, "malifalitiko!", nil)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)

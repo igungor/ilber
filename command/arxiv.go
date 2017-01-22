@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/aaron-lebo/ocd/feeds/atom"
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -26,7 +27,7 @@ var cmdArxiv = &Command{
 
 const arxivURL = "http://export.arxiv.org/api/query"
 
-func runArxiv(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runArxiv(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeNone}
 	if len(args) == 0 {

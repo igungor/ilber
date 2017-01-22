@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -22,7 +23,7 @@ var cmdWiki = &Command{
 // Wikipedia API lacks multi-lingual search.
 const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
-func runWiki(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runWiki(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
 	if len(args) == 0 {
@@ -34,13 +35,10 @@ func runWiki(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	googleAPIKey := ctx.Value("googleAPIKey").(string)
-	searchEngineID := ctx.Value("googleSearchEngineID").(string)
-
 	terms := []string{"wikipedia"}
 	terms = append(terms, args...)
 
-	urls, err := search(googleAPIKey, searchEngineID, "", terms...)
+	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "", terms...)
 	if err != nil {
 		log.Printf("Error while 'bkz' query. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {

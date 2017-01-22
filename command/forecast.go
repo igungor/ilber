@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -28,7 +29,7 @@ const (
 	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
 )
 
-func runForecast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runForecast(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	var location string
 	if len(args) == 0 {
@@ -43,11 +44,9 @@ func runForecast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	forecastAPIKey := ctx.Value("openWeatherMapAppID").(string)
-
 	params := u.Query()
 	params.Set("units", "metric")
-	params.Set("APPID", forecastAPIKey)
+	params.Set("APPID", b.Config.OpenweathermapAppID)
 	params.Set("q", location)
 	u.RawQuery = params.Encode()
 

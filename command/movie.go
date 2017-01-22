@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -19,7 +20,7 @@ var cmdMovie = &Command{
 	Run:       runMovie,
 }
 
-func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runMovie(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	opts := &tlbot.SendOptions{}
 	if len(args) == 0 {
@@ -33,14 +34,11 @@ func runMovie(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	googleAPIKey := ctx.Value("googleAPIKey").(string)
-	searchEngineID := ctx.Value("googleSearchEngineID").(string)
-
 	// the best search engine is still google.
 	// i've tried imdb, themoviedb, rottentomatoes, omdbapi.
 	// themoviedb search engine was the most accurate yet still can't find any
 	// result if any release date is given in query terms.
-	urls, err := search(googleAPIKey, searchEngineID, "", args...)
+	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "", args...)
 	if err != nil {
 		log.Printf("Error searching %v: %v\n", args, err)
 		if err == errSearchQuotaExceeded {

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -23,7 +24,7 @@ var cmdLocation = &Command{
 
 const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runLocation(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", nil)
@@ -36,10 +37,9 @@ func runLocation(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	googleAPIKey := ctx.Value("googleAPIKey").(string)
 	place := strings.Join(args, " ")
 	params := u.Query()
-	params.Set("key", googleAPIKey)
+	params.Set("key", b.Config.GoogleAPIKey)
 	params.Set("query", place)
 	u.RawQuery = params.Encode()
 

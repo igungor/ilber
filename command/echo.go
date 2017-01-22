@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -19,7 +20,7 @@ var cmdEcho = &Command{
 	Run:       runEcho,
 }
 
-func runEcho(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runEcho(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		args = []string{"çok cahilsin"}

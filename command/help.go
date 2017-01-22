@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -19,7 +20,7 @@ var cmdHelp = &Command{
 	Run:       runHelp,
 }
 
-func runHelp(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runHelp(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	_, _ = b.SendMessage(msg.Chat.ID, help(), nil)
 }
 

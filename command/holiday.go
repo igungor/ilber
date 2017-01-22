@@ -7,6 +7,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -64,7 +65,7 @@ func in(date, start, end time.Time) bool {
 	return date.After(start) && date.Before(end)
 }
 
-func runHoliday(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runHoliday(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	now := time.Now().UTC()
 	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
 

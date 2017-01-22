@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -138,7 +139,7 @@ func populate() {
 	}
 }
 
-func runPrayerCall(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runPrayerCall(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)
@@ -167,7 +168,7 @@ func runPrayerCall(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 }
 
-func runFoodFast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runFoodFast(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)
@@ -188,7 +189,7 @@ func runFoodFast(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 	}
 }
 
-func runFoodDawn(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runFoodDawn(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	loc, _ := time.LoadLocation(timezone)
 
 	now := time.Now().In(loc)

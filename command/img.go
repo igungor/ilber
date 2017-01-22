@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/igungor/ilber/bot"
 	"github.com/igungor/tlbot"
 )
 
@@ -18,7 +19,7 @@ var cmdImg = &Command{
 	Run:       runImg,
 }
 
-func runImg(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
+func runImg(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	args := msg.Args()
 	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeNone}
 	if len(args) == 0 {
@@ -31,10 +32,7 @@ func runImg(ctx context.Context, b *tlbot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	googleAPIKey := ctx.Value("googleAPIKey").(string)
-	searchEngineID := ctx.Value("googleSearchEngineID").(string)
-
-	urls, err := search(googleAPIKey, searchEngineID, "image", args...)
+	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "image", args...)
 	if err != nil {
 		log.Printf("Error while searching image. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
