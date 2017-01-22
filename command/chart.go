@@ -39,8 +39,6 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		return
 	}
 
-	fmt.Println(pairs)
-
 	mainSeries := chart.ContinuousSeries{
 		Name:    "currency",
 		XValues: chart.Sequence.Float64(1, 100),
