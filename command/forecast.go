@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -29,7 +29,7 @@ const (
 	forecastURL = "http://api.openweathermap.org/data/2.5/weather"
 )
 
-func runForecast(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
 	var location string
 	if len(args) == 0 {
@@ -67,7 +67,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	if txt == "" {
 		txt = fmt.Sprintf("%v bulunamadı.", location)
 	}
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	_, err = b.SendMessage(msg.Chat.ID, txt, opts)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)

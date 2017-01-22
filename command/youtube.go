@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
 )
@@ -24,7 +24,7 @@ var cmdYoutube = &Command{
 	Run:       runYoutube,
 }
 
-func runYoutube(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	youtubeHTTPClient := &http.Client{
 		Transport: &transport.APIKey{
 			Key: b.Config.GoogleAPIKey,
@@ -37,7 +37,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	}
 
 	args := msg.Args()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(youtubeExamples)
 		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)

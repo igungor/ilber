@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -19,9 +19,9 @@ var cmdImg = &Command{
 	Run:       runImg,
 }
 
-func runImg(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeNone}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeNone}
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)
@@ -41,8 +41,8 @@ func runImg(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	photo := tlbot.Photo{
-		File: tlbot.File{
+	photo := telegram.Photo{
+		File: telegram.File{
 			URL: urls[0],
 		},
 	}

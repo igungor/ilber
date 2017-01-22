@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -19,9 +19,9 @@ var cmdYo = &Command{
 	Run:       runYo,
 }
 
-func runYo(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(yoExamples)
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
@@ -43,8 +43,8 @@ func runYo(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 		return
 	}
 
-	photo := tlbot.Photo{
-		File: tlbot.File{
+	photo := telegram.Photo{
+		File: telegram.File{
 			URL: u[0],
 		},
 	}

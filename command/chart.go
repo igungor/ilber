@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 	"github.com/wcharczuk/go-chart"
 	"github.com/wcharczuk/go-chart/drawing"
 )
@@ -24,9 +24,9 @@ var cmdChart = &Command{
 	Hidden:    true,
 }
 
-func runChart(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	var opts tlbot.SendOptions
+	var opts telegram.SendOptions
 
 	currency := "dollar"
 	if len(args) > 0 {
@@ -100,7 +100,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	}
 
 	chartname := fmt.Sprintf("%v-%v.png", currency, time.Now().Format("2006-01-02-15:04:05"))
-	photo := tlbot.Photo{File: tlbot.File{
+	photo := telegram.Photo{File: telegram.File{
 		Name: chartname,
 		Body: &buf,
 	}}

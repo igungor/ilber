@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -20,7 +20,7 @@ var cmdMe = &Command{
 	Run:       runMe,
 }
 
-func runMe(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runMe(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		args = []string{"hmmmmm"}
@@ -32,7 +32,7 @@ func runMe(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	}
 
 	txt := fmt.Sprintf("`* %v %v`", user, strings.Join(args, " "))
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)

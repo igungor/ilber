@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 // A Command is an implementation of a bot command.
@@ -22,7 +22,7 @@ type Command struct {
 	Hidden bool
 
 	// Run runs the command.
-	Run func(context.Context, *bot.Bot, *tlbot.Message)
+	Run func(context.Context, *bot.Bot, *telegram.Message)
 }
 
 var (

@@ -11,7 +11,7 @@ import (
 
 	"github.com/aaron-lebo/ocd/feeds/atom"
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -27,11 +27,11 @@ var cmdArxiv = &Command{
 
 const arxivURL = "http://export.arxiv.org/api/query"
 
-func runArxiv(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeNone}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeNone}
 	if len(args) == 0 {
-		opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+		opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 		_, err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
@@ -99,7 +99,7 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	}
 	buf.WriteString(fmt.Sprintf("*pdf:* %v", pdflink))
 
-	opts.ParseMode = tlbot.ModeMarkdown
+	opts.ParseMode = telegram.ModeMarkdown
 	_, err = b.SendMessage(msg.Chat.ID, buf.String(), opts)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)

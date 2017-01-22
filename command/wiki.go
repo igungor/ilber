@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -23,9 +23,9 @@ var cmdWiki = &Command{
 // Wikipedia API lacks multi-lingual search.
 const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
-func runWiki(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		txt := "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*"
 		_, err := b.SendMessage(msg.Chat.ID, txt, opts)

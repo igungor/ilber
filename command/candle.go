@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -32,7 +32,7 @@ var dasCandles = map[string]string{
 	"29 Nov 2017": "Mevlid Kandili",
 }
 
-func runCandle(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runCandle(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	const timeformat = "2 Jan 2006"
 	loc, _ := time.LoadLocation("Europe/Istanbul")
 	now := time.Now().In(loc).Format(timeformat)
@@ -44,7 +44,7 @@ func runCandle(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 		txt = fmt.Sprintf("Evet, bugün *%v*\n", v)
 	}
 
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)

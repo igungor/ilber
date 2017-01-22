@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -20,7 +20,7 @@ var cmdHelp = &Command{
 	Run:       runHelp,
 }
 
-func runHelp(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runHelp(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	_, _ = b.SendMessage(msg.Chat.ID, help(), nil)
 }
 

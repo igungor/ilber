@@ -1,9 +1,9 @@
 package bot
 
-import "github.com/igungor/tlbot"
+import "github.com/igungor/telegram"
 
 type Bot struct {
-	*tlbot.Bot
+	*telegram.Bot
 	Config *Config
 	Store  *Store
 }
@@ -20,7 +20,7 @@ func New(configPath string) (*Bot, error) {
 		return nil, err
 	}
 
-	bot := tlbot.New(cfg.Token)
+	bot := telegram.New(cfg.Token)
 	return &Bot{
 		Config: cfg,
 		Bot:    &bot,

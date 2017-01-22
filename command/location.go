@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -24,7 +24,7 @@ var cmdLocation = &Command{
 
 const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-func runLocation(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", nil)
@@ -70,7 +70,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
 	}
 
 	firstPlace := places.Results[0]
-	location := tlbot.Location{
+	location := telegram.Location{
 		Lat:  firstPlace.Geometry.Location.Lat,
 		Long: firstPlace.Geometry.Location.Long,
 	}

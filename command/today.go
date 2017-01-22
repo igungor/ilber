@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -36,7 +36,7 @@ func (w weekday) String() string {
 	return days[w]
 }
 
-func runToday(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runToday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
 	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 	if err != nil {

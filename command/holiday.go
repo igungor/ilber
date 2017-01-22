@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -65,9 +65,9 @@ func in(date, start, end time.Time) bool {
 	return date.After(start) && date.Before(end)
 }
 
-func runHoliday(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
+func runHoliday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	now := time.Now().UTC()
-	opts := &tlbot.SendOptions{ParseMode: tlbot.ModeMarkdown}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 
 	for _, t := range holidays {
 		if in(now, t.date, t.date.Add(t.duration)) {

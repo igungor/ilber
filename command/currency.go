@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/igungor/ilber/bot"
-	"github.com/igungor/tlbot"
+	"github.com/igungor/telegram"
 )
 
 func init() {
@@ -28,8 +28,8 @@ var defaultCurrencies = []string{"USD", "EUR"}
 
 const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 
-func runCurrency(ctx context.Context, b *bot.Bot, msg *tlbot.Message) {
-	opts := &tlbot.SendOptions{}
+func runCurrency(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
+	opts := &telegram.SendOptions{}
 	s, err := parseQuery(msg.Args())
 	if err != nil {
 		log.Printf("Error parsing query: %v\n", err)
