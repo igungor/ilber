@@ -33,7 +33,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		currency = args[0]
 	}
 
-	pairs, err := b.Store.Values(currency)
+	_, err := b.Store.Values(currency)
 	if err != nil {
 		_, _ = b.SendMessage(msg.Chat.ID, err.Error(), &opts)
 		return
