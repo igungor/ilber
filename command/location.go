@@ -62,7 +62,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	if len(places.Results) == 0 {
-		_, err = b.SendMessage(msg.Chat.ID, "bulamadim", nil)
+		_, err = b.SendMessage(msg.Chat.ID, "bulamadım", nil)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}

@@ -21,7 +21,7 @@ var cmdImg = &Command{
 
 func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeNone}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)

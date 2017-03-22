@@ -22,11 +22,10 @@ var cmdMovie = &Command{
 
 func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{}
+	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
-		opts.ParseMode = telegram.ModeMarkdown
 		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
@@ -57,7 +56,6 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		}
 	}
 
-	opts.ParseMode = telegram.ModeMarkdown
 	_, err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈", opts)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)

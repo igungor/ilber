@@ -24,7 +24,7 @@ var cmdHoliday = &Command{
 
 var day = 24 * time.Hour
 
-var holidays = []h{
+var holidays = []holiday{
 	// 2017
 	{"Yılbaşı tatili", newdate("1 Jan 2017"), day},
 	{"Çocuk Bayramı", newdate("23 Apr 2017"), day},
@@ -38,13 +38,13 @@ var holidays = []h{
 	{"Cumhuriyet Bayramı", newdate("29 Oct 2017"), day + 12*time.Hour},
 }
 
-type h struct {
+type holiday struct {
 	name     string
 	date     time.Time
 	duration time.Duration
 }
 
-type byDate []h
+type byDate []holiday
 
 func (d byDate) Len() int           { return len(d) }
 func (d byDate) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
@@ -69,17 +69,17 @@ func runHoliday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	now := time.Now().UTC()
 	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 
-	for _, t := range holidays {
-		if in(now, t.date, t.date.Add(t.duration)) {
-			_, err := b.SendMessage(msg.Chat.ID, fmt.Sprintf("Bugün %v", t.name), opts)
+	for _, holiday := range holidays {
+		if in(now, holiday.date, holiday.date.Add(holiday.duration)) {
+			_, err := b.SendMessage(msg.Chat.ID, fmt.Sprintf("Bugün %v", holiday.name), opts)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
 			return
 		}
 
-		if now.Before(t.date) {
-			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", t.date.Format("_2/01/2006"), t.name, t.duration.Hours()/24)
+		if now.Before(holiday.date) {
+			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", holiday.date.Format("_2/01/2006"), holiday.name, holiday.duration.Hours()/24)
 			_, err := b.SendMessage(msg.Chat.ID, txt, opts)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)

@@ -31,8 +31,6 @@ func (b byName) Less(i, j int) bool { return b[i].Name < b[j].Name }
 func (b byName) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 
 func help() string {
-	var buf bytes.Buffer
-
 	var cmds []*Command
 	for _, cmd := range commands {
 		cmds = append(cmds, cmd)
@@ -40,6 +38,7 @@ func help() string {
 
 	sort.Sort(byName(cmds))
 
+	var buf bytes.Buffer
 	buf.WriteString("şunlar var:\n\n")
 	for _, cmd := range cmds {
 		// do not include hidden commands
