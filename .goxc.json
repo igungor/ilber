@@ -1,0 +1,15 @@
+{
+	"AppName": "ilber",
+	"ArtifactsDest": "release",
+	"Tasks": [
+		"go-install",
+		"xc",
+		"deb",
+		"rmbin"
+	],
+	"Arch": "amd64",
+	"Os": "linux",
+	"PackageVersion": "0.1",
+	"Verbosity": "q",
+	"ConfigVersion": "0.9"
+}
