@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	currencyBucket = []byte("currency")
+	currencyBucket = []byte("currencies")
 )
 
 type Store struct {

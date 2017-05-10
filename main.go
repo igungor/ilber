@@ -23,7 +23,7 @@ var (
 func usage() {
 	fmt.Fprintf(os.Stderr, "ilber is a multi-purpose Telegram bot\n\n")
 	fmt.Fprintf(os.Stderr, "usage:\n")
-	fmt.Fprintf(os.Stderr, "  ilber -c <path of ilber.conf>\n\n")
+	fmt.Fprintf(os.Stderr, "  ilber -c path-to-ilber.conf\n\n")
 	fmt.Fprintf(os.Stderr, "flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)

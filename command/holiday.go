@@ -61,7 +61,6 @@ func in(date, start, end time.Time) bool {
 	if date.Equal(start) || date.Equal(end) {
 		return true
 	}
-
 	return date.After(start) && date.Before(end)
 }
 

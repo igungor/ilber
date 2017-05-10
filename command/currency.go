@@ -98,11 +98,10 @@ func parseQuery(terms []string) (string, error) {
 	if isQuestion {
 		rate, err := strconv.ParseFloat(records[0][1], 32)
 		if err != nil {
-			return "", fmt.Errorf("error reading record as float: %v", err)
-		} else {
-			r := f * rate
-			buf.WriteString(fmt.Sprintf("%.2f %v = %.2f %v\n", f, currencies[0], r, currencies[1]))
+			return "", fmt.Errorf("Error reading record as float: %v", err)
 		}
+
+		buf.WriteString(fmt.Sprintf("%.2f %v = %.2f %v\n", f, currencies[0], f*rate, currencies[1]))
 		return buf.String(), nil
 	}
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strings"
 
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/telegram"
@@ -27,10 +28,9 @@ const urbanURL = "http://api.urbandictionary.com/v0/define"
 
 func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
 	if len(args) == 0 {
 		txt := "neyi arayayım?"
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, nil)
 		if err != nil {
 			log.Printf("Error sending message: %v\n", err)
 		}
@@ -44,7 +44,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		return
 	}
 
-	term := args[0]
+	term := strings.Join(args, " ")
 	params := url.Values{}
 	params.Set("term", term)
 	u.RawQuery = params.Encode()
@@ -65,7 +65,13 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		return
 	}
 
-	_, err = b.SendMessage(msg.Chat.ID, r.String(), opts)
+	if r.ResultType == "no_results" {
+		log.Printf("Empty result set from Urban Dictionary for term %q\n", term)
+		b.SendMessage(msg.Chat.ID, fmt.Sprintf("UrbanDictonary'de %q diye birşey yok", term), nil)
+		return
+	}
+
+	_, err = b.SendMessage(msg.Chat.ID, r.String(), nil)
 	if err != nil {
 		log.Printf("Error sending message to Telegram: %v\n", err)
 	}
@@ -90,13 +96,21 @@ type response struct {
 
 func (r response) String() string {
 	if len(r.List) == 0 {
-		return "UrbanDictonary'de böyle birşey yok"
+		return fmt.Sprintf("UrbanDictonary'de böyle birşey yok")
+	}
+
+	var maxItems int
+	if len(r.List) > 3 {
+		maxItems = 3
+	} else {
+		maxItems = len(r.List)
 	}
 
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("**Definitions of %q**\n\n", r.List[0].Word))
-	for _, item := range r.List {
-		buf.WriteString(fmt.Sprintf("- %v\n", item.Definition))
+	buf.WriteString(fmt.Sprintf("Definitions of %q\n\n", r.List[0].Word))
+	for i := 0; i < maxItems; i++ {
+		item := r.List[i]
+		buf.WriteString(fmt.Sprintf("* %v\n", item.Definition))
 		buf.WriteString("\n")
 	}
 
