@@ -1,8 +1,10 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/url"
 
@@ -91,5 +93,12 @@ func (r response) String() string {
 		return "UrbanDictonary'de böyle birşey yok"
 	}
 
-	return r.List[0].Definition
+	var buf bytes.Buffer
+	buf.WriteString(fmt.Sprintf("**Definitions of %q**\n\n", r.List[0].Word))
+	for _, item := range r.List {
+		buf.WriteString(fmt.Sprintf("- %v\n", item.Definition))
+		buf.WriteString("\n")
+	}
+
+	return buf.String()
 }
