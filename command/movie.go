@@ -41,7 +41,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error searching %v: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			_, _ = b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, opts)
+			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug, opts)
 		}
 		return
 	}

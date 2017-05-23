@@ -40,7 +40,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	u, err := url.Parse(urbanURL)
 	if err != nil {
 		log.Printf("Error parsing Urban Dictionary URL: %v\n", err)
-		b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
+		b.SendMessage(msg.Chat.ID, emojiShrug, nil)
 		return
 	}
 
@@ -52,7 +52,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
 		log.Printf("Error sending request to Urban Dictionary API: %v\n", err)
-		b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
+		b.SendMessage(msg.Chat.ID, emojiShrug, nil)
 		return
 	}
 	defer resp.Body.Close()
@@ -61,7 +61,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
 		log.Printf("Error parsing response body from Urban Dictonary: %v\n", err)
-		b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
+		b.SendMessage(msg.Chat.ID, emojiShrug, nil)
 		return
 	}
 

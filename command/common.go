@@ -66,3 +66,8 @@ func search(apikey, searchEngineID string, searchType string, terms ...string) (
 func randChoice(elems []string) string {
 	return elems[rand.Intn(len(elems))]
 }
+
+// emojis
+const (
+	emojiShrug = `¯\_(ツ)_/¯`
+)

@@ -42,7 +42,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error while 'bkz' query. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
-			b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
+			b.SendMessage(msg.Chat.ID, emojiShrug, nil)
 		}
 		return
 	}

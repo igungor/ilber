@@ -38,7 +38,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			_, _ = b.SendMessage(msg.Chat.ID, `¯\_(ツ)_/¯`, nil)
+			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug, nil)
 		}
 		return
 	}
