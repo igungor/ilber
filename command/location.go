@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -41,6 +42,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	params := u.Query()
 	params.Set("key", b.Config.GoogleAPIKey)
 	params.Set("query", place)
+	params.Set("language", "tr")
 	u.RawQuery = params.Encode()
 
 	resp, err := httpclient.Get(u.String())
@@ -61,22 +63,32 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		return
 	}
 
-	if len(places.Results) == 0 {
-		_, err = b.SendMessage(msg.Chat.ID, "bulamadım", nil)
-		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
-		}
+	// possible status' are at: https://developers.google.com/places/web-service/search#PlaceSearchStatusCodes
+	if places.Status != "OK" {
+		log.Printf("Google places query status is not OK: %v\n", places.Status)
+		b.SendMessage(msg.Chat.ID, "bulamadım", nil)
 		return
 	}
 
-	firstPlace := places.Results[0]
-	location := telegram.Location{
-		Lat:  firstPlace.Geometry.Location.Lat,
-		Long: firstPlace.Geometry.Location.Long,
+	if len(places.Results) == 0 {
+		log.Printf("Google places query returned 0 result\n")
+		b.SendMessage(msg.Chat.ID, "bulamadım", nil)
+		return
 	}
-	_, err = b.SendLocation(msg.Chat.ID, location, nil)
+
+	p := places.Results[0]
+	venue := telegram.Venue{
+		Title: fmt.Sprintf("%v (%v/5.0)", p.Name, p.Rating),
+		Location: telegram.Location{
+			Lat:  p.Geometry.Location.Lat,
+			Long: p.Geometry.Location.Long,
+		},
+		Address: p.FormattedAddress,
+	}
+
+	_, err = b.SendVenue(msg.Chat.ID, venue, nil)
 	if err != nil {
-		log.Printf("Error sending location: %v\n", err)
+		log.Printf("Error sending venue: %v\n", err)
 	}
 }
 
@@ -89,13 +101,18 @@ type placesResponse struct {
 				Long float64 `json:"lng"`
 			} `json:"location"`
 		} `json:"geometry"`
-		Icon      string   `json:"icon"`
-		ID        string   `json:"id"`
-		Name      string   `json:"name"`
-		PlaceID   string   `json:"place_id"`
-		Rating    float64  `json:"rating"`
-		Reference string   `json:"reference"`
-		Types     []string `json:"types"`
+		Icon         string `json:"icon"`
+		ID           string `json:"id"`
+		Name         string `json:"name"`
+		OpeningHours *struct {
+			OpenNow bool `json:"open_now"`
+		} `json:"opening_hours"`
+		PlaceID           string   `json:"place_id"`
+		PriceLevel        int      `json:"price_level"`
+		Rating            float64  `json:"rating"`
+		Reference         string   `json:"reference"`
+		Types             []string `json:"types"`
+		PermanentlyClosed bool     `json:"permanently_closed"`
 	} `json:"results"`
 	Status string `json:"status"`
 }
