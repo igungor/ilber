@@ -57,7 +57,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	defer resp.Body.Close()
 
-	var forecast Forecast
+	var forecast forecast
 	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
 		log.Printf("Error while decoding response: %v\n", err)
 		return
@@ -76,7 +76,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 }
 
 // openweathermap response
-type Forecast struct {
+type forecast struct {
 	City    string `json:"name"`
 	Weather []struct {
 		ID          int    `json:"id"`
@@ -88,7 +88,7 @@ type Forecast struct {
 	} `json:"main"`
 }
 
-func (f Forecast) String() string {
+func (f forecast) String() string {
 	if len(f.Weather) == 0 {
 		return ""
 	}
