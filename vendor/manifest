@@ -37,7 +37,7 @@
 		{
 			"importpath": "github.com/igungor/telegram",
 			"repository": "https://github.com/igungor/telegram",
-			"revision": "014f1fc3ec3836860653691d769e6b1014872458",
+			"revision": "cb61b31ae90ccca07202537f9f11482ed497f628",
 			"branch": "master"
 		},
 		{

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/igungor/telegram"
@@ -42,21 +43,26 @@ func main() {
 		flag.Usage()
 	}
 
-	b := telegram.New(*token)
-	err := b.SetWebhook(*webhook)
+	bot := telegram.New(*token)
+	err := bot.SetWebhook(*webhook)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	messages := b.Listen(net.JoinHostPort(*host, *port))
-	for msg := range messages {
-		go func() {
+	http.HandleFunc("/", bot.Handler())
+
+	go func() {
+		log.Fatal(http.ListenAndServe(net.JoinHostPort(*host, *port), nil))
+	}()
+
+	for msg := range bot.Messages() {
+		go func(msg *telegram.Message) {
 			// echo the message as *bold*
 			txt := "*" + msg.Text + "*"
-			_, err := b.SendMessage(msg.Chat.ID, txt, nil)
+			_, err := bot.SendMessage(msg.Chat.ID, txt, nil)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
-		}()
+		}(msg)
 	}
 }
