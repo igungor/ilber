@@ -23,7 +23,7 @@ func New(configPath string) (*Bot, error) {
 	bot := telegram.New(cfg.Token)
 	return &Bot{
 		Config: cfg,
-		Bot:    &bot,
+		Bot:    bot,
 		Store:  store,
 	}, nil
 }

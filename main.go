@@ -46,6 +46,13 @@ func main() {
 	}
 	log.Printf("Webhook set to %v\n", b.Config.Webhook)
 
+	http.HandleFunc("/", b.Handler())
+
+	go func() {
+		addr := net.JoinHostPort(b.Config.Host, b.Config.Port)
+		log.Fatal(http.ListenAndServe(addr, nil))
+	}()
+
 	if b.Config.Profile {
 		go func() {
 			log.Println("Exposing profile information on http://0.0.0.0:6969")
@@ -54,8 +61,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	messages := b.Listen(net.JoinHostPort(b.Config.Host, b.Config.Port))
-	for msg := range messages {
+	for msg := range b.Messages() {
 		log.Printf("%v\n", msg)
 
 		// react only to user sent messages
@@ -75,6 +81,6 @@ func main() {
 		}
 
 		// it is. cool, run it!
-		go cmd.Run(ctx, b, &msg)
+		go cmd.Run(ctx, b, msg)
 	}
 }
