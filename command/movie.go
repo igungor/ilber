@@ -22,11 +22,11 @@ var cmdMovie = &Command{
 
 func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
+	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
 		term := randChoice(movieExamples)
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -41,14 +41,14 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error searching %v: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug, opts)
+			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
 		return
 	}
 
 	for _, url := range urls {
 		if strings.Contains(url, "imdb.com/title/tt") {
-			_, err := b.SendMessage(msg.Chat.ID, url, opts)
+			_, err := b.SendMessage(msg.Chat.ID, url)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}
@@ -56,7 +56,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		}
 	}
 
-	_, err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈", opts)
+	_, err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈")
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

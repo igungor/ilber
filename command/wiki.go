@@ -25,10 +25,10 @@ const wikiURL = "https://ajax.googleapis.com/ajax/services/search/web"
 
 func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
+	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
 		txt := "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*"
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
 			log.Printf("Error while sending message. Err: %v\n", err)
 		}
@@ -42,14 +42,14 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error while 'bkz' query. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
-			b.SendMessage(msg.Chat.ID, emojiShrug, nil)
+			b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
 		return
 	}
 
 	for _, articleURL := range urls {
 		if strings.Contains(articleURL, "wikipedia.org/wiki/") {
-			_, err = b.SendMessage(msg.Chat.ID, articleURL, nil)
+			_, err = b.SendMessage(msg.Chat.ID, articleURL)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 				return
@@ -58,7 +58,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		}
 	}
 
-	_, err = b.SendMessage(msg.Chat.ID, "aradığın referansı bulamadım 🙈", opts)
+	_, err = b.SendMessage(msg.Chat.ID, "aradığın referansı bulamadım 🙈")
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

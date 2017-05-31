@@ -29,10 +29,9 @@ const arxivURL = "http://export.arxiv.org/api/query"
 
 func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeNone}
+	markdown := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
-		opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
-		_, err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", opts)
+		_, err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", markdown)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -69,7 +68,7 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	if len(result.Entries) == 0 {
-		_, err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", opts)
+		_, err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", markdown)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -99,8 +98,7 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	buf.WriteString(fmt.Sprintf("*pdf:* %v", pdflink))
 
-	opts.ParseMode = telegram.ModeMarkdown
-	_, err = b.SendMessage(msg.Chat.ID, buf.String(), opts)
+	_, err = b.SendMessage(msg.Chat.ID, buf.String(), markdown)
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 	}

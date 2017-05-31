@@ -21,11 +21,11 @@ var cmdYo = &Command{
 
 func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
+	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
 		term := randChoice(yoExamples)
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -38,7 +38,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
-			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug, nil)
+			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
 		return
 	}
@@ -48,7 +48,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 			URL: u[0],
 		},
 	}
-	_, err = b.SendPhoto(msg.Chat.ID, photo, nil)
+	_, err = b.SendPhoto(msg.Chat.ID, photo)
 	if err != nil {
 		log.Printf("Error while sending image: %v\n", err)
 		return

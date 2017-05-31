@@ -67,8 +67,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if txt == "" {
 		txt = fmt.Sprintf("%v bulunamadı.", location)
 	}
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
-	_, err = b.SendMessage(msg.Chat.ID, txt, opts)
+	_, err = b.SendMessage(msg.Chat.ID, txt, telegram.WithParseMode(telegram.ModeMarkdown))
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

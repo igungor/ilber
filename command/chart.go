@@ -26,8 +26,6 @@ var cmdChart = &Command{
 
 func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	var opts telegram.SendOptions
-
 	currency := "dollar"
 	if len(args) > 0 {
 		currency = args[0]
@@ -35,7 +33,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err := b.Store.Values(currency)
 	if err != nil {
-		_, _ = b.SendMessage(msg.Chat.ID, err.Error(), &opts)
+		_, _ = b.SendMessage(msg.Chat.ID, err.Error(), telegram.WithParseMode(telegram.ModeMarkdown))
 		return
 	}
 

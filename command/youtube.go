@@ -37,11 +37,11 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
+	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
 		term := randChoice(youtubeExamples)
 		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -57,7 +57,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	if len(response.Items) == 0 {
-		_, err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈", opts)
+		_, err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈")
 		if err != nil {
 			log.Printf("Error while sending message. Err: %v\n", err)
 		}
@@ -67,7 +67,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	video := response.Items[0]
 	v := fmt.Sprintf("https://youtube.com/watch?v=%v\n", video.Id.VideoId)
 
-	_, err = b.SendMessage(msg.Chat.ID, v, nil)
+	_, err = b.SendMessage(msg.Chat.ID, v)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 	}

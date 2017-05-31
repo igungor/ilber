@@ -21,11 +21,11 @@ var cmdImg = &Command{
 
 func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
-	opts := &telegram.SendOptions{ParseMode: telegram.ModeMarkdown}
+	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	if len(args) == 0 {
 		term := randChoice(imgExamples)
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)
-		_, err := b.SendMessage(msg.Chat.ID, txt, opts)
+		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -36,7 +36,7 @@ func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if err != nil {
 		log.Printf("Error while searching image. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
-			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug, nil)
+			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
 		return
 	}

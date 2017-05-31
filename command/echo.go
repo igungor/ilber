@@ -26,11 +26,8 @@ func runEcho(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		args = []string{"çok cahilsin"}
 	}
 
-	opts := telegram.SendOptions{
-		ParseMode: telegram.ModeMarkdown,
-	}
 	txt := fmt.Sprintf("*%v*", strings.Join(args, " "))
-	_, err := b.SendMessage(msg.Chat.ID, txt, &opts)
+	_, err := b.SendMessage(msg.Chat.ID, txt, telegram.WithParseMode(telegram.ModeMarkdown))
 	if err != nil {
 		log.Printf("Error while sending message: %v\n", err)
 		return
