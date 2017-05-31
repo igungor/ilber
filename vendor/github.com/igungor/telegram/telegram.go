@@ -47,7 +47,7 @@ func (b *Bot) Handler() http.HandlerFunc {
 		defer w.WriteHeader(http.StatusOK)
 
 		var u Update
-		json.NewDecoder(r.Body).Decode(&u)
+		_ = json.NewDecoder(r.Body).Decode(&u)
 		b.messageCh <- &u.Payload
 	}
 }
@@ -80,21 +80,24 @@ func (b *Bot) SetWebhook(webhook string) error {
 
 // SendMessage sends text message to the recipient. Callers can send plain
 // text or markdown messages by setting mode parameter.
-func (b *Bot) SendMessage(recipient int64, message string, opts *SendOptions) (Message, error) {
+func (b *Bot) SendMessage(recipient int64, message string, opts ...SendOption) (Message, error) {
 	params := url.Values{
 		"chat_id": {strconv.FormatInt(recipient, 10)},
 		"text":    {message},
 	}
 
-	mapSendOptions(&params, opts)
+	mapSendOptions(&params, opts...)
 
 	var r struct {
 		OK      bool   `json:"ok"`
 		Desc    string `json:"description"`
-		ErrCode int    `json:"errorcode"`
+		ErrCode int    `json:"error_code"`
 		Message Message
 	}
-	b.sendCommand(nil, "sendMessage", params, &r)
+	err := b.sendCommand(nil, "sendMessage", params, &r)
+	if err != nil {
+		return r.Message, err
+	}
 
 	if !r.OK {
 		return Message{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
@@ -112,12 +115,12 @@ func (b *Bot) forwardMessage(recipient User, message Message) (Message, error) {
 //  b := bot.New("your-token-here")
 //  photo := bot.Photo{URL: "http://i.imgur.com/6S9naG6.png"}
 //  err := b.SendPhoto(recipient, photo, "sample image", nil)
-func (b *Bot) SendPhoto(recipient int64, photo Photo, opts *SendOptions) (Message, error) {
+func (b *Bot) SendPhoto(recipient int64, photo Photo, opts ...SendOption) (Message, error) {
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("caption", photo.Caption)
 
-	mapSendOptions(&params, opts)
+	mapSendOptions(&params, opts...)
 	var r struct {
 		OK      bool    `json:"ok"`
 		Desc    string  `json:"description"`
@@ -181,23 +184,23 @@ func (b *Bot) sendFile(method string, f File, form string, params url.Values, v 
 // SendAudio sends audio files, if you want Telegram clients to display
 // them in the music player. audio must be in the .mp3 format and must not
 // exceed 50 MB in size.
-func (b *Bot) sendAudio(recipient int64, audio Audio, opts *SendOptions) (Message, error) {
+func (b *Bot) sendAudio(recipient int64, audio Audio, opts ...SendOption) (Message, error) {
 	panic("not implemented yet")
 }
 
 // SendDocument sends general files. Documents must not exceed 50 MB in size.
-func (b *Bot) sendDocument(recipient int64, document Document, opts *SendOptions) (Message, error) {
+func (b *Bot) sendDocument(recipient int64, document Document, opts ...SendOption) (Message, error) {
 	panic("not implemented yet")
 }
 
 //SendSticker sends stickers with .webp extensions.
-func (b *Bot) sendSticker(recipient int64, sticker Sticker, opts *SendOptions) (Message, error) {
+func (b *Bot) sendSticker(recipient int64, sticker Sticker, opts ...SendOption) (Message, error) {
 	panic("not implemented yet")
 }
 
 // SendVideo sends video files. Telegram clients support mp4 videos (other
 // formats may be sent as Document). Video files must not exceed 50 MB in size.
-func (b *Bot) sendVideo(recipient int64, video Video, opts *SendOptions) (Message, error) {
+func (b *Bot) sendVideo(recipient int64, video Video, opts ...SendOption) (Message, error) {
 	panic("not implemented yet")
 }
 
@@ -205,18 +208,18 @@ func (b *Bot) sendVideo(recipient int64, video Video, opts *SendOptions) (Messag
 // the file as a playable voice message. For this to work, your audio must be
 // in an .ogg file encoded with OPUS (other formats may be sent as Audio or
 // Document). audio must not exceed 50 MB in size.
-func (b *Bot) sendVoice(recipient int64, audio Audio, opts *SendOptions) (Message, error) {
+func (b *Bot) sendVoice(recipient int64, audio Audio, opts ...SendOption) (Message, error) {
 	panic("not implemented yet")
 }
 
 // SendLocation sends location point on the map.
-func (b *Bot) SendLocation(recipient int64, location Location, opts *SendOptions) (Message, error) {
+func (b *Bot) SendLocation(recipient int64, location Location, opts ...SendOption) (Message, error) {
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("latitude", strconv.FormatFloat(location.Lat, 'f', -1, 64))
 	params.Set("longitude", strconv.FormatFloat(location.Long, 'f', -1, 64))
 
-	mapSendOptions(&params, opts)
+	mapSendOptions(&params, opts...)
 
 	var r struct {
 		OK      bool    `json:"ok"`
@@ -237,7 +240,7 @@ func (b *Bot) SendLocation(recipient int64, location Location, opts *SendOptions
 }
 
 // SendVenue sends information about a venue.
-func (b *Bot) SendVenue(recipient int64, venue Venue, opts *SendOptions) (Message, error) {
+func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Message, error) {
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("latitude", strconv.FormatFloat(venue.Location.Lat, 'f', -1, 64))
@@ -245,7 +248,7 @@ func (b *Bot) SendVenue(recipient int64, venue Venue, opts *SendOptions) (Messag
 	params.Set("title", venue.Title)
 	params.Set("address", venue.Address)
 
-	mapSendOptions(&params, opts)
+	mapSendOptions(&params, opts...)
 
 	var r struct {
 		OK      bool    `json:"ok"`
@@ -289,16 +292,58 @@ func (b *Bot) SendChatAction(recipient int64, action Action) error {
 	return nil
 }
 
-type SendOptions struct {
-	ReplyTo int64
+// sendOptions configure a SendMessage call. sendOptions are set by the
+// SendOption values passed to SendMessage.
+type sendOptions struct {
+	replyTo int64
 
-	ParseMode ParseMode
+	parseMode ParseMode
 
-	DisableWebPagePreview bool
+	disableWebPagePreview bool
 
-	DisableNotification bool
+	disableNotification bool
 
-	ReplyMarkup ReplyMarkup
+	replyMarkup ReplyMarkup
+}
+
+// SendOption configures how we configure the message to be sent.
+type SendOption func(*sendOptions)
+
+// WithParseMode returns a SendOption which sets the message format, such as
+// HTML, Markdown etc.
+func WithParseMode(mode ParseMode) SendOption {
+	return func(o *sendOptions) {
+		o.parseMode = mode
+	}
+}
+
+// WithReplyTo returns a SendOption which sets the message to be replied to.
+func WithReplyTo(to int64) SendOption {
+	return func(o *sendOptions) {
+		o.replyTo = to
+	}
+}
+
+// WithReplyMarkup returns a SendOption which configures a custom keyboard for
+// the sent message.
+func WithReplyMarkup(markup ReplyMarkup) SendOption {
+	return func(o *sendOptions) {
+		o.replyMarkup = markup
+	}
+}
+
+// WithDisableWebPagePreview returns a SendOption which disables webpage
+// previews if the message contains a link.
+func WithDisableWebPagePreview(disable bool) SendOption {
+	return func(o *sendOptions) {
+		o.disableWebPagePreview = disable
+	}
+}
+
+func WithDisableNotification(disable bool) SendOption {
+	return func(o *sendOptions) {
+		o.disableNotification = disable
+	}
 }
 
 func (b *Bot) GetFile(fileID string) (File, error) {
@@ -352,10 +397,6 @@ func (b *Bot) sendCommand(ctx context.Context, method string, params url.Values,
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status: %v", resp.Status)
-	}
-
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
@@ -379,25 +420,26 @@ func (b *Bot) getMe() (User, error) {
 	return r.User, nil
 }
 
-func mapSendOptions(m *url.Values, opts *SendOptions) {
-	if opts == nil {
-		return
+func mapSendOptions(m *url.Values, opts ...SendOption) {
+	var o sendOptions
+	for _, opt := range opts {
+		opt(&o)
 	}
 
-	if opts.ReplyTo != 0 {
-		m.Set("reply_to_message_id", strconv.FormatInt(opts.ReplyTo, 10))
+	if o.replyTo != 0 {
+		m.Set("reply_to_message_id", strconv.FormatInt(o.replyTo, 10))
 	}
 
-	if opts.DisableWebPagePreview {
+	if o.disableWebPagePreview {
 		m.Set("disable_web_page_preview", "true")
 	}
 
-	if opts.DisableNotification {
+	if o.disableNotification {
 		m.Set("disable_notification", "true")
 	}
 
-	if opts.ParseMode != ModeNone {
-		m.Set("parse_mode", string(opts.ParseMode))
+	if o.parseMode != ModeNone {
+		m.Set("parse_mode", string(o.parseMode))
 	}
 
 	// TODO: map ReplyMarkup options as well
