@@ -42,7 +42,7 @@ func register(cmd *Command) {
 		panic("cannot register command with an empty Run function value")
 	}
 	if _, ok := commands[cmd.Name]; ok {
-		panic("plugin already registered: " + cmd.Name)
+		panic("command already registered: " + cmd.Name)
 	}
 
 	commands[cmd.Name] = cmd
