@@ -100,7 +100,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		Name: chartname,
 		Body: &buf,
 	}}
-	_, err = b.SendPhoto(msg.Chat.ID, photo, nil)
+	_, err = b.SendPhoto(msg.Chat.ID, photo)
 	if err != nil {
 		log.Printf("Error sending photo: %v\n", err)
 		return

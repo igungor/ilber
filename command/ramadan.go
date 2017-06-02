@@ -102,15 +102,15 @@ var _callTime = map[string]struct {
 	"29 May 2017": {"20:35", "03:34"},
 	"30 May 2017": {"20:36", "03:33"},
 	"31 May 2017": {"20:37", "03:32"},
-	"01 Jun 2017": {"20:37", "03:32"},
-	"02 Jun 2017": {"20:38", "03:30"},
-	"03 Jun 2017": {"20:39", "03:29"},
-	"04 Jun 2017": {"20:40", "03:28"},
-	"05 Jun 2017": {"20:40", "03:28"},
-	"06 Jun 2017": {"20:41", "03:27"},
-	"07 Jun 2017": {"20:42", "03:26"},
-	"08 Jun 2017": {"20:42", "03:26"},
-	"09 Jun 2017": {"20:43", "03:25"},
+	"1 Jun 2017":  {"20:37", "03:32"},
+	"2 Jun 2017":  {"20:38", "03:30"},
+	"3 Jun 2017":  {"20:39", "03:29"},
+	"4 Jun 2017":  {"20:40", "03:28"},
+	"5 Jun 2017":  {"20:40", "03:28"},
+	"6 Jun 2017":  {"20:41", "03:27"},
+	"7 Jun 2017":  {"20:42", "03:26"},
+	"8 Jun 2017":  {"20:42", "03:26"},
+	"9 Jun 2017":  {"20:43", "03:25"},
 	"10 Jun 2017": {"20:43", "03:25"},
 	"11 Jun 2017": {"20:44", "03:24"},
 	"12 Jun 2017": {"20:44", "03:24"},
@@ -161,7 +161,7 @@ func runPrayerCall(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt = randChoice(noes)
 	}
 
-	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return
@@ -182,7 +182,7 @@ func runFoodFast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return
@@ -203,7 +203,7 @@ func runFoodDawn(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt = "galiba oruç bitti"
 	}
 
-	_, err := b.SendMessage(msg.Chat.ID, txt, nil)
+	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
 		log.Printf("Error while sending message. Err: %v\n", err)
 		return

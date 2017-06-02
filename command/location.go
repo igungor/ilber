@@ -28,7 +28,7 @@ const mapBaseURL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
 	if len(args) == 0 {
-		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?", nil)
+		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?")
 		if err != nil {
 			log.Printf("Error while sending message: %v\n", err)
 		}
@@ -66,13 +66,13 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	// possible status' are at: https://developers.google.com/places/web-service/search#PlaceSearchStatusCodes
 	if places.Status != "OK" {
 		log.Printf("Google places query status is not OK: %v\n", places.Status)
-		b.SendMessage(msg.Chat.ID, "bulamadım", nil)
+		b.SendMessage(msg.Chat.ID, "bulamadım")
 		return
 	}
 
 	if len(places.Results) == 0 {
 		log.Printf("Google places query returned 0 result\n")
-		b.SendMessage(msg.Chat.ID, "bulamadım", nil)
+		b.SendMessage(msg.Chat.ID, "bulamadım")
 		return
 	}
 
@@ -86,7 +86,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		Address: p.FormattedAddress,
 	}
 
-	_, err = b.SendVenue(msg.Chat.ID, venue, nil)
+	_, err = b.SendVenue(msg.Chat.ID, venue)
 	if err != nil {
 		log.Printf("Error sending venue: %v\n", err)
 	}

@@ -21,7 +21,7 @@ var cmdHelp = &Command{
 }
 
 func runHelp(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
-	_, _ = b.SendMessage(msg.Chat.ID, help(), nil)
+	b.SendMessage(msg.Chat.ID, help())
 }
 
 type byName []*Command
