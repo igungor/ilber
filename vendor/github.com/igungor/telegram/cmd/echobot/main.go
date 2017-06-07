@@ -59,7 +59,7 @@ func main() {
 		go func(msg *telegram.Message) {
 			// echo the message as *bold*
 			txt := "*" + msg.Text + "*"
-			_, err := bot.SendMessage(msg.Chat.ID, txt, nil)
+			_, err := bot.SendMessage(msg.Chat.ID, txt)
 			if err != nil {
 				log.Printf("Error while sending message. Err: %v\n", err)
 			}

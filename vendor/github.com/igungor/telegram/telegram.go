@@ -64,7 +64,7 @@ func (b *Bot) SetWebhook(webhook string) error {
 	var r struct {
 		OK      bool   `json:"ok"`
 		Desc    string `json:"description"`
-		ErrCode int    `json:"errorcode"`
+		ErrCode int    `json:"error_code"`
 	}
 	err := b.sendCommand(nil, "setWebhook", params, &r)
 	if err != nil {
@@ -224,7 +224,7 @@ func (b *Bot) SendLocation(recipient int64, location Location, opts ...SendOptio
 	var r struct {
 		OK      bool    `json:"ok"`
 		Desc    string  `json:"description"`
-		ErrCode int     `json:"errorcode"`
+		ErrCode int     `json:"error_code"`
 		Message Message `json:"message"`
 	}
 	err := b.sendCommand(nil, "sendLocation", params, &r)
@@ -253,7 +253,7 @@ func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Messa
 	var r struct {
 		OK      bool    `json:"ok"`
 		Desc    string  `json:"description"`
-		ErrCode int     `json:"errorcode"`
+		ErrCode int     `json:"error_code"`
 		Message Message `json:"message"`
 	}
 	err := b.sendCommand(nil, "sendVenue", params, &r)
@@ -353,7 +353,7 @@ func (b *Bot) GetFile(fileID string) (File, error) {
 	var r struct {
 		OK      bool   `json:"ok"`
 		Desc    string `json:"description"`
-		ErrCode int    `json:"errorcode"`
+		ErrCode int    `json:"error_code"`
 		File    File   `json:"result"`
 	}
 	err := b.sendCommand(nil, "getFile", params, &r)
@@ -421,6 +421,10 @@ func (b *Bot) getMe() (User, error) {
 }
 
 func mapSendOptions(m *url.Values, opts ...SendOption) {
+	if len(opts) == 0 {
+		return
+	}
+
 	var o sendOptions
 	for _, opt := range opts {
 		opt(&o)
