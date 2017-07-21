@@ -218,6 +218,7 @@ type Audio struct {
 	Performer string `json:"performer"`
 	Title     string `json:"title"`
 	MimeType  string `json:"mime_type"`
+	Caption   string `json:"caption"`
 }
 
 // Document represents a general file (as opposed to photos and audio files).
@@ -265,7 +266,7 @@ type Venue struct {
 	Location     Location `json:"location"`
 	Title        string   `json:"title"`
 	Address      string   `json:"address"`
-	FoursquareID string   `json:"foursquare_id"`
+	FoursquareID string   `json:"foursquare_id,omitempty"`
 }
 
 // Contact represents a phone contact.

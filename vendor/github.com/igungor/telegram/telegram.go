@@ -37,7 +37,7 @@ func New(token string) *Bot {
 	return &Bot{
 		token:     token,
 		baseURL:   fmt.Sprintf("https://api.telegram.org/bot%v/", token),
-		client:    &http.Client{Timeout: 30 * time.Second},
+		client:    &http.Client{Timeout: 5 * time.Minute},
 		messageCh: make(chan *Message),
 	}
 }
@@ -56,16 +56,12 @@ func (b *Bot) Messages() <-chan *Message {
 	return b.messageCh
 }
 
-// SetWebhook assigns bot's webhook url with the given url.
+// SetWebhook assigns bot's webhook URL with the given URL.
 func (b *Bot) SetWebhook(webhook string) error {
 	params := url.Values{}
 	params.Set("url", webhook)
 
-	var r struct {
-		OK      bool   `json:"ok"`
-		Desc    string `json:"description"`
-		ErrCode int    `json:"error_code"`
-	}
+	var r response
 	err := b.sendCommand(nil, "setWebhook", params, &r)
 	if err != nil {
 		return err
@@ -81,18 +77,15 @@ func (b *Bot) SetWebhook(webhook string) error {
 // SendMessage sends text message to the recipient. Callers can send plain
 // text or markdown messages by setting mode parameter.
 func (b *Bot) SendMessage(recipient int64, message string, opts ...SendOption) (Message, error) {
-	params := url.Values{
-		"chat_id": {strconv.FormatInt(recipient, 10)},
-		"text":    {message},
-	}
-
+	const method = "sendMessage"
+	params := url.Values{}
+	params.Set("chat_id", strconv.FormatInt(recipient, 10))
+	params.Set("text", message)
 	mapSendOptions(&params, opts...)
 
 	var r struct {
-		OK      bool   `json:"ok"`
-		Desc    string `json:"description"`
-		ErrCode int    `json:"error_code"`
-		Message Message
+		response
+		Message Message `json:"result"`
 	}
 	err := b.sendCommand(nil, "sendMessage", params, &r)
 	if err != nil {
@@ -116,27 +109,26 @@ func (b *Bot) forwardMessage(recipient User, message Message) (Message, error) {
 //  photo := bot.Photo{URL: "http://i.imgur.com/6S9naG6.png"}
 //  err := b.SendPhoto(recipient, photo, "sample image", nil)
 func (b *Bot) SendPhoto(recipient int64, photo Photo, opts ...SendOption) (Message, error) {
+	const method = "sendPhoto"
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("caption", photo.Caption)
 
 	mapSendOptions(&params, opts...)
 	var r struct {
-		OK      bool    `json:"ok"`
-		Desc    string  `json:"description"`
-		ErrCode int     `json:"error_code"`
-		Message Message `json:"message"`
+		response
+		Message Message `json:"result"`
 	}
 
 	var err error
 	if photo.Exists() {
 		params.Set("photo", photo.FileID)
-		err = b.sendCommand(nil, "sendPhoto", params, &r)
+		err = b.sendCommand(nil, method, params, &r)
 	} else if photo.URL != "" {
 		params.Set("photo", photo.URL)
-		err = b.sendCommand(nil, "sendPhoto", params, &r)
+		err = b.sendCommand(nil, method, params, &r)
 	} else {
-		err = b.sendFile("sendPhoto", photo.File, "photo", params, &r)
+		err = b.sendFile(method, photo.File, "photo", params, &r)
 	}
 
 	if err != nil {
@@ -178,14 +170,48 @@ func (b *Bot) sendFile(method string, f File, form string, params url.Values, v 
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	}
+
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
 // SendAudio sends audio files, if you want Telegram clients to display
 // them in the music player. audio must be in the .mp3 format and must not
 // exceed 50 MB in size.
-func (b *Bot) sendAudio(recipient int64, audio Audio, opts ...SendOption) (Message, error) {
-	panic("not implemented yet")
+func (b *Bot) SendAudio(recipient int64, audio Audio, opts ...SendOption) (Message, error) {
+	const method = "sendAudio"
+	params := url.Values{}
+	params.Set("chat_id", strconv.FormatInt(recipient, 10))
+	params.Set("caption", audio.Caption)
+
+	mapSendOptions(&params, opts...)
+	var r struct {
+		response
+		Message Message `json:"result"`
+	}
+
+	var err error
+	if audio.Exists() {
+		params.Set("audio", audio.FileID)
+		err = b.sendCommand(nil, method, params, &r)
+	} else if audio.URL != "" {
+		params.Set("audio", audio.URL)
+		err = b.sendCommand(nil, method, params, &r)
+	} else {
+		err = b.sendFile(method, audio.File, "audio", params, &r)
+	}
+
+	if err != nil {
+		return Message{}, err
+	}
+
+	if !r.OK {
+		return Message{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
+	}
+
+	return r.Message, nil
 }
 
 // SendDocument sends general files. Documents must not exceed 50 MB in size.
@@ -214,6 +240,7 @@ func (b *Bot) sendVoice(recipient int64, audio Audio, opts ...SendOption) (Messa
 
 // SendLocation sends location point on the map.
 func (b *Bot) SendLocation(recipient int64, location Location, opts ...SendOption) (Message, error) {
+	const method = "sendLocation"
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("latitude", strconv.FormatFloat(location.Lat, 'f', -1, 64))
@@ -222,12 +249,10 @@ func (b *Bot) SendLocation(recipient int64, location Location, opts ...SendOptio
 	mapSendOptions(&params, opts...)
 
 	var r struct {
-		OK      bool    `json:"ok"`
-		Desc    string  `json:"description"`
-		ErrCode int     `json:"error_code"`
-		Message Message `json:"message"`
+		response
+		Message Message `json:"result"`
 	}
-	err := b.sendCommand(nil, "sendLocation", params, &r)
+	err := b.sendCommand(nil, method, params, &r)
 	if err != nil {
 		return Message{}, err
 	}
@@ -241,6 +266,7 @@ func (b *Bot) SendLocation(recipient int64, location Location, opts ...SendOptio
 
 // SendVenue sends information about a venue.
 func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Message, error) {
+	const method = "sendVenue"
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("latitude", strconv.FormatFloat(venue.Location.Lat, 'f', -1, 64))
@@ -251,12 +277,10 @@ func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Messa
 	mapSendOptions(&params, opts...)
 
 	var r struct {
-		OK      bool    `json:"ok"`
-		Desc    string  `json:"description"`
-		ErrCode int     `json:"error_code"`
-		Message Message `json:"message"`
+		response
+		Message Message `json:"result"`
 	}
-	err := b.sendCommand(nil, "sendVenue", params, &r)
+	err := b.sendCommand(nil, method, params, &r)
 	if err != nil {
 		return Message{}, err
 	}
@@ -270,17 +294,13 @@ func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Messa
 // SendChatAction broadcasts type of action to recipient, such as `typing`,
 // `uploading a photo` etc.
 func (b *Bot) SendChatAction(recipient int64, action Action) error {
+	const method = "sendChatAction"
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
 	params.Set("action", string(action))
 
-	var r struct {
-		OK      bool   `json:"ok"`
-		Desc    string `json:"description"`
-		ErrCode int    `json:"error_code"`
-	}
-
-	err := b.sendCommand(nil, "sendChatAction", params, &r)
+	var r response
+	err := b.sendCommand(nil, method, params, &r)
 	if err != nil {
 		return err
 
@@ -351,10 +371,8 @@ func (b *Bot) GetFile(fileID string) (File, error) {
 	params.Set("file_id", fileID)
 
 	var r struct {
-		OK      bool   `json:"ok"`
-		Desc    string `json:"description"`
-		ErrCode int    `json:"error_code"`
-		File    File   `json:"result"`
+		response
+		File File `json:"result"`
 	}
 	err := b.sendCommand(nil, "getFile", params, &r)
 	if err != nil {
@@ -397,15 +415,15 @@ func (b *Bot) sendCommand(ctx context.Context, method string, params url.Values,
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	}
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
 func (b *Bot) getMe() (User, error) {
 	var r struct {
-		OK      bool   `json:"ok"`
-		Desc    string `json:"description"`
-		ErrCode int    `json:"error_code"`
-
+		response
 		User User `json:"result"`
 	}
 	err := b.sendCommand(nil, "getMe", url.Values{}, &r)
@@ -421,13 +439,11 @@ func (b *Bot) getMe() (User, error) {
 }
 
 func mapSendOptions(m *url.Values, opts ...SendOption) {
-	if len(opts) == 0 {
-		return
-	}
-
 	var o sendOptions
 	for _, opt := range opts {
-		opt(&o)
+		if opt != nil {
+			opt(&o)
+		}
 	}
 
 	if o.replyTo != 0 {
@@ -446,5 +462,15 @@ func mapSendOptions(m *url.Values, opts ...SendOption) {
 		m.Set("parse_mode", string(o.parseMode))
 	}
 
-	// TODO: map ReplyMarkup options as well
+	if o.replyMarkup.Keyboard != nil {
+		kb, _ := json.Marshal(o.replyMarkup)
+		m.Set("reply_markup", string(kb))
+	}
+}
+
+// response is a common response structure.
+type response struct {
+	OK      bool   `json:"ok"`
+	Desc    string `json:"description"`
+	ErrCode int    `json:"error_code"`
 }
