@@ -26,7 +26,6 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  ilber -c path-to-ilber.conf\n\n")
 	fmt.Fprintf(os.Stderr, "flags:\n")
 	flag.PrintDefaults()
-	os.Exit(2)
 }
 
 func main() {
