@@ -11,9 +11,11 @@ import (
 
 	"net/http/pprof"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/ilber/command"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // flags
@@ -49,8 +51,31 @@ func main() {
 		b.Logger.Fatal(http.ListenAndServe(addr, mux))
 	}()
 
+	incomingRequestsTotal := prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "ilber",
+		Name:      "incoming_requests_total",
+		Help:      "Number of requests served (including invalid queries)",
+	})
+	invalidCommandsTotal := prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "ilber",
+		Name:      "invalid_commands_total",
+		Help:      "Number of incoming invalid commands",
+	})
+	requestsServedTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "ilber",
+		Name:      "requests_served_total",
+		Help:      "Number of requests served (valid commands)",
+	}, []string{"command"})
+
+	prometheus.MustRegister(
+		incomingRequestsTotal,
+		invalidCommandsTotal,
+		requestsServedTotal,
+	)
+
 	ctx := context.Background()
 	for msg := range b.Messages() {
+		incomingRequestsTotal.Inc()
 		b.Logger.Printf("%v\n", msg)
 
 		// react only to user sent messages
@@ -60,16 +85,18 @@ func main() {
 		// is message a bot command?
 		cmdname := msg.Command()
 		if cmdname == "" {
+			invalidCommandsTotal.Inc()
 			continue
 		}
 
 		// is the command even registered?
 		cmd := command.Lookup(cmdname)
 		if cmd == nil {
+			invalidCommandsTotal.Inc()
 			continue
 		}
 
-		// it is. cool, run it!
+		requestsServedTotal.WithLabelValues(cmdname).Inc()
 		go cmd.Run(ctx, b, msg)
 	}
 }
