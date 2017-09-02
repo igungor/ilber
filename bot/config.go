@@ -12,7 +12,6 @@ type Config struct {
 	Host         string `json:"host"`
 	Port         string `json:"port"`
 	Debug        bool   `json:"debug"`
-	Profile      bool   `json:"profile"`
 	DatabasePath string `json:"dbPath"`
 
 	GoogleAPIKey         string `json:"googleAPIKey"`
