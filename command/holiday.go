@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
@@ -71,7 +70,7 @@ func runHoliday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		if in(now, holiday.date, holiday.date.Add(holiday.duration)) {
 			_, err := b.SendMessage(msg.Chat.ID, fmt.Sprintf("Bugün %v", holiday.name), md)
 			if err != nil {
-				log.Printf("Error while sending message. Err: %v\n", err)
+				b.Logger.Printf("Error while sending message. Err: %v\n", err)
 			}
 			return
 		}
@@ -80,7 +79,7 @@ func runHoliday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 			txt := fmt.Sprintf("En yakın tatil *%v* - %v (*%v* gün)", holiday.date.Format("_2/01/2006"), holiday.name, holiday.duration.Hours()/24)
 			_, err := b.SendMessage(msg.Chat.ID, txt, md)
 			if err != nil {
-				log.Printf("Error while sending message. Err: %v\n", err)
+				b.Logger.Printf("Error while sending message. Err: %v\n", err)
 			}
 			return
 		}
@@ -88,7 +87,7 @@ func runHoliday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err := b.SendMessage(msg.Chat.ID, "yakın zamanda tatil görünmüyor :(", md)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

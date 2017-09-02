@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -32,7 +31,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	service, err := youtube.New(youtubeHTTPClient)
 	if err != nil {
-		log.Printf("Error creating new youtube client: %v", err)
+		b.Logger.Printf("Error creating new youtube client: %v", err)
 		return
 	}
 
@@ -43,7 +42,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := fmt.Sprintf("ne arayayım? örneğin: */youtube %s*", term)
 		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -52,14 +51,14 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	call := service.Search.List("id").Type("video").Q(qs).MaxResults(1)
 	response, err := call.Do()
 	if err != nil {
-		log.Printf("Error making youtube search API call: %v", err)
+		b.Logger.Printf("Error making youtube search API call: %v", err)
 		return
 	}
 
 	if len(response.Items) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "aradığın videoyu bulamadım 🙈")
 		if err != nil {
-			log.Printf("Error while sending message. Err: %v\n", err)
+			b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		}
 		return
 	}
@@ -69,7 +68,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendMessage(msg.Chat.ID, v)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 	}
 }
 

@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/igungor/ilber/bot"
@@ -28,7 +27,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := fmt.Sprintf("hangi filmi arıyorsun? örneğin: */imdb %s*", term)
 		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -39,7 +38,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	// result if any release date is given in query terms.
 	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "", args...)
 	if err != nil {
-		log.Printf("Error searching %v: %v\n", args, err)
+		b.Logger.Printf("Error searching %v: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
 			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
@@ -50,7 +49,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		if strings.Contains(url, "imdb.com/title/tt") {
 			_, err := b.SendMessage(msg.Chat.ID, url)
 			if err != nil {
-				log.Printf("Error while sending message. Err: %v\n", err)
+				b.Logger.Printf("Error while sending message. Err: %v\n", err)
 			}
 			return
 		}
@@ -58,7 +57,7 @@ func runMovie(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendMessage(msg.Chat.ID, "aradığın filmi bulamadım 🙈")
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

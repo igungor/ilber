@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/telegram"
@@ -27,7 +26,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := fmt.Sprintf("hangi karikatürü arıyorsun? örneğin: */yo %s*", term)
 		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -36,7 +35,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	terms = append(terms, args...)
 	u, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "image", terms...)
 	if err != nil {
-		log.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
+		b.Logger.Printf("Error while searching image with given criteria: %v. Err: %v\n", args, err)
 		if err == errSearchQuotaExceeded {
 			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
@@ -50,7 +49,7 @@ func runYo(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	_, err = b.SendPhoto(msg.Chat.ID, photo)
 	if err != nil {
-		log.Printf("Error while sending image: %v\n", err)
+		b.Logger.Printf("Error while sending image: %v\n", err)
 		return
 	}
 }

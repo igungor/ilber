@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/igungor/ilber/bot"
@@ -163,7 +162,7 @@ func runPrayerCall(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }
@@ -184,7 +183,7 @@ func runFoodFast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }
@@ -205,7 +204,7 @@ func runFoodDawn(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"log"
 	"strings"
 
 	"github.com/igungor/ilber/bot"
@@ -30,7 +29,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := "neye referans vereyim? mesela bana bakın: */bkz İlber Ortaylı*"
 		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
-			log.Printf("Error while sending message. Err: %v\n", err)
+			b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		}
 		return
 	}
@@ -40,7 +39,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "", terms...)
 	if err != nil {
-		log.Printf("Error while 'bkz' query. Err: %v\n", err)
+		b.Logger.Printf("Error while 'bkz' query. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
 			b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
@@ -51,7 +50,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		if strings.Contains(articleURL, "wikipedia.org/wiki/") {
 			_, err = b.SendMessage(msg.Chat.ID, articleURL)
 			if err != nil {
-				log.Printf("Error while sending message. Err: %v\n", err)
+				b.Logger.Printf("Error while sending message. Err: %v\n", err)
 				return
 			}
 			return
@@ -60,7 +59,7 @@ func runWiki(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendMessage(msg.Chat.ID, "aradığın referansı bulamadım 🙈")
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

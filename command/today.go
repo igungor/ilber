@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/igungor/ilber/bot"
@@ -40,6 +39,6 @@ func runToday(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	txt := fmt.Sprintf("bugün %v", weekday(time.Now().Weekday()).String())
 	_, err := b.SendMessage(msg.Chat.ID, txt)
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 	}
 }

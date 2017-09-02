@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 
@@ -32,14 +31,14 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := "neyi arayayım?"
 		_, err := b.SendMessage(msg.Chat.ID, txt)
 		if err != nil {
-			log.Printf("Error sending message: %v\n", err)
+			b.Logger.Printf("Error sending message: %v\n", err)
 		}
 		return
 	}
 
 	u, err := url.Parse(urbanURL)
 	if err != nil {
-		log.Printf("Error parsing Urban Dictionary URL: %v\n", err)
+		b.Logger.Printf("Error parsing Urban Dictionary URL: %v\n", err)
 		b.SendMessage(msg.Chat.ID, emojiShrug)
 		return
 	}
@@ -51,7 +50,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("Error sending request to Urban Dictionary API: %v\n", err)
+		b.Logger.Printf("Error sending request to Urban Dictionary API: %v\n", err)
 		b.SendMessage(msg.Chat.ID, emojiShrug)
 		return
 	}
@@ -60,20 +59,20 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	var r response
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
-		log.Printf("Error parsing response body from Urban Dictonary: %v\n", err)
+		b.Logger.Printf("Error parsing response body from Urban Dictonary: %v\n", err)
 		b.SendMessage(msg.Chat.ID, emojiShrug)
 		return
 	}
 
 	if r.ResultType == "no_results" {
-		log.Printf("Empty result set from Urban Dictionary for term %q\n", term)
+		b.Logger.Printf("Empty result set from Urban Dictionary for term %q\n", term)
 		b.SendMessage(msg.Chat.ID, fmt.Sprintf("UrbanDictonary'de %q diye birşey yok", term))
 		return
 	}
 
 	_, err = b.SendMessage(msg.Chat.ID, r.String())
 	if err != nil {
-		log.Printf("Error sending message to Telegram: %v\n", err)
+		b.Logger.Printf("Error sending message to Telegram: %v\n", err)
 	}
 }
 

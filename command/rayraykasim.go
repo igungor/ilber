@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"log"
 
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/telegram"
@@ -22,7 +21,7 @@ var cmdRayRay = &Command{
 func runRayRay(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	_, err := b.SendMessage(msg.Chat.ID, "malifalitiko!")
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

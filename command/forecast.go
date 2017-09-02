@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,7 +39,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	u, err := url.Parse(forecastURL)
 	if err != nil {
-		log.Printf("Error while parsing URL '%v'. Err: %v", forecastURL, err)
+		b.Logger.Printf("Error while parsing URL '%v'. Err: %v", forecastURL, err)
 		return
 	}
 
@@ -52,14 +51,14 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Printf("Error while fetching forecast for location '%v'. Err: %v\n", location, err)
+		b.Logger.Printf("Error while fetching forecast for location '%v'. Err: %v\n", location, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	var forecast forecast
 	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
-		log.Printf("Error while decoding response: %v\n", err)
+		b.Logger.Printf("Error while decoding response: %v\n", err)
 		return
 	}
 
@@ -69,7 +68,7 @@ func runForecast(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	_, err = b.SendMessage(msg.Chat.ID, txt, telegram.WithParseMode(telegram.ModeMarkdown))
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 		return
 	}
 }

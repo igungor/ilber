@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/telegram"
@@ -27,14 +26,14 @@ func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		txt := fmt.Sprintf("ne resmi aramak istiyorsun? örneğin: */img %s*", term)
 		_, err := b.SendMessage(msg.Chat.ID, txt, md)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
 
 	urls, err := search(b.Config.GoogleAPIKey, b.Config.GoogleSearchEngineID, "image", args...)
 	if err != nil {
-		log.Printf("Error while searching image. Err: %v\n", err)
+		b.Logger.Printf("Error while searching image. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
 			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
 		}
@@ -49,7 +48,7 @@ func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendPhoto(msg.Chat.ID, photo)
 	if err != nil {
-		log.Printf("Error while sending photo: %v\n", err)
+		b.Logger.Printf("Error while sending photo: %v\n", err)
 		return
 	}
 }

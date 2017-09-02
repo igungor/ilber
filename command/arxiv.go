@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 
@@ -33,14 +32,14 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if len(args) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "boş geçmeyelim 💩", markdown)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
 
 	u, err := url.Parse(arxivURL)
 	if err != nil {
-		log.Printf("Error while parsing url '%v'. Err: %v", arxivURL, err)
+		b.Logger.Printf("Error while parsing url '%v'. Err: %v", arxivURL, err)
 		return
 	}
 
@@ -55,7 +54,7 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("Error while fetching arxiv document. Err: %v", err)
+		b.Logger.Printf("Error while fetching arxiv document. Err: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -63,14 +62,14 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	var result atom.Feed
 	err = xml.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		log.Printf("Error while decoding the response: %v", err)
+		b.Logger.Printf("Error while decoding the response: %v", err)
 		return
 	}
 
 	if len(result.Entries) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "sonuç boş geldi 👐", markdown)
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -100,6 +99,6 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendMessage(msg.Chat.ID, buf.String(), markdown)
 	if err != nil {
-		log.Printf("Error while sending message: %v\n", err)
+		b.Logger.Printf("Error while sending message: %v\n", err)
 	}
 }

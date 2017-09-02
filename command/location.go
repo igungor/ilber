@@ -30,7 +30,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	if len(args) == 0 {
 		_, err := b.SendMessage(msg.Chat.ID, "nerenin konumunu arayayım?")
 		if err != nil {
-			log.Printf("Error while sending message: %v\n", err)
+			b.Logger.Printf("Error while sending message: %v\n", err)
 		}
 		return
 	}
@@ -47,31 +47,31 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	resp, err := httpclient.Get(u.String())
 	if err != nil {
-		log.Printf("Error searching place '%v'. Err: %v\n", place, err)
+		b.Logger.Printf("Error searching place '%v'. Err: %v\n", place, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	var places placesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&places); err != nil {
-		log.Printf("Error decoding response. Err: %v\n", err)
+		b.Logger.Printf("Error decoding response. Err: %v\n", err)
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("Error searching place '%v'. Status: %v\n", place, places.Status)
+		b.Logger.Printf("Error searching place '%v'. Status: %v\n", place, places.Status)
 		return
 	}
 
 	// possible status' are at: https://developers.google.com/places/web-service/search#PlaceSearchStatusCodes
 	if places.Status != "OK" {
-		log.Printf("Google places query status is not OK: %v\n", places.Status)
+		b.Logger.Printf("Google places query status is not OK: %v\n", places.Status)
 		b.SendMessage(msg.Chat.ID, "bulamadım")
 		return
 	}
 
 	if len(places.Results) == 0 {
-		log.Printf("Google places query returned 0 result\n")
+		b.Logger.Printf("Google places query returned 0 result\n")
 		b.SendMessage(msg.Chat.ID, "bulamadım")
 		return
 	}
@@ -88,7 +88,7 @@ func runLocation(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 
 	_, err = b.SendVenue(msg.Chat.ID, venue)
 	if err != nil {
-		log.Printf("Error sending venue: %v\n", err)
+		b.Logger.Printf("Error sending venue: %v\n", err)
 	}
 }
 

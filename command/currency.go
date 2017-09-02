@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"log"
 	"net/url"
 	"strconv"
 	"strings"
@@ -31,14 +30,14 @@ const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
 func runCurrency(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	s, err := parseQuery(msg.Args())
 	if err != nil {
-		log.Printf("Error parsing query: %v\n", err)
+		b.Logger.Printf("Error parsing query: %v\n", err)
 		_, _ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu")
 		return
 	}
 
 	_, err = b.SendMessage(msg.Chat.ID, s, telegram.WithParseMode(telegram.ModeMarkdown))
 	if err != nil {
-		log.Printf("Error while sending message. Err: %v\n", err)
+		b.Logger.Printf("Error while sending message. Err: %v\n", err)
 	}
 }
 

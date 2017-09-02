@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/igungor/ilber/bot"
@@ -35,7 +34,7 @@ func runMe(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	md := telegram.WithParseMode(telegram.ModeMarkdown)
 	_, err := b.SendMessage(msg.Chat.ID, txt, md)
 	if err != nil {
-		log.Printf("Error while sending message: %v\n", err)
+		b.Logger.Printf("Error while sending message: %v\n", err)
 		return
 	}
 }

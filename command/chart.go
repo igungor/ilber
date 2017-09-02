@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/igungor/ilber/bot"
@@ -91,7 +90,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	var buf bytes.Buffer
 	err = graph.Render(chart.PNG, &buf)
 	if err != nil {
-		log.Printf("Error rendering image: %v\n", err)
+		b.Logger.Printf("Error rendering image: %v\n", err)
 		return
 	}
 
@@ -102,7 +101,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}}
 	_, err = b.SendPhoto(msg.Chat.ID, photo)
 	if err != nil {
-		log.Printf("Error sending photo: %v\n", err)
+		b.Logger.Printf("Error sending photo: %v\n", err)
 		return
 	}
 }
