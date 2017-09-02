@@ -288,7 +288,7 @@ func (d draw) TextWithin(r Renderer, text string, box Box, style Style) {
 			ty = y
 		}
 
-		r.Text(line, tx, ty)
+		d.Text(r, line, tx, ty, style)
 		y += lineBox.Height() + style.GetTextLineSpacing()
 	}
 }

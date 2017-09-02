@@ -7,15 +7,9 @@ import (
 
 // ContinuousRange represents a boundary for a set of numbers.
 type ContinuousRange struct {
-	Min        float64
-	Max        float64
-	Domain     int
-	Descending bool
-}
-
-// IsDescending returns if the range is descending.
-func (r ContinuousRange) IsDescending() bool {
-	return r.Descending
+	Min    float64
+	Max    float64
+	Domain int
 }
 
 // IsZero returns if the ContinuousRange has been set or not.
@@ -69,10 +63,5 @@ func (r ContinuousRange) String() string {
 func (r ContinuousRange) Translate(value float64) int {
 	normalized := value - r.Min
 	ratio := normalized / r.GetDelta()
-
-	if r.IsDescending() {
-		return r.Domain - int(math.Ceil(ratio*float64(r.Domain)))
-	}
-
 	return int(math.Ceil(ratio * float64(r.Domain)))
 }

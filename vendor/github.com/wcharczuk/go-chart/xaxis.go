@@ -1,6 +1,9 @@
 package chart
 
-import "math"
+import (
+	"math"
+	"sort"
+)
 
 // XAxis represents the horizontal axis.
 type XAxis struct {
@@ -68,6 +71,7 @@ func (xa XAxis) GetGridLines(ticks []Tick) []GridLine {
 // Measure returns the bounds of the axis.
 func (xa XAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, ticks []Tick) Box {
 	tickStyle := xa.TickStyle.InheritFrom(xa.Style.InheritFrom(defaults))
+	sort.Sort(Ticks(ticks))
 
 	tp := xa.GetTickPosition()
 
@@ -119,6 +123,8 @@ func (xa XAxis) Render(r Renderer, canvasBox Box, ra Range, defaults Style, tick
 	r.MoveTo(canvasBox.Left, canvasBox.Bottom)
 	r.LineTo(canvasBox.Right, canvasBox.Bottom)
 	r.Stroke()
+
+	sort.Sort(Ticks(ticks))
 
 	tp := xa.GetTickPosition()
 

@@ -14,15 +14,6 @@ import (
 	"time"
 )
 
-type ParseMode string
-
-// Parse modes
-const (
-	ModeNone     ParseMode = ""
-	ModeMarkdown ParseMode = "Markdown"
-	ModeHTML     ParseMode = "HTML"
-)
-
 // Bot represent a Telegram bot.
 type Bot struct {
 	token     string
@@ -48,7 +39,7 @@ func (b *Bot) Handler() http.HandlerFunc {
 
 		var u Update
 		_ = json.NewDecoder(r.Body).Decode(&u)
-		b.messageCh <- &u.Payload
+		b.messageCh <- &u.Message
 	}
 }
 
@@ -74,8 +65,19 @@ func (b *Bot) SetWebhook(webhook string) error {
 	return nil
 }
 
-// SendMessage sends text message to the recipient. Callers can send plain
-// text or markdown messages by setting mode parameter.
+// DeleteWebhook removes webhook integration.
+// TODO(ig):
+func (b *Bot) deleteWebhook() error {
+	return nil
+}
+
+// GetWebhookInfo retrieves current webook status.
+// TODO(ig):
+func (b *Bot) getWebhookInfo() (webhookinfo, error) {
+	return webhookinfo{}, nil
+}
+
+// SendMessage sends text message to the recipient.
 func (b *Bot) SendMessage(recipient int64, message string, opts ...SendOption) (Message, error) {
 	const method = "sendMessage"
 	params := url.Values{}
@@ -99,7 +101,7 @@ func (b *Bot) SendMessage(recipient int64, message string, opts ...SendOption) (
 }
 
 func (b *Bot) forwardMessage(recipient User, message Message) (Message, error) {
-	panic("not implemented yet")
+	panic("TODO")
 }
 
 // SendPhoto sends given photo to recipient. Only remote URLs are supported for now.
@@ -107,7 +109,7 @@ func (b *Bot) forwardMessage(recipient User, message Message) (Message, error) {
 //
 //  b := bot.New("your-token-here")
 //  photo := bot.Photo{URL: "http://i.imgur.com/6S9naG6.png"}
-//  err := b.SendPhoto(recipient, photo, "sample image", nil)
+//  b.SendPhoto(recipient, photo, "sample image")
 func (b *Bot) SendPhoto(recipient int64, photo Photo, opts ...SendOption) (Message, error) {
 	const method = "sendPhoto"
 	params := url.Values{}
@@ -140,41 +142,6 @@ func (b *Bot) SendPhoto(recipient int64, photo Photo, opts ...SendOption) (Messa
 	}
 
 	return r.Message, nil
-}
-
-func (b *Bot) sendFile(method string, f File, form string, params url.Values, v interface{}) error {
-	var buf bytes.Buffer
-	w := multipart.NewWriter(&buf)
-	part, err := w.CreateFormFile(form, f.Name)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(part, f.Body)
-	if err != nil {
-		return err
-	}
-
-	for k, v := range params {
-		w.WriteField(k, v[0])
-	}
-
-	err = w.Close()
-	if err != nil {
-		return err
-	}
-
-	resp, err := b.client.Post(b.baseURL+method, w.FormDataContentType(), &buf)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
-	}
-
-	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
 // SendAudio sends audio files, if you want Telegram clients to display
@@ -216,18 +183,21 @@ func (b *Bot) SendAudio(recipient int64, audio Audio, opts ...SendOption) (Messa
 
 // SendDocument sends general files. Documents must not exceed 50 MB in size.
 func (b *Bot) sendDocument(recipient int64, document Document, opts ...SendOption) (Message, error) {
-	panic("not implemented yet")
+	const method = "sendDocument"
+	panic("TODO")
 }
 
 //SendSticker sends stickers with .webp extensions.
 func (b *Bot) sendSticker(recipient int64, sticker Sticker, opts ...SendOption) (Message, error) {
-	panic("not implemented yet")
+	const method = "sendSticker"
+	panic("TODO")
 }
 
 // SendVideo sends video files. Telegram clients support mp4 videos (other
 // formats may be sent as Document). Video files must not exceed 50 MB in size.
 func (b *Bot) sendVideo(recipient int64, video Video, opts ...SendOption) (Message, error) {
-	panic("not implemented yet")
+	const method = "sendVideo"
+	panic("TODO")
 }
 
 // SendVoice sends audio files, if you want Telegram clients to display
@@ -235,7 +205,13 @@ func (b *Bot) sendVideo(recipient int64, video Video, opts ...SendOption) (Messa
 // in an .ogg file encoded with OPUS (other formats may be sent as Audio or
 // Document). audio must not exceed 50 MB in size.
 func (b *Bot) sendVoice(recipient int64, audio Audio, opts ...SendOption) (Message, error) {
-	panic("not implemented yet")
+	const method = "sendVoice"
+	panic("TODO")
+}
+
+func (b *Bot) sendVideoNote(recipient int64, videonote VideoNote, opts ...SendOption) (Message, error) {
+	const method = "sendVideoNote"
+	panic("TODO")
 }
 
 // SendLocation sends location point on the map.
@@ -291,9 +267,23 @@ func (b *Bot) SendVenue(recipient int64, venue Venue, opts ...SendOption) (Messa
 	return r.Message, nil
 }
 
+func (b *Bot) sendContact(recipient int64, contact Contact, opts ...SendOption) (Message, error) {
+	const method = "sendContact"
+	panic("TODO")
+}
+
 // SendChatAction broadcasts type of action to recipient, such as `typing`,
 // `uploading a photo` etc.
-func (b *Bot) SendChatAction(recipient int64, action Action) error {
+//
+// Use this method when you need to tell the user that something is happening
+// on the bot's side. The status is set for 5 seconds or less (when a message
+// arrives from your bot, Telegram clients clear its typing status).
+//
+// Example: The ImageBot needs some time to process a request
+// and upload the image. Instead of sending a text message along the lines of
+// “Retrieving image, please wait…”, the bot may use SendChatAction with action
+// = UploadingPhoto. The user will see a “sending photo” status for the bot.
+func (b *Bot) SendChatAction(recipient int64, action ChatAction) error {
 	const method = "sendChatAction"
 	params := url.Values{}
 	params.Set("chat_id", strconv.FormatInt(recipient, 10))
@@ -310,6 +300,76 @@ func (b *Bot) SendChatAction(recipient int64, action Action) error {
 	}
 
 	return nil
+}
+
+// GetFile retrieves basic info about a file and prepare it for downloading.
+// For the moment, bots can download files of up to 20MB in size.
+// It is guaranteed that the link will be valid for at least 1 hour. When the
+// link expires, a new one can be requested by calling getFile again.
+func (b *Bot) GetFile(fileID string) (File, error) {
+	const method = "getFile"
+	params := url.Values{}
+	params.Set("file_id", fileID)
+
+	var r struct {
+		response
+		File File `json:"result"`
+	}
+	err := b.sendCommand(nil, method, params, &r)
+	if err != nil {
+		return File{}, err
+	}
+
+	if !r.OK {
+		return File{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
+	}
+
+	u := "https://api.telegram.org/file/bot" + b.token + "/" + r.File.FilePath
+	r.File.URL = u
+
+	return r.File, nil
+}
+
+// Use this method to set a new profile photo for the chat. Photos can't be
+// changed for private chats. The bot must be an administrator in the chat for
+// this to work and must have the appropriate admin rights.
+func (b *Bot) setChatPhoto(recipient int64, photo Photo) error {
+	const method = "setChatPhoto"
+	panic("TODO")
+}
+
+func (b *Bot) setChatTitle(recipient int64, title string) error {
+	const method = "setChatTitle"
+	panic("TODO")
+}
+
+func (b *Bot) setChatDescription(recipient int64, desc string) error {
+	const method = "setChatDescription"
+	panic("TODO")
+}
+
+func (b *Bot) getChat(recipient int64) (Chat, error) {
+	const method = "getChat"
+	panic("TODO")
+}
+
+// DeleteMessage deletes a message, including service messages, with the following limitations:
+// - A message can only be deleted if it was sent less than 48 hours ago.
+// - Bots can delete outgoing messages in groups and supergroups.
+// - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+// - If the bot is an administrator of a group, it can delete any message there.
+// - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+func (b *Bot) deleteMessage(recipient int64, messageid int64) error {
+	const method = "deleteMessage"
+	panic("TODO")
+}
+
+// Use this method to delete a chat photo. Photos can't be changed for private
+// chats. The bot must be an administrator in the chat for this to work and
+// must have the appropriate admin rights.
+func (b *Bot) deleteChatPhoto(recipient int64) error {
+	const method = "setChatPhoto"
+	panic("TODO")
 }
 
 // sendOptions configure a SendMessage call. sendOptions are set by the
@@ -360,40 +420,29 @@ func WithDisableWebPagePreview(disable bool) SendOption {
 	}
 }
 
+// WithDisableNotification sends the message silently. Users will receive a
+// notification with no sound.
 func WithDisableNotification(disable bool) SendOption {
 	return func(o *sendOptions) {
 		o.disableNotification = disable
 	}
 }
 
-func (b *Bot) GetFile(fileID string) (File, error) {
-	params := url.Values{}
-	params.Set("file_id", fileID)
-
+func (b *Bot) getMe() (User, error) {
 	var r struct {
 		response
-		File File `json:"result"`
+		User User `json:"result"`
 	}
-	err := b.sendCommand(nil, "getFile", params, &r)
+	err := b.sendCommand(nil, "getMe", url.Values{}, &r)
 	if err != nil {
-		return File{}, err
+		return User{}, err
 	}
 
 	if !r.OK {
-		return File{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
+		return User{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
 	}
 
-	return r.File, nil
-}
-
-func (b *Bot) GetFileDownloadURL(fileID string) (string, error) {
-	f, err := b.GetFile(fileID)
-	if err != nil {
-		return "", err
-	}
-
-	u := "https://api.telegram.org/file/bot" + b.token + "/" + f.FilePath
-	return u, nil
+	return r.User, nil
 }
 
 func (b *Bot) sendCommand(ctx context.Context, method string, params url.Values, v interface{}) error {
@@ -421,21 +470,39 @@ func (b *Bot) sendCommand(ctx context.Context, method string, params url.Values,
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
-func (b *Bot) getMe() (User, error) {
-	var r struct {
-		response
-		User User `json:"result"`
-	}
-	err := b.sendCommand(nil, "getMe", url.Values{}, &r)
+func (b *Bot) sendFile(method string, f File, form string, params url.Values, v interface{}) error {
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+	part, err := w.CreateFormFile(form, f.Name)
 	if err != nil {
-		return User{}, err
+		return err
 	}
 
-	if !r.OK {
-		return User{}, fmt.Errorf("%v (%v)", r.Desc, r.ErrCode)
+	_, err = io.Copy(part, f.Body)
+	if err != nil {
+		return err
 	}
 
-	return r.User, nil
+	for k, v := range params {
+		w.WriteField(k, v[0])
+	}
+
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+
+	resp, err := b.client.Post(b.baseURL+method, w.FormDataContentType(), &buf)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	}
+
+	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
 func mapSendOptions(m *url.Values, opts ...SendOption) {

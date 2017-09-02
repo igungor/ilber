@@ -2,7 +2,6 @@ package chart
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math"
 
@@ -86,7 +85,7 @@ func (bc BarChart) GetBarWidth() int {
 // Render renders the chart with the given renderer to the given io.Writer.
 func (bc BarChart) Render(rp RendererProvider, w io.Writer) error {
 	if len(bc.Bars) == 0 {
-		return errors.New("please provide at least one bar")
+		return errors.New("Please provide at least one bar.")
 	}
 
 	r, err := rp(bc.GetWidth(), bc.GetHeight())
@@ -112,9 +111,6 @@ func (bc BarChart) Render(rp RendererProvider, w io.Writer) error {
 
 	canvasBox = bc.getDefaultCanvasBox()
 	yr = bc.getRanges()
-	if yr.GetMax()-yr.GetMin() == 0 {
-		return fmt.Errorf("invalid data range; cannot be zero")
-	}
 	yr = bc.setRangeDomains(canvasBox, yr)
 	yf = bc.getValueFormatters()
 
@@ -366,7 +362,7 @@ func (bc BarChart) getAdjustedCanvasBox(r Renderer, canvasBox Box, yrange Range,
 				lines := Text.WrapFit(r, bar.Label, barLabelBox.Width(), axisStyle)
 				linesBox := Text.MeasureLines(r, lines, axisStyle)
 
-				xaxisHeight = Math.MinInt(linesBox.Height()+(2*DefaultXAxisMargin), xaxisHeight)
+				xaxisHeight = Math.MaxInt(linesBox.Height()+(2*DefaultXAxisMargin), xaxisHeight)
 			}
 		}
 

@@ -2,7 +2,6 @@ package chart
 
 import (
 	"errors"
-	"fmt"
 	"io"
 
 	"github.com/golang/freetype/truetype"
@@ -89,10 +88,7 @@ func (pc PieChart) Render(rp RendererProvider, w io.Writer) error {
 	pc.drawBackground(r)
 	pc.drawCanvas(r, canvasBox)
 
-	finalValues, err := pc.finalizeValues(pc.Values)
-	if err != nil {
-		return err
-	}
+	finalValues := pc.finalizeValues(pc.Values)
 	pc.drawSlices(r, canvasBox, finalValues)
 	pc.drawTitle(r)
 	for _, a := range pc.Elements {
@@ -162,12 +158,8 @@ func (pc PieChart) drawSlices(r Renderer, canvasBox Box, values []Value) {
 	}
 }
 
-func (pc PieChart) finalizeValues(values []Value) ([]Value, error) {
-	finalValues := Values(values).Normalize()
-	if len(finalValues) == 0 {
-		return nil, fmt.Errorf("pie chart must contain at least (1) non-zero value")
-	}
-	return finalValues, nil
+func (pc PieChart) finalizeValues(values []Value) []Value {
+	return Values(values).Normalize()
 }
 
 func (pc PieChart) getDefaultCanvasBox() Box {
