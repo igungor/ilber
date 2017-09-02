@@ -36,7 +36,7 @@ func main() {
 
 	b, err := bot.New(*flagConfig, logger)
 	if err != nil {
-		log.Fatalf("Could not initialize the bot: %v\n", err)
+		b.Logger.Fatalf("Could not initialize the bot: %v\n", err)
 	}
 
 	mux := http.NewServeMux()
@@ -46,12 +46,12 @@ func main() {
 
 	go func() {
 		addr := net.JoinHostPort(b.Config.Host, b.Config.Port)
-		log.Fatal(http.ListenAndServe(addr, mux))
+		b.Logger.Fatal(http.ListenAndServe(addr, mux))
 	}()
 
 	ctx := context.Background()
 	for msg := range b.Messages() {
-		log.Printf("%v\n", msg)
+		b.Logger.Printf("%v\n", msg)
 
 		// react only to user sent messages
 		if msg.IsService() {
