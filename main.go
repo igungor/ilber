@@ -9,10 +9,11 @@ import (
 	"net/http"
 	"os"
 
-	_ "net/http/pprof"
+	"net/http/pprof"
 
 	"github.com/igungor/ilber/bot"
 	"github.com/igungor/ilber/command"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // flags
@@ -29,35 +30,24 @@ func usage() {
 }
 
 func main() {
-	log.SetPrefix("ilber: ")
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	logger := log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
 	flag.Usage = usage
 	flag.Parse()
 
-	b, err := bot.New(*flagConfig)
+	b, err := bot.New(*flagConfig, logger)
 	if err != nil {
-		log.Fatalf("error initializing the bot: %v\n", err)
+		log.Fatalf("Could not initialize the bot: %v\n", err)
 	}
 
-	err = b.SetWebhook(b.Config.Webhook)
-	if err != nil {
-		log.Fatalf("error while setting webhook: %v", err)
-	}
-	log.Printf("Webhook set to %v\n", b.Config.Webhook)
-
-	http.HandleFunc("/", b.Handler())
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", b.Handler())
+	registerMetrics(mux)
+	registerProfile(mux)
 
 	go func() {
 		addr := net.JoinHostPort(b.Config.Host, b.Config.Port)
-		log.Fatal(http.ListenAndServe(addr, nil))
+		log.Fatal(http.ListenAndServe(addr, mux))
 	}()
-
-	if b.Config.Profile {
-		go func() {
-			log.Println("Exposing profile information on http://0.0.0.0:6969")
-			log.Printf("profile error: %v", http.ListenAndServe(":6969", nil))
-		}()
-	}
 
 	ctx := context.Background()
 	for msg := range b.Messages() {
@@ -82,4 +72,20 @@ func main() {
 		// it is. cool, run it!
 		go cmd.Run(ctx, b, msg)
 	}
+}
+
+func registerMetrics(mux *http.ServeMux) {
+	mux.Handle("/metrics", promhttp.Handler())
+}
+
+func registerProfile(mux *http.ServeMux) {
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	mux.Handle("/debug/pprof/block", pprof.Handler("block"))
+	mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
 }
