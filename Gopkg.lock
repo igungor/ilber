@@ -15,24 +15,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/blendlabs/go-exception"
-  packages = ["."]
-  revision = "04be78b9b2a71cf039fe86cef5221b3d3cb89fd7"
-
-[[projects]]
-  name = "github.com/boltdb/bolt"
-  packages = ["."]
-  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
-  version = "v1.3.1"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/golang/freetype"
-  packages = ["raster","truetype"]
-  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
-
-[[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "17ce1425424ab154092bbb43af630bd647f3bb0d"
@@ -74,28 +56,10 @@
   revision = "e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2"
 
 [[projects]]
-  name = "github.com/wcharczuk/go-chart"
-  packages = [".","drawing"]
-  revision = "fc2973067ce43455507ea5f9aa9814aabbf8f2ca"
-  version = "v2.0"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/image"
-  packages = ["draw","font","math/f64","math/fixed"]
-  revision = "426cfd8eeb6e08ab1932954e09e3c2cb2bc6e36d"
-
-[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp"]
   revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/sys"
-  packages = ["unix"]
-  revision = "7ddbeae9ae08c6a06a59597f0c9edbc5ff2444ce"
 
 [[projects]]
   branch = "master"
@@ -106,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8424bb4587e06f800cf14852d8afbd43a8fa45b58949441bc8871c29134c50fa"
+  inputs-digest = "797482480b13868118f8cafe247ab1d53ecaa01d3d4a4d951cf794fc7ef007c5"
   solver-name = "gps-cdcl"
   solver-version = 1
