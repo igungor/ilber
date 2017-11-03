@@ -17,6 +17,7 @@ type Config struct {
 	GoogleAPIKey         string `json:"googleAPIKey"`
 	GoogleSearchEngineID string `json:"googleSearchEngineID"`
 	OpenweathermapAppID  string `json:"openWeatherMapAppID"`
+	AlphaVantageToken    string `json:"alphavantageToken"`
 }
 
 func readConfig(configPath string) (*Config, error) {

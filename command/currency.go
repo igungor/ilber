@@ -3,8 +3,9 @@ package command
 import (
 	"bytes"
 	"context"
-	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -23,91 +24,268 @@ var cmdCurrency = &Command{
 	Run:       runCurrency,
 }
 
-var defaultCurrencies = []string{"USD", "EUR"}
+const (
+	yahooFinanceURL = "https://query1.finance.yahoo.com/v8/finance/chart/"
+	// TRY=X?range=1m"
+	alphavantageURL = "https://www.alphavantage.co/query"
+)
 
-const financeURL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1"
-
-func runCurrency(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
-	s, err := parseQuery(msg.Args())
-	if err != nil {
-		b.Logger.Printf("Error parsing query: %v\n", err)
-		_, _ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu")
-		return
-	}
-
-	_, err = b.SendMessage(msg.Chat.ID, s, telegram.WithParseMode(telegram.ModeMarkdown))
-	if err != nil {
-		b.Logger.Printf("Error while sending message. Err: %v\n", err)
+func defaultCurrencies() []query {
+	return []query{
+		{
+			from: "USD",
+			to:   "TRY",
+		},
+		{
+			from: "EUR",
+			to:   "TRY",
+		},
 	}
 }
 
-func parseQuery(terms []string) (string, error) {
+func runCurrency(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
+	queries := parseMessage(msg.Args())
+
+	var errs []error
+	// FIXME(ig): enable yahoo later
+	for _, fn := range []queryfunc{queryYahooFinance, queryAlphaVantage} {
+		s, err := fn(queries, b.Config.AlphaVantageToken)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		_, _ = b.SendMessage(msg.Chat.ID, s, telegram.WithParseMode(telegram.ModeMarkdown))
+		break
+	}
+
+	if len(errs) > 0 {
+		b.Logger.Printf("Error parsing query: %q\n", errs)
+		_, _ = b.SendMessage(msg.Chat.ID, "birtakım hatalar sözkonusu")
+	}
+}
+
+func maybeNumber(s string) bool {
+	_, err := strconv.ParseFloat(s, 32)
+	return err == nil
+}
+
+func parseMessage(terms []string) []query {
 	if terms == nil {
-		terms = defaultCurrencies
+		return defaultCurrencies()
 	}
 
-	u, _ := url.Parse(financeURL)
-	params := u.Query()
+	// parse the calculation. eg: "4 USD in TRY"
+	//
+	// 4 term queries are calculations, such as:
+	// "3 USD in TRY" or
+	// "5 BTC to TRY"
+	if len(terms) == 4 && maybeNumber(terms[0]) {
+		amount, _ := strconv.ParseFloat(terms[0], 32)
+		from := terms[1]
+		to := terms[3]
 
-	var isQuestion bool
-	var f float64
-
-	// check if the query is a calculation statement (contains 4 tokens):
-	// x EUR in TRY
-	// x dollars in pounds
-	// x dolar kaç lira
-	if len(terms) == 4 {
-		var err error
-		f, err = strconv.ParseFloat(terms[0], 32)
-		if err == nil {
-			isQuestion = true
+		return []query{
+			{
+				amount: amount,
+				from:   from,
+				to:     to,
+				isCalc: true,
+			},
 		}
 	}
 
-	currencies := make([]string, len(terms))
-	if isQuestion {
-		currencies[0], currencies[1] = normalize(terms[1]), normalize(terms[3])
-		params.Set("s", fmt.Sprintf("%v%v=X", currencies[0], currencies[1]))
-	} else {
-		// query string be like: USDTRY=X,EURTRY=X
-		var qs []string
-		for i, cur := range terms {
-			cur = normalize(cur)
-			currencies[i] = cur
-			qs = append(qs, cur+"TRY=X")
+	var currencies []string
+	for _, term := range terms {
+		if len(term) != 3 {
+			continue
 		}
-		params.Set("s", strings.Join(qs, ","))
+		currencies = append(currencies, term)
+	}
+	var queries []query
+	for _, currency := range currencies {
+		query := query{
+			amount: 1,
+			from:   currency,
+			to:     "TRY",
+		}
+		queries = append(queries, query)
+	}
+	return queries
+}
+
+type query struct {
+	amount float64
+	from   string
+	to     string
+	isCalc bool
+}
+
+type queryfunc func([]query, string) (string, error)
+
+func queryYahooFinance(queries []query, token string) (string, error) {
+	if len(queries) == 0 {
+		return "", fmt.Errorf("yahoo: no query found")
 	}
 
-	u.RawQuery = params.Encode()
-	resp, err := httpclient.Get(u.String())
-	if err != nil {
-		return "", fmt.Errorf("error fetching currencies: %v", err)
-	}
-	defer resp.Body.Close()
+	request := func(q query) (float64, error) {
+		u, _ := url.Parse(yahooFinanceURL)
+		u.Path += fmt.Sprintf("%v%v=%v", q.from, q.to, "X")
+		params := u.Query()
+		params.Set("range", "1d")
+		u.RawQuery = params.Encode()
 
-	cr := csv.NewReader(resp.Body)
-	records, err := cr.ReadAll()
-	if err != nil {
-		return "", fmt.Errorf("error reading csv: %v", err)
+		resp, err := httpclient.Get(u.String())
+		if err != nil {
+			return 0, fmt.Errorf("yahoo: could not fetch response: %v", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return 0, fmt.Errorf("yahoo: unexpected status code %v", resp.StatusCode)
+		}
+
+		var response yahooFinanceResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		if err != nil {
+			return 0, fmt.Errorf("yahoo: could not parse json: %v", err)
+		}
+
+		result := response.Chart.Result
+		fmt.Printf("len results: %v\n", len(result))
+		quote := result[len(result)-1].Indicators.Quote
+		close := quote[len(quote)-1].Close
+		// last value is always nil, so fetch the one before the last
+		rate := close[len(close)-2].(float64)
+		return rate, nil
+	}
+
+	if len(queries) == 1 && queries[0].isCalc {
+		q := queries[0]
+		rate, err := request(q)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf(
+			"%4.2f %v = %4.2f %v",
+			q.amount,
+			normalize(q.from),
+			q.amount*rate,
+			normalize(q.to),
+		), nil
+	}
+
+	var rates []float64
+	for _, q := range queries {
+		rate, err := request(q)
+		if err != nil {
+			return "", err
+		}
+		rates = append(rates, rate)
 	}
 
 	var buf bytes.Buffer
-	if isQuestion {
-		rate, err := strconv.ParseFloat(records[0][1], 32)
+	for i, rate := range rates {
+		fmt.Fprintf(&buf, "%v = %4.2f %v\n",
+			normalize(queries[i].from),
+			rate,
+			normalize(queries[i].to),
+		)
+	}
+	return buf.String(), nil
+}
+
+func queryAlphaVantage(queries []query, token string) (string, error) {
+	if len(queries) == 0 {
+		return "", fmt.Errorf("av: no query found")
+	}
+
+	request := func(q query) (float64, error) {
+		u, _ := url.Parse(alphavantageURL)
+		params := u.Query()
+		params.Set("function", "CURRENCY_EXCHANGE_RATE")
+		params.Set("from_currency", q.from)
+		params.Set("to_currency", q.to)
+		params.Set("apikey", token)
+		u.RawQuery = params.Encode()
+
+		resp, err := httpclient.Get(u.String())
 		if err != nil {
-			return "", fmt.Errorf("Error reading record as float: %v", err)
+			return 0, fmt.Errorf("av: could not fetch response: %v", err)
+		}
+		defer resp.Body.Close()
+
+		var response alphavantageResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		if err != nil {
+			return 0, fmt.Errorf("av: could not parse json: %v", err)
 		}
 
-		buf.WriteString(fmt.Sprintf("%.2f %v = %.2f %v\n", f, currencies[0], f*rate, currencies[1]))
-		return buf.String(), nil
+		return strconv.ParseFloat(response.Realtime_Currency_Exchange_Rate.Rate, 64)
 	}
 
-	for i, record := range records {
-		buf.WriteString(fmt.Sprintf("%v = %v ₺\n", currencies[i], record[1]))
+	if len(queries) == 1 && queries[0].isCalc {
+		q := queries[0]
+		rate, err := request(q)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf(
+			"%4.2f %v = %4.2f %v",
+			q.amount,
+			normalize(q.from),
+			q.amount*rate,
+			normalize(q.to),
+		), nil
 	}
 
+	var rates []float64
+	for _, q := range queries {
+		rate, err := request(q)
+		if err != nil {
+			return "", err
+		}
+		rates = append(rates, rate)
+	}
+
+	var buf bytes.Buffer
+	for i, rate := range rates {
+		fmt.Fprintf(&buf, "%v = %4.2f %v\n",
+			normalize(queries[i].from),
+			rate,
+			normalize(queries[i].to),
+		)
+	}
 	return buf.String(), nil
+}
+
+type alphavantageResponse struct {
+	Realtime_Currency_Exchange_Rate struct {
+		From string `json:"1. From_Currency Code"`
+		_    string `json:"2. From_Currency Name"`
+		To   string `json:"3. To_Currency Code"`
+		_    string `json:"4. To_Currency Name"`
+		Rate string `json:"5. Exchange Rate"`
+		_    string `json:"6. Last Refreshed"`
+		_    string `json:"7. Time Zone"`
+	} `json:"Realtime Currency Exchange Rate"`
+}
+
+type yahooFinanceResponse struct {
+	Chart struct {
+		Error  interface{} `json:"error"`
+		Result []struct {
+			Indicators struct {
+				Quote []struct {
+					Close  []interface{} `json:"close"`
+					High   []interface{} `json:"high"`
+					Low    []interface{} `json:"low"`
+					Open   []interface{} `json:"open"`
+					Volume []interface{} `json:"volume"`
+				} `json:"quote"`
+			} `json:"indicators"`
+			Timestamp []int64 `json:"timestamp"`
+		} `json:"result"`
+	} `json:"chart"`
 }
 
 // popular currencies

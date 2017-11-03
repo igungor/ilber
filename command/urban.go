@@ -56,7 +56,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 	defer resp.Body.Close()
 
-	var r response
+	var r urbanResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
 		b.Logger.Printf("Error parsing response body from Urban Dictonary: %v\n", err)
@@ -76,7 +76,7 @@ func runUrban(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 }
 
-type response struct {
+type urbanResponse struct {
 	List []struct {
 		Author      string `json:"author"`
 		CurrentVote string `json:"current_vote"`
@@ -93,22 +93,22 @@ type response struct {
 	Tags       []string      `json:"tags"`
 }
 
-func (r response) String() string {
-	if len(r.List) == 0 {
+func (ur urbanResponse) String() string {
+	if len(ur.List) == 0 {
 		return fmt.Sprintf("UrbanDictonary'de böyle birşey yok")
 	}
 
 	var maxItems int
-	if len(r.List) > 3 {
+	if len(ur.List) > 3 {
 		maxItems = 3
 	} else {
-		maxItems = len(r.List)
+		maxItems = len(ur.List)
 	}
 
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("Definitions of %q\n\n", r.List[0].Word))
+	buf.WriteString(fmt.Sprintf("Definitions of %q\n\n", ur.List[0].Word))
 	for i := 0; i < maxItems; i++ {
-		item := r.List[i]
+		item := ur.List[i]
 		buf.WriteString(fmt.Sprintf("* %v\n", item.Definition))
 		buf.WriteString("\n")
 	}
