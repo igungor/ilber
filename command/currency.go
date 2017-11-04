@@ -26,7 +26,6 @@ var cmdCurrency = &Command{
 
 const (
 	yahooFinanceURL = "https://query1.finance.yahoo.com/v8/finance/chart/"
-	// TRY=X?range=1m"
 	alphavantageURL = "https://www.alphavantage.co/query"
 )
 
@@ -151,12 +150,19 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 		}
 
 		result := response.Chart.Result
-		fmt.Printf("len results: %v\n", len(result))
 		quote := result[len(result)-1].Indicators.Quote
 		close := quote[len(quote)-1].Close
-		// last value is always nil, so fetch the one before the last
-		rate := close[len(close)-2].(float64)
-		return rate, nil
+
+		var rates []float64
+		for _, v := range close {
+			rate, ok := v.(float64)
+			// skip unrecognized values to a list for later use
+			if !ok {
+				continue
+			}
+			rates = append(rates, rate)
+		}
+		return rates[len(rates)-1], nil
 	}
 
 	if len(queries) == 1 && queries[0].isCalc {
@@ -166,7 +172,7 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 			return "", err
 		}
 		return fmt.Sprintf(
-			"%4.2f %v = %4.2f %v",
+			"%4.2f %v = %4.4f %v",
 			q.amount,
 			normalize(q.from),
 			q.amount*rate,
@@ -185,7 +191,7 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 
 	var buf bytes.Buffer
 	for i, rate := range rates {
-		fmt.Fprintf(&buf, "%v = %4.2f %v\n",
+		fmt.Fprintf(&buf, "%v = %4.4f %v\n",
 			normalize(queries[i].from),
 			rate,
 			normalize(queries[i].to),
@@ -230,7 +236,7 @@ func queryAlphaVantage(queries []query, token string) (string, error) {
 			return "", err
 		}
 		return fmt.Sprintf(
-			"%4.2f %v = %4.2f %v",
+			"%4.2f %v = %4.4f %v",
 			q.amount,
 			normalize(q.from),
 			q.amount*rate,
@@ -249,7 +255,7 @@ func queryAlphaVantage(queries []query, token string) (string, error) {
 
 	var buf bytes.Buffer
 	for i, rate := range rates {
-		fmt.Fprintf(&buf, "%v = %4.2f %v\n",
+		fmt.Fprintf(&buf, "%v = %4.4f %v\n",
 			normalize(queries[i].from),
 			rate,
 			normalize(queries[i].to),
