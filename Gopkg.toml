@@ -13,3 +13,7 @@
 [[constraint]]
   branch = "master"
   name = "google.golang.org/api"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/wcharczuk/go-chart"

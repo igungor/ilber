@@ -1,0 +1,19 @@
+language: go
+sudo: false
+
+notifications:
+  slack:
+    rooms:
+      - secure: "FToGpbISqzxKUYrx5ajodhMB+Yz/DqFS5/BrUKgifNup8shikRPXM+/KAnRPc2PFCKErzZQEdrqbdPageWOosY77qMLMlyaPY5ZdA8kV5n+Ro2WmFicj6XqUngMe5FAxdX8aYcp9EGWOOyha28tIMK8ExQzF06/aLXpqq/xlm7HKXrWTSrQ9RKsaM9EGODQyzZj0VrP2Drs1rNkNj2Vi/6jX5l7/Cw8c3cMosXaMcjFRtbdmkz+9oKBa9J/PhcZQ5J+odAG5F6YPBcQBXJLB+6chBu4n+gpEAb2er2n+RP1oGtiJoQYv2gOejrwPkyvlUyx4bKLyYrigFOJJCewWKCobHe6TcHWP9yPbyTRelywN6whw+zlNLQ0duASEEPGcl0yXSs/g6QlYBbz6k9ArRSY+9NWRhmDzY6oDYH+oyw/pfvSAQA9obliMfcIu/v27xnNDMSP7H3vfi5UTmuiYmGlKc8BfyC5/EoRY1W4XPtETn9pAsX49mrOVyFdWcezqbvtyIOXzKeI/WJpL8INLH6rTIIQizbPTCuGN/lo5PT+aUesKTgE3/O2MI/Wh06mvJD/usKcV5BKm45x3/ml42NvmQMUHBiRzgg5/Dx7f3Zokr1x45cGQFSie66yXr9N6sID5kom6ZEIpG3wZzvJbXqiWPD5ioepklia4IMzddiY="  
+    on_success: change 
+    on_failure: change
+    template:
+      - "%{repository_slug} %{message} %{duration}"
+      - "%{author} : (<%{compare_url}|%{commit}>) %{commit_message}"
+      - "Build Details: %{build_url}"
+
+before_script:
+  - go get -u github.com/blendlabs/go-assert
+
+script: 
+  - go test
