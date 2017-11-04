@@ -850,7 +850,10 @@ type LogEntry struct {
 	// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[L
 	// OG_ID]"
 	// "folders/[FOLDER_ID]/logs/[LOG_ID]"
-	// [LOG_ID] must be URL-encoded within log_name. Example:
+	// A project number may optionally be used in place of PROJECT_ID. The
+	// project number is translated to its corresponding PROJECT_ID
+	// internally  and the log_name field will contain PROJECT_ID in queries
+	// and exports.[LOG_ID] must be URL-encoded within log_name. Example:
 	// "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Fa
 	// ctivity". [LOG_ID] must be less than 512 characters long and can only
 	// include the following characters: upper and lower case alphanumeric
@@ -902,6 +905,12 @@ type LogEntry struct {
 	// SourceLocation: Optional. Source code location information associated
 	// with the log entry, if any.
 	SourceLocation *LogEntrySourceLocation `json:"sourceLocation,omitempty"`
+
+	// SpanId: Optional. Id of the span within the trace associated with the
+	// log entry. e.g. "0000000000000042" For Stackdriver trace spans, this
+	// is the same format that the Stackdriver trace API uses. The ID is a
+	// 16-character hexadecimal encoding of an 8-byte array.
+	SpanId string `json:"spanId,omitempty"`
 
 	// TextPayload: The log entry payload, represented as a Unicode string
 	// (UTF-8).
@@ -1221,18 +1230,14 @@ type LogSink struct {
 	// not exported. For more information, see Exporting Logs With Sinks.
 	Destination string `json:"destination,omitempty"`
 
-	// EndTime: Optional. The time at which this sink will stop exporting
-	// log entries. Log entries are exported only if their timestamp is
-	// earlier than the end time. If this field is not supplied, there is no
-	// end time. If both a start time and an end time are provided, then the
-	// end time must be later than the start time.
+	// EndTime: Deprecated. This field is ignored when creating or updating
+	// sinks.
 	EndTime string `json:"endTime,omitempty"`
 
 	// Filter: Optional. An advanced logs filter. The only exported log
 	// entries are those that are in the resource owning the sink and that
-	// match the filter. The filter must use the log entry format specified
-	// by the output_version_format parameter. For example, in the v2
-	// format:
+	// match the filter. For
+	// example:
 	// logName="projects/[PROJECT_ID]/logs/[LOG_ID]" AND severity>=ERROR
 	//
 	Filter string `json:"filter,omitempty"`
@@ -1273,10 +1278,8 @@ type LogSink struct {
 	//   "V1" - LogEntry version 1 format.
 	OutputVersionFormat string `json:"outputVersionFormat,omitempty"`
 
-	// StartTime: Optional. The time at which this sink will begin exporting
-	// log entries. Log entries are exported only if their timestamp is not
-	// earlier than the start time. The default value of this field is the
-	// time the sink is created or updated.
+	// StartTime: Deprecated. This field is ignored when creating or
+	// updating sinks.
 	StartTime string `json:"startTime,omitempty"`
 
 	// WriterIdentity: Output only. An IAM identity&mdash;a service account
@@ -1327,7 +1330,9 @@ type MetricDescriptor struct {
 
 	// DisplayName: A concise name for the metric, which can be displayed in
 	// user interfaces. Use sentence case without an ending period, for
-	// example "Request count".
+	// example "Request count". This field is optional but it is recommended
+	// to be set for any metrics associated with user-visible concepts, such
+	// as Quota.
 	DisplayName string `json:"displayName,omitempty"`
 
 	// Labels: The set of labels that can be used to describe a specific
@@ -1352,16 +1357,7 @@ type MetricDescriptor struct {
 	// zero and sets a new start time for the following points.
 	MetricKind string `json:"metricKind,omitempty"`
 
-	// Name: The resource name of the metric descriptor. Depending on the
-	// implementation, the name typically includes: (1) the parent resource
-	// name that defines the scope of the metric type or of its data; and
-	// (2) the metric's URL-encoded type, which also appears in the type
-	// field of this descriptor. For example, following is the resource name
-	// of a custom metric within the GCP project
-	// my-project-id:
-	// "projects/my-project-id/metricDescriptors/custom.google
-	// apis.com%2Finvoice%2Fpaid%2Famount"
-	//
+	// Name: The resource name of the metric descriptor.
 	Name string `json:"name,omitempty"`
 
 	// Type: The metric type, including its DNS name prefix. The type is not
@@ -1822,13 +1818,13 @@ type WriteLogEntriesRequest struct {
 	// identifier, respectively. The supplied values are chosen so that,
 	// among the log entries that did not supply their own values, the
 	// entries earlier in the list will sort before the entries later in the
-	// list. See entries.list.Log entries with timestamps that are more than
-	// the logs retention period in the past or more than 24 hours in the
-	// future might be discarded. Discarding does not return an error.To
-	// improve throughput and to avoid exceeding the quota limit for calls
-	// to entries.write, you should try to include several log entries in
-	// this list, rather than calling this method for each individual log
-	// entry.
+	// list. See the entries.list method.Log entries with timestamps that
+	// are more than the logs retention period in the past or more than 24
+	// hours in the future might be discarded. Discarding does not return an
+	// error.To improve throughput and to avoid exceeding the quota limit
+	// for calls to entries.write, you should try to include several log
+	// entries in this list, rather than calling this method for each
+	// individual log entry.
 	Entries []*LogEntry `json:"entries,omitempty"`
 
 	// Labels: Optional. Default labels that are added to the labels field
@@ -4069,10 +4065,9 @@ type ProjectsSinksCreateCall struct {
 
 // Create: Creates a sink that exports specified log entries to a
 // destination. The export of newly-ingested log entries begins
-// immediately, unless the current time is outside the sink's start and
-// end times or the sink's writer_identity is not permitted to write to
-// the destination. A sink can export log entries only from the resource
-// owning the sink.
+// immediately, unless the sink's writer_identity is not permitted to
+// write to the destination. A sink can export log entries only from the
+// resource owning the sink.
 func (r *ProjectsSinksService) Create(parent string, logsink *LogSink) *ProjectsSinksCreateCall {
 	c := &ProjectsSinksCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -4183,7 +4178,7 @@ func (c *ProjectsSinksCreateCall) Do(opts ...googleapi.CallOption) (*LogSink, er
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates a sink that exports specified log entries to a destination. The export of newly-ingested log entries begins immediately, unless the current time is outside the sink's start and end times or the sink's writer_identity is not permitted to write to the destination. A sink can export log entries only from the resource owning the sink.",
+	//   "description": "Creates a sink that exports specified log entries to a destination. The export of newly-ingested log entries begins immediately, unless the sink's writer_identity is not permitted to write to the destination. A sink can export log entries only from the resource owning the sink.",
 	//   "flatPath": "v2beta1/projects/{projectsId}/sinks",
 	//   "httpMethod": "POST",
 	//   "id": "logging.projects.sinks.create",
@@ -4693,10 +4688,9 @@ type ProjectsSinksUpdateCall struct {
 }
 
 // Update: Updates a sink. This method replaces the following fields in
-// the existing sink with values from the new sink: destination, filter,
-// output_version_format, start_time, and end_time. The updated sink
-// might also have a new writer_identity; see the unique_writer_identity
-// field.
+// the existing sink with values from the new sink: destination, and
+// filter. The updated sink might also have a new writer_identity; see
+// the unique_writer_identity field.
 func (r *ProjectsSinksService) Update(sinkNameid string, logsink *LogSink) *ProjectsSinksUpdateCall {
 	c := &ProjectsSinksUpdateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.sinkNameid = sinkNameid
@@ -4717,6 +4711,21 @@ func (r *ProjectsSinksService) Update(sinkNameid string, logsink *LogSink) *Proj
 // false or defaulted to false.
 func (c *ProjectsSinksUpdateCall) UniqueWriterIdentity(uniqueWriterIdentity bool) *ProjectsSinksUpdateCall {
 	c.urlParams_.Set("uniqueWriterIdentity", fmt.Sprint(uniqueWriterIdentity))
+	return c
+}
+
+// UpdateMask sets the optional parameter "updateMask": Field mask that
+// specifies the fields in sink that need an update. A sink field will
+// be overwritten if, and only if, it is in the update mask. name and
+// output only fields cannot be updated.An empty updateMask is
+// temporarily treated as using the following mask for backwards
+// compatibility purposes:  destination,filter,includeChildren At some
+// point in the future, behavior will be removed and specifying an empty
+// updateMask will be an error.For a detailed FieldMask definition, see
+// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmaskExample:
+// updateMask=filter.
+func (c *ProjectsSinksUpdateCall) UpdateMask(updateMask string) *ProjectsSinksUpdateCall {
+	c.urlParams_.Set("updateMask", updateMask)
 	return c
 }
 
@@ -4806,7 +4815,7 @@ func (c *ProjectsSinksUpdateCall) Do(opts ...googleapi.CallOption) (*LogSink, er
 	}
 	return ret, nil
 	// {
-	//   "description": "Updates a sink. This method replaces the following fields in the existing sink with values from the new sink: destination, filter, output_version_format, start_time, and end_time. The updated sink might also have a new writer_identity; see the unique_writer_identity field.",
+	//   "description": "Updates a sink. This method replaces the following fields in the existing sink with values from the new sink: destination, and filter. The updated sink might also have a new writer_identity; see the unique_writer_identity field.",
 	//   "flatPath": "v2beta1/projects/{projectsId}/sinks/{sinksId}",
 	//   "httpMethod": "PUT",
 	//   "id": "logging.projects.sinks.update",
@@ -4825,6 +4834,12 @@ func (c *ProjectsSinksUpdateCall) Do(opts ...googleapi.CallOption) (*LogSink, er
 	//       "description": "Optional. See sinks.create for a description of this field. When updating a sink, the effect of this field on the value of writer_identity in the updated sink depends on both the old and new values of this field:\nIf the old and new values of this field are both false or both true, then there is no change to the sink's writer_identity.\nIf the old value is false and the new value is true, then writer_identity is changed to a unique service account.\nIt is an error if the old value is true and the new value is set to false or defaulted to false.",
 	//       "location": "query",
 	//       "type": "boolean"
+	//     },
+	//     "updateMask": {
+	//       "description": "Optional. Field mask that specifies the fields in sink that need an update. A sink field will be overwritten if, and only if, it is in the update mask. name and output only fields cannot be updated.An empty updateMask is temporarily treated as using the following mask for backwards compatibility purposes:  destination,filter,includeChildren At some point in the future, behavior will be removed and specifying an empty updateMask will be an error.For a detailed FieldMask definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmaskExample: updateMask=filter.",
+	//       "format": "google-fieldmask",
+	//       "location": "query",
+	//       "type": "string"
 	//     }
 	//   },
 	//   "path": "v2beta1/{+sinkName}",

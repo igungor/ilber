@@ -236,6 +236,13 @@ type AddonsConfig struct {
 	// KubernetesDashboard: Configuration for the Kubernetes Dashboard.
 	KubernetesDashboard *KubernetesDashboard `json:"kubernetesDashboard,omitempty"`
 
+	// NetworkPolicyConfig: Configuration for NetworkPolicy. This only
+	// tracks whether the addon
+	// is enabled or not on the Master, it does not track whether network
+	// policy
+	// is enabled for the nodes.
+	NetworkPolicyConfig *NetworkPolicyConfig `json:"networkPolicyConfig,omitempty"`
+
 	// ForceSendFields is a list of field names (e.g.
 	// "HorizontalPodAutoscaling") to unconditionally include in API
 	// requests. By default, fields with empty values are omitted from API
@@ -540,6 +547,9 @@ type Cluster struct {
 	// * if left as an empty string,`logging.googleapis.com` will be used.
 	LoggingService string `json:"loggingService,omitempty"`
 
+	// MaintenancePolicy: Configure the maintenance policy for this cluster.
+	MaintenancePolicy *MaintenancePolicy `json:"maintenancePolicy,omitempty"`
+
 	// MasterAuth: The authentication information for accessing the master
 	// endpoint.
 	MasterAuth *MasterAuth `json:"masterAuth,omitempty"`
@@ -608,6 +618,10 @@ type Cluster struct {
 	// are
 	// specified.
 	NodePools []*NodePool `json:"nodePools,omitempty"`
+
+	// PodSecurityPolicyConfig: Configuration for the PodSecurityPolicy
+	// feature.
+	PodSecurityPolicyConfig *PodSecurityPolicyConfig `json:"podSecurityPolicyConfig,omitempty"`
 
 	// SelfLink: [Output only] Server-defined URL for the resource.
 	SelfLink string `json:"selfLink,omitempty"`
@@ -756,6 +770,10 @@ type ClusterUpdate struct {
 	// upgrade). Use `-` to upgrade to the latest version supported by
 	// the server.
 	DesiredNodeVersion string `json:"desiredNodeVersion,omitempty"`
+
+	// DesiredPodSecurityPolicyConfig: The desired configuration options for
+	// the PodSecurityPolicy feature.
+	DesiredPodSecurityPolicyConfig *PodSecurityPolicyConfig `json:"desiredPodSecurityPolicyConfig,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "DesiredAddonsConfig")
 	// to unconditionally include in API requests. By default, fields with
@@ -932,6 +950,43 @@ type CreateNodePoolRequest struct {
 
 func (s *CreateNodePoolRequest) MarshalJSON() ([]byte, error) {
 	type noMethod CreateNodePoolRequest
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// DailyMaintenanceWindow: Time window specified for daily maintenance
+// operations.
+type DailyMaintenanceWindow struct {
+	// Duration: [Output only] Duration of the time window, automatically
+	// chosen to be
+	// smallest possible in the given scenario.
+	Duration string `json:"duration,omitempty"`
+
+	// StartTime: Time within the maintenance window to start the
+	// maintenance operations.
+	// It must be in format "HH:MM”, where HH : [00-23] and MM : [00-59]
+	// GMT.
+	StartTime string `json:"startTime,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Duration") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Duration") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *DailyMaintenanceWindow) MarshalJSON() ([]byte, error) {
+	type noMethod DailyMaintenanceWindow
 	raw := noMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1311,6 +1366,68 @@ func (s *ListOperationsResponse) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// MaintenancePolicy: MaintenancePolicy defines the maintenance policy
+// to be used for the cluster.
+type MaintenancePolicy struct {
+	// Window: Specifies the maintenance window in which maintenance may be
+	// performed.
+	Window *MaintenanceWindow `json:"window,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Window") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Window") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MaintenancePolicy) MarshalJSON() ([]byte, error) {
+	type noMethod MaintenancePolicy
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// MaintenanceWindow: MaintenanceWindow defines the maintenance window
+// to be used for the cluster.
+type MaintenanceWindow struct {
+	// DailyMaintenanceWindow: DailyMaintenanceWindow specifies a daily
+	// maintenance operation window.
+	DailyMaintenanceWindow *DailyMaintenanceWindow `json:"dailyMaintenanceWindow,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "DailyMaintenanceWindow") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "DailyMaintenanceWindow")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MaintenanceWindow) MarshalJSON() ([]byte, error) {
+	type noMethod MaintenanceWindow
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // MasterAuth: The authentication information for accessing the master
 // endpoint.
 // Authentication can be done using HTTP basic auth or using
@@ -1454,6 +1571,38 @@ func (s *NetworkPolicy) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// NetworkPolicyConfig: Configuration for NetworkPolicy. This only
+// tracks whether the addon
+// is enabled or not on the Master, it does not track whether network
+// policy
+// is enabled for the nodes.
+type NetworkPolicyConfig struct {
+	// Disabled: Whether NetworkPolicy is enabled for this cluster.
+	Disabled bool `json:"disabled,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Disabled") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Disabled") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *NetworkPolicyConfig) MarshalJSON() ([]byte, error) {
+	type noMethod NetworkPolicyConfig
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // NodeConfig: Parameters that describe the nodes in a cluster.
 type NodeConfig struct {
 	// Accelerators: A list of hardware accelerators to be attached to each
@@ -1486,7 +1635,8 @@ type NodeConfig struct {
 	// and conflicts should be avoided.
 	// For more information, including usage and the valid values,
 	// see:
-	// http://kubernetes.io/v1.1/docs/user-guide/labels.html
+	// https://kubernetes.io/docs/concepts/overview/working-with-objects
+	// /labels/
 	Labels map[string]string `json:"labels,omitempty"`
 
 	// LocalSsdCount: The number of local SSD disks to be attached to the
@@ -1533,6 +1683,20 @@ type NodeConfig struct {
 	// The total size of all keys and values must be less than 512 KB.
 	Metadata map[string]string `json:"metadata,omitempty"`
 
+	// MinCpuPlatform: Minimum CPU platform to be used by this instance. The
+	// instance may be
+	// scheduled on the specified or newer CPU platform. Applicable values
+	// are the
+	// friendly names of CPU platforms, such as
+	// <code>minCpuPlatform: &quot;Intel Haswell&quot;</code>
+	// or
+	// <code>minCpuPlatform: &quot;Intel Sandy Bridge&quot;</code>. For
+	// more
+	// information, read [how to specify min CPU
+	// platform](https://cloud.google.com/compute/docs/instances/specify-min-
+	// cpu-platform)
+	MinCpuPlatform string `json:"minCpuPlatform,omitempty"`
+
 	// OauthScopes: The set of Google API scopes to be made available on all
 	// of the
 	// node VMs under the "default" service account.
@@ -1577,6 +1741,14 @@ type NodeConfig struct {
 	// list
 	// must comply with RFC1035.
 	Tags []string `json:"tags,omitempty"`
+
+	// Taints: List of kubernetes taints to be applied to each node.
+	//
+	// For more information, including usage and the valid values,
+	// see:
+	// https://kubernetes.io/docs/concepts/configuration/taint-and-toler
+	// ation/
+	Taints []*NodeTaint `json:"taints,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Accelerators") to
 	// unconditionally include in API requests. By default, fields with
@@ -1783,12 +1955,65 @@ func (s *NodePoolAutoscaling) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// NodeTaint: Kubernetes taint is comprised of three fields: key, value,
+// and effect. Effect
+// can only be one of three types:  NoSchedule, PreferNoSchedule or
+// NoExecute.
+//
+// For more information, including usage and the valid values,
+// see:
+// https://kubernetes.io/docs/concepts/configuration/taint-and-toler
+// ation/
+type NodeTaint struct {
+	// Effect: Effect for taint.
+	//
+	// Possible values:
+	//   "EFFECT_UNSPECIFIED" - Not set
+	//   "NO_SCHEDULE" - NoSchedule
+	//   "PREFER_NO_SCHEDULE" - PreferNoSchedule
+	//   "NO_EXECUTE" - NoExecute
+	Effect string `json:"effect,omitempty"`
+
+	// Key: Key for taint.
+	Key string `json:"key,omitempty"`
+
+	// Value: Value for taint.
+	Value string `json:"value,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Effect") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Effect") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *NodeTaint) MarshalJSON() ([]byte, error) {
+	type noMethod NodeTaint
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // Operation: This operation resource represents operations that may
 // have happened or are
 // happening on the cluster. All fields are output only.
 type Operation struct {
 	// Detail: Detailed operation progress, if available.
 	Detail string `json:"detail,omitempty"`
+
+	// EndTime: [Output only] The time the operation completed,
+	// in
+	// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+	EndTime string `json:"endTime,omitempty"`
 
 	// Location: [Output only] The name of the Google Compute
 	// Engine
@@ -1826,6 +2051,11 @@ type Operation struct {
 
 	// SelfLink: Server-defined URL for the resource.
 	SelfLink string `json:"selfLink,omitempty"`
+
+	// StartTime: [Output only] The time the operation started,
+	// in
+	// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+	StartTime string `json:"startTime,omitempty"`
 
 	// Status: The current status of the operation.
 	//
@@ -1874,6 +2104,37 @@ type Operation struct {
 
 func (s *Operation) MarshalJSON() ([]byte, error) {
 	type noMethod Operation
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// PodSecurityPolicyConfig: Configuration for the PodSecurityPolicy
+// feature.
+type PodSecurityPolicyConfig struct {
+	// Enabled: Enable the PodSecurityPolicy controller for this cluster. If
+	// enabled, pods
+	// must be valid under a PodSecurityPolicy to be created.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Enabled") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Enabled") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PodSecurityPolicyConfig) MarshalJSON() ([]byte, error) {
+	type noMethod PodSecurityPolicyConfig
 	raw := noMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -2107,15 +2368,129 @@ func (s *SetLegacyAbacRequest) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// SetLoggingServiceRequest: SetLoggingServiceRequest sets the logging
+// service of a cluster.
+type SetLoggingServiceRequest struct {
+	// ClusterId: The name of the cluster to upgrade.
+	// This field is deprecated, use name instead.
+	ClusterId string `json:"clusterId,omitempty"`
+
+	// LoggingService: The logging service the cluster should use to write
+	// metrics.
+	// Currently available options:
+	//
+	// * "logging.googleapis.com" - the Google Cloud Logging service
+	// * "none" - no metrics will be exported from the cluster
+	LoggingService string `json:"loggingService,omitempty"`
+
+	// Name: The name (project, location, cluster) of the cluster to set
+	// logging.
+	// Specified in the format 'projects/*/locations/*/clusters/*'.
+	Name string `json:"name,omitempty"`
+
+	// ProjectId: The Google Developers Console [project ID or
+	// project
+	// number](https://support.google.com/cloud/answer/6158840).
+	// This
+	//  field is deprecated, use name instead.
+	ProjectId string `json:"projectId,omitempty"`
+
+	// Zone: The name of the Google Compute
+	// Engine
+	// [zone](/compute/docs/zones#available) in which the cluster
+	// resides.
+	Zone string `json:"zone,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ClusterId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ClusterId") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SetLoggingServiceRequest) MarshalJSON() ([]byte, error) {
+	type noMethod SetLoggingServiceRequest
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SetMaintenancePolicyRequest: SetMaintenancePolicyRequest sets the
+// maintenance policy for a cluster.
+type SetMaintenancePolicyRequest struct {
+	// ClusterId: The name of the cluster to update.
+	ClusterId string `json:"clusterId,omitempty"`
+
+	// MaintenancePolicy: The maintenance policy to be set for the cluster.
+	// An empty field
+	// clears the existing maintenance policy.
+	MaintenancePolicy *MaintenancePolicy `json:"maintenancePolicy,omitempty"`
+
+	// Name: The name (project, location, cluster id) of the cluster to set
+	// maintenance
+	// policy.
+	// Specified in the format 'projects/*/locations/*/clusters/*'.
+	Name string `json:"name,omitempty"`
+
+	// ProjectId: The Google Developers Console [project ID or
+	// project
+	// number](https://support.google.com/cloud/answer/6158840).
+	ProjectId string `json:"projectId,omitempty"`
+
+	// Zone: The name of the Google Compute
+	// Engine
+	// [zone](/compute/docs/zones#available) in which the cluster
+	// resides.
+	Zone string `json:"zone,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ClusterId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ClusterId") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SetMaintenancePolicyRequest) MarshalJSON() ([]byte, error) {
+	type noMethod SetMaintenancePolicyRequest
+	raw := noMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // SetMasterAuthRequest: SetMasterAuthRequest updates the admin password
 // of a cluster.
 type SetMasterAuthRequest struct {
-	// Action: The exact form of action to be taken on the master auth
+	// Action: The exact form of action to be taken on the master auth.
 	//
 	// Possible values:
-	//   "UNKNOWN" - Operation is unknown and will error out
+	//   "UNKNOWN" - Operation is unknown and will error out.
 	//   "SET_PASSWORD" - Set the password to a user generated value.
 	//   "GENERATE_PASSWORD" - Generate a new password and set it to that.
+	//   "SET_USERNAME" - Set the username.  If an empty username is
+	// provided, basic authentication
+	// is disabled for the cluster.  If a non-empty username is provided,
+	// basic
+	// authentication is enabled, with either a provided password or a
+	// generated
+	// one.
 	Action string `json:"action,omitempty"`
 
 	// ClusterId: The name of the cluster to upgrade.
@@ -3503,6 +3878,276 @@ func (c *ProjectsLocationsClustersSetLegacyAbacCall) Do(opts ...googleapi.CallOp
 	//   "path": "v1beta1/{+name}:setLegacyAbac",
 	//   "request": {
 	//     "$ref": "SetLegacyAbacRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "container.projects.locations.clusters.setLogging":
+
+type ProjectsLocationsClustersSetLoggingCall struct {
+	s                        *Service
+	name                     string
+	setloggingservicerequest *SetLoggingServiceRequest
+	urlParams_               gensupport.URLParams
+	ctx_                     context.Context
+	header_                  http.Header
+}
+
+// SetLogging: Sets the logging service of a specific cluster.
+func (r *ProjectsLocationsClustersService) SetLogging(name string, setloggingservicerequest *SetLoggingServiceRequest) *ProjectsLocationsClustersSetLoggingCall {
+	c := &ProjectsLocationsClustersSetLoggingCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	c.setloggingservicerequest = setloggingservicerequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsClustersSetLoggingCall) Fields(s ...googleapi.Field) *ProjectsLocationsClustersSetLoggingCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsClustersSetLoggingCall) Context(ctx context.Context) *ProjectsLocationsClustersSetLoggingCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsClustersSetLoggingCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsClustersSetLoggingCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.setloggingservicerequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta1/{+name}:setLogging")
+	urls += "?" + c.urlParams_.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "container.projects.locations.clusters.setLogging" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsClustersSetLoggingCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Sets the logging service of a specific cluster.",
+	//   "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:setLogging",
+	//   "httpMethod": "POST",
+	//   "id": "container.projects.locations.clusters.setLogging",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name (project, location, cluster) of the cluster to set logging.\nSpecified in the format 'projects/*/locations/*/clusters/*'.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1beta1/{+name}:setLogging",
+	//   "request": {
+	//     "$ref": "SetLoggingServiceRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "container.projects.locations.clusters.setMaintenancePolicy":
+
+type ProjectsLocationsClustersSetMaintenancePolicyCall struct {
+	s                           *Service
+	name                        string
+	setmaintenancepolicyrequest *SetMaintenancePolicyRequest
+	urlParams_                  gensupport.URLParams
+	ctx_                        context.Context
+	header_                     http.Header
+}
+
+// SetMaintenancePolicy: Sets the maintenance policy for a cluster.
+func (r *ProjectsLocationsClustersService) SetMaintenancePolicy(name string, setmaintenancepolicyrequest *SetMaintenancePolicyRequest) *ProjectsLocationsClustersSetMaintenancePolicyCall {
+	c := &ProjectsLocationsClustersSetMaintenancePolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	c.setmaintenancepolicyrequest = setmaintenancepolicyrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsClustersSetMaintenancePolicyCall) Fields(s ...googleapi.Field) *ProjectsLocationsClustersSetMaintenancePolicyCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsClustersSetMaintenancePolicyCall) Context(ctx context.Context) *ProjectsLocationsClustersSetMaintenancePolicyCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsClustersSetMaintenancePolicyCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsClustersSetMaintenancePolicyCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.setmaintenancepolicyrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta1/{+name}:setMaintenancePolicy")
+	urls += "?" + c.urlParams_.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "container.projects.locations.clusters.setMaintenancePolicy" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsClustersSetMaintenancePolicyCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Sets the maintenance policy for a cluster.",
+	//   "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}:setMaintenancePolicy",
+	//   "httpMethod": "POST",
+	//   "id": "container.projects.locations.clusters.setMaintenancePolicy",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name (project, location, cluster id) of the cluster to set maintenance\npolicy.\nSpecified in the format 'projects/*/locations/*/clusters/*'.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1beta1/{+name}:setMaintenancePolicy",
+	//   "request": {
+	//     "$ref": "SetMaintenancePolicyRequest"
 	//   },
 	//   "response": {
 	//     "$ref": "Operation"
@@ -6787,6 +7432,160 @@ func (c *ProjectsZonesClustersListCall) Do(opts ...googleapi.CallOption) (*ListC
 
 }
 
+// method id "container.projects.zones.clusters.logging":
+
+type ProjectsZonesClustersLoggingCall struct {
+	s                        *Service
+	projectId                string
+	zone                     string
+	clusterId                string
+	setloggingservicerequest *SetLoggingServiceRequest
+	urlParams_               gensupport.URLParams
+	ctx_                     context.Context
+	header_                  http.Header
+}
+
+// Logging: Sets the logging service of a specific cluster.
+func (r *ProjectsZonesClustersService) Logging(projectId string, zone string, clusterId string, setloggingservicerequest *SetLoggingServiceRequest) *ProjectsZonesClustersLoggingCall {
+	c := &ProjectsZonesClustersLoggingCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.projectId = projectId
+	c.zone = zone
+	c.clusterId = clusterId
+	c.setloggingservicerequest = setloggingservicerequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsZonesClustersLoggingCall) Fields(s ...googleapi.Field) *ProjectsZonesClustersLoggingCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsZonesClustersLoggingCall) Context(ctx context.Context) *ProjectsZonesClustersLoggingCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsZonesClustersLoggingCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsZonesClustersLoggingCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.setloggingservicerequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/logging")
+	urls += "?" + c.urlParams_.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"projectId": c.projectId,
+		"zone":      c.zone,
+		"clusterId": c.clusterId,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "container.projects.zones.clusters.logging" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsZonesClustersLoggingCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Sets the logging service of a specific cluster.",
+	//   "flatPath": "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/logging",
+	//   "httpMethod": "POST",
+	//   "id": "container.projects.zones.clusters.logging",
+	//   "parameterOrder": [
+	//     "projectId",
+	//     "zone",
+	//     "clusterId"
+	//   ],
+	//   "parameters": {
+	//     "clusterId": {
+	//       "description": "The name of the cluster to upgrade.\nThis field is deprecated, use name instead.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "projectId": {
+	//       "description": "The Google Developers Console [project ID or project\nnumber](https://support.google.com/cloud/answer/6158840).\nThis field is deprecated, use name instead.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "zone": {
+	//       "description": "The name of the Google Compute Engine\n[zone](/compute/docs/zones#available) in which the cluster\nresides.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/logging",
+	//   "request": {
+	//     "$ref": "SetLoggingServiceRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
 // method id "container.projects.zones.clusters.resourceLabels":
 
 type ProjectsZonesClustersResourceLabelsCall struct {
@@ -6930,6 +7729,160 @@ func (c *ProjectsZonesClustersResourceLabelsCall) Do(opts ...googleapi.CallOptio
 	//   "path": "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/resourceLabels",
 	//   "request": {
 	//     "$ref": "SetLabelsRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "container.projects.zones.clusters.setMaintenancePolicy":
+
+type ProjectsZonesClustersSetMaintenancePolicyCall struct {
+	s                           *Service
+	projectId                   string
+	zone                        string
+	clusterId                   string
+	setmaintenancepolicyrequest *SetMaintenancePolicyRequest
+	urlParams_                  gensupport.URLParams
+	ctx_                        context.Context
+	header_                     http.Header
+}
+
+// SetMaintenancePolicy: Sets the maintenance policy for a cluster.
+func (r *ProjectsZonesClustersService) SetMaintenancePolicy(projectId string, zone string, clusterId string, setmaintenancepolicyrequest *SetMaintenancePolicyRequest) *ProjectsZonesClustersSetMaintenancePolicyCall {
+	c := &ProjectsZonesClustersSetMaintenancePolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.projectId = projectId
+	c.zone = zone
+	c.clusterId = clusterId
+	c.setmaintenancepolicyrequest = setmaintenancepolicyrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsZonesClustersSetMaintenancePolicyCall) Fields(s ...googleapi.Field) *ProjectsZonesClustersSetMaintenancePolicyCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsZonesClustersSetMaintenancePolicyCall) Context(ctx context.Context) *ProjectsZonesClustersSetMaintenancePolicyCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsZonesClustersSetMaintenancePolicyCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsZonesClustersSetMaintenancePolicyCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.setmaintenancepolicyrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}:setMaintenancePolicy")
+	urls += "?" + c.urlParams_.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"projectId": c.projectId,
+		"zone":      c.zone,
+		"clusterId": c.clusterId,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "container.projects.zones.clusters.setMaintenancePolicy" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsZonesClustersSetMaintenancePolicyCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Sets the maintenance policy for a cluster.",
+	//   "flatPath": "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}:setMaintenancePolicy",
+	//   "httpMethod": "POST",
+	//   "id": "container.projects.zones.clusters.setMaintenancePolicy",
+	//   "parameterOrder": [
+	//     "projectId",
+	//     "zone",
+	//     "clusterId"
+	//   ],
+	//   "parameters": {
+	//     "clusterId": {
+	//       "description": "The name of the cluster to update.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "projectId": {
+	//       "description": "The Google Developers Console [project ID or project\nnumber](https://support.google.com/cloud/answer/6158840).",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "zone": {
+	//       "description": "The name of the Google Compute Engine\n[zone](/compute/docs/zones#available) in which the cluster\nresides.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1beta1/projects/{projectId}/zones/{zone}/clusters/{clusterId}:setMaintenancePolicy",
+	//   "request": {
+	//     "$ref": "SetMaintenancePolicyRequest"
 	//   },
 	//   "response": {
 	//     "$ref": "Operation"

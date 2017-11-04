@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "17ce1425424ab154092bbb43af630bd647f3bb0d"
+  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
 
 [[projects]]
   branch = "master"
@@ -65,13 +65,13 @@
   branch = "master"
   name = "github.com/prometheus/common"
   packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
-  revision = "bc8b88226a1210b016e9993b1d75f858c9c8f778"
+  revision = "1bab55dd05dbff384524a6a1c99006d9eb5f139b"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [".","xfs"]
-  revision = "e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2"
+  revision = "a6e9df898b1336106c743392c48ee0b71f5c4efa"
 
 [[projects]]
   branch = "master"
@@ -89,13 +89,13 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp"]
-  revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
+  revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
   packages = ["customsearch/v1","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","youtube/v3"]
-  revision = "f5fa6a3eed6362c07f4e2e4425faeab907a041bd"
+  revision = "292d630dd6cbaf326d3ca4009e294654554f70fb"
 
 [solve-meta]
   analyzer-name = "dep"
