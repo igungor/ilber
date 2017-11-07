@@ -135,7 +135,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		YValues: rates,
 	}
 
-	chartname := fmt.Sprintf("%v in %v for %v", fromCurrency, toCurrency, defaultDataRange)
+	chartname := fmt.Sprintf("%v in %v for 5 days", fromCurrency, toCurrency)
 	graph := chart.Chart{
 		Title:      chartname,
 		TitleStyle: chart.StyleShow(),
