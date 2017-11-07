@@ -15,13 +15,13 @@ import (
 	chart "github.com/wcharczuk/go-chart"
 )
 
-const (
-	defaultDataRange = "3d"
-)
-
 func init() {
 	register(cmdChart)
 }
+
+const (
+	defaultDataRange = "5d"
+)
 
 var cmdChart = &Command{
 	Name:      "chart",
@@ -33,21 +33,27 @@ var cmdChart = &Command{
 func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	args := msg.Args()
 
-	var currencies []string
+	var (
+		fromCurrency string
+		toCurrency   string
+	)
 	switch len(args) {
 	case 0:
-		currencies = []string{"USD", "TRY"}
+		fromCurrency = "USD"
+		toCurrency = "TRY"
 	case 1:
-		currencies = []string{normalize(args[0]), "TRY"}
+		fromCurrency = normalize(args[0])
+		toCurrency = "TRY"
 	case 2:
-		currencies = []string{normalize(args[0]), normalize(args[1])}
+		fromCurrency = normalize(args[0])
+		toCurrency = normalize(args[1])
 	default:
 		_, _ = b.SendMessage(msg.Chat.ID, "anlamadim")
 		return
 	}
 
 	u, _ := url.Parse(yahooFinanceURL)
-	u.Path += fmt.Sprintf("%v%v=%v", currencies[0], currencies[1], "X")
+	u.Path += fmt.Sprintf("%v%v=%v", fromCurrency, toCurrency, "X")
 	params := u.Query()
 	params.Set("range", defaultDataRange)
 	u.RawQuery = params.Encode()
@@ -112,11 +118,11 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	dateformatter := func(v interface{}) string {
-		dur, _ := time.ParseDuration(defaultDataRange)
-		if dur < 2*24*time.Hour {
+		duration := toDuration(defaultDataRange)
+		if duration <= 2*24*time.Hour {
 			return chart.TimeHourValueFormatter(v)
 		}
-		return chart.TimeValueFormatter(v)
+		return chart.TimeValueFormatterWithFormat("01-02 03:04PM")(v)
 	}
 
 	priceSeries := chart.TimeSeries{
@@ -129,7 +135,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		YValues: rates,
 	}
 
-	chartname := fmt.Sprintf("%v in %v for %v", currencies[0], currencies[1], defaultDataRange)
+	chartname := fmt.Sprintf("%v in %v for %v", fromCurrency, toCurrency, defaultDataRange)
 	graph := chart.Chart{
 		Title:      chartname,
 		TitleStyle: chart.StyleShow(),
@@ -174,4 +180,29 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		b.Logger.Printf("chart: could not send photo: %v", err)
 		return
 	}
+}
+
+func toDuration(s string) time.Duration {
+	var (
+		day   = 24 * time.Hour
+		month = 30 * day
+		year  = 12 * month
+
+		defaultDuration = 5 * day
+	)
+	validRanges := map[string]time.Duration{
+		"1d":  day,
+		"5d":  5 * day,
+		"1mo": month,
+		"3mo": 3 * month,
+		"6mo": 6 * month,
+		"1y":  year,
+		"2y":  2 * year,
+		"5y":  5 * year,
+		"10y": 10 * year,
+	}
+	if dur, ok := validRanges[s]; ok {
+		return dur
+	}
+	return defaultDuration
 }
