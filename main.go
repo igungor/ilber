@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"os"
 
@@ -18,11 +17,6 @@ import (
 	"github.com/igungor/ilber/command"
 )
 
-// flags
-var (
-	flagConfig = flag.String("c", "./ilber.conf", "configuration file path")
-)
-
 func usage() {
 	fmt.Fprintf(os.Stderr, "ilber is a multi-purpose Telegram bot\n\n")
 	fmt.Fprintf(os.Stderr, "usage:\n")
@@ -32,13 +26,17 @@ func usage() {
 }
 
 func main() {
-	logger := log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
+	var (
+		flagConfig = flag.String("c", "ilber.toml", "Path to configuration file")
+	)
 	flag.Usage = usage
 	flag.Parse()
 
+	logger := log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
+
 	b, err := bot.New(*flagConfig, logger)
 	if err != nil {
-		b.Logger.Fatalf("Could not initialize the bot: %v\n", err)
+		logger.Fatalf("Could not initialize the bot: %v\n", err)
 	}
 
 	mux := http.NewServeMux()
@@ -47,8 +45,7 @@ func main() {
 	registerProfile(mux)
 
 	go func() {
-		addr := net.JoinHostPort(b.Config.Host, b.Config.Port)
-		b.Logger.Fatal(http.ListenAndServe(addr, mux))
+		b.Logger.Fatal(http.ListenAndServe(b.Config.Addr, mux))
 	}()
 
 	incomingRequestsTotal := prometheus.NewCounter(prometheus.CounterOpts{

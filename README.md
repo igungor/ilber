@@ -11,7 +11,7 @@ go get -u github.com/igungor/ilber
 ## run
 
 ```sh
-ilber -c "path-to-ilber.conf"
+ilber -c "path-to-ilber.toml"
 ```
 
 ## license

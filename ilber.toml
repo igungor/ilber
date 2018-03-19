@@ -1,0 +1,7 @@
+addr = "0.0.0.0:1985"
+token = ""
+webhook = ""
+debug = false
+google-api-key = ""
+google-search-engine-id = ""
+openweathermap-app-id = ""

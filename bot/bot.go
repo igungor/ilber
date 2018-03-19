@@ -9,12 +9,12 @@ import (
 
 type Bot struct {
 	*telegram.Bot
-	Config *Config
+	Config Config
 	Logger *log.Logger
 }
 
 func New(configPath string, logger *log.Logger) (*Bot, error) {
-	cfg, err := readConfig(configPath)
+	cfg, err := Load(configPath)
 	if err != nil {
 		return nil, err
 	}

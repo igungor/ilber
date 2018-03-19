@@ -1,41 +1,54 @@
 package bot
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+	"net"
+
+	"github.com/burntsushi/toml"
 )
 
 type Config struct {
-	Token        string `json:"token"`
-	Webhook      string `json:"webhook"`
-	Host         string `json:"host"`
-	Port         string `json:"port"`
-	Debug        bool   `json:"debug"`
-	DatabasePath string `json:"dbPath"`
+	Token        string `toml:"token"`
+	Webhook      string `toml:"webhook"`
+	Addr         string `toml:"addr"`
+	Debug        bool   `toml:"debug"`
+	DatabasePath string `toml:"database-path"`
 
-	GoogleAPIKey         string `json:"googleAPIKey"`
-	GoogleSearchEngineID string `json:"googleSearchEngineID"`
-	OpenweathermapAppID  string `json:"openWeatherMapAppID"`
-	AlphaVantageToken    string `json:"alphavantageToken"`
+	GoogleAPIKey         string `toml:"google-api-key"`
+	GoogleSearchEngineID string `toml:"google-search-engine-id"`
+	OpenweathermapAppID  string `toml:"openweathermap-app-id"`
+	AlphaVantageToken    string `toml:"alphavantage-token"`
 }
 
-func readConfig(configPath string) (*Config, error) {
-	f, err := os.Open(configPath)
+func (c Config) validate() error {
+	if c.Addr == "" {
+		return fmt.Errorf("addr must be specified (host:port)")
+	}
+	_, _, err := net.SplitHostPort(c.Addr)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("invalid 'addr' specified")
 	}
-	defer f.Close()
 
+	if c.Token == "" {
+		return fmt.Errorf("'token' must be specified")
+	}
+
+	if c.Webhook == "" {
+		return fmt.Errorf("'webhook' must be specified")
+	}
+
+	return nil
+}
+
+func Load(path string) (Config, error) {
 	var cfg Config
-	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
-		return nil, err
+	_, err := toml.DecodeFile(path, &cfg)
+	if err != nil {
+		return Config{}, fmt.Errorf("could not decode config file: %v", err)
 	}
-	if cfg.Token == "" {
-		return nil, fmt.Errorf("token field can not be empty")
+
+	if err := cfg.validate(); err != nil {
+		return Config{}, err
 	}
-	if cfg.Webhook == "" {
-		return nil, fmt.Errorf("webhook field can not be empty")
-	}
-	return &cfg, nil
+	return cfg, nil
 }
