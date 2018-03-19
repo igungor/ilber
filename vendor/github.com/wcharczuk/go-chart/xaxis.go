@@ -2,8 +2,7 @@ package chart
 
 import (
 	"math"
-
-	util "github.com/wcharczuk/go-chart/util"
+	"sort"
 )
 
 // XAxis represents the horizontal axis.
@@ -32,14 +31,6 @@ func (xa XAxis) GetName() string {
 // GetStyle returns the style.
 func (xa XAxis) GetStyle() Style {
 	return xa.Style
-}
-
-// GetValueFormatter returns the value formatter for the axis.
-func (xa XAxis) GetValueFormatter() ValueFormatter {
-	if xa.ValueFormatter != nil {
-		return xa.ValueFormatter
-	}
-	return FloatValueFormatter
 }
 
 // GetTickPosition returns the tick position option for the axis.
@@ -80,6 +71,7 @@ func (xa XAxis) GetGridLines(ticks []Tick) []GridLine {
 // Measure returns the bounds of the axis.
 func (xa XAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, ticks []Tick) Box {
 	tickStyle := xa.TickStyle.InheritFrom(xa.Style.InheritFrom(defaults))
+	sort.Sort(Ticks(ticks))
 
 	tp := xa.GetTickPosition()
 
@@ -105,9 +97,9 @@ func (xa XAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, tic
 			break
 		}
 
-		left = util.Math.MinInt(left, ltx)
-		right = util.Math.MaxInt(right, rtx)
-		bottom = util.Math.MaxInt(bottom, ty)
+		left = Math.MinInt(left, ltx)
+		right = Math.MaxInt(right, rtx)
+		bottom = Math.MaxInt(bottom, ty)
 	}
 
 	if xa.NameStyle.Show && len(xa.Name) > 0 {
@@ -131,6 +123,8 @@ func (xa XAxis) Render(r Renderer, canvasBox Box, ra Range, defaults Style, tick
 	r.MoveTo(canvasBox.Left, canvasBox.Bottom)
 	r.LineTo(canvasBox.Right, canvasBox.Bottom)
 	r.Stroke()
+
+	sort.Sort(Ticks(ticks))
 
 	tp := xa.GetTickPosition()
 
@@ -159,7 +153,7 @@ func (xa XAxis) Render(r Renderer, canvasBox Box, ra Range, defaults Style, tick
 				ty = canvasBox.Bottom + (2 * DefaultXAxisMargin)
 			}
 			Draw.Text(r, t.Label, tx, ty, tickWithAxisStyle)
-			maxTextHeight = util.Math.MaxInt(maxTextHeight, tb.Height())
+			maxTextHeight = Math.MaxInt(maxTextHeight, tb.Height())
 			break
 		case TickPositionBetweenTicks:
 			if index > 0 {
@@ -175,7 +169,7 @@ func (xa XAxis) Render(r Renderer, canvasBox Box, ra Range, defaults Style, tick
 				}, finalTickStyle)
 
 				ftb := Text.MeasureLines(r, Text.WrapFit(r, t.Label, tx-ltx, finalTickStyle), finalTickStyle)
-				maxTextHeight = util.Math.MaxInt(maxTextHeight, ftb.Height())
+				maxTextHeight = Math.MaxInt(maxTextHeight, ftb.Height())
 			}
 			break
 		}

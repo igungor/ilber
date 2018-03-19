@@ -9,7 +9,6 @@ import (
 
 	"golang.org/x/image/font"
 
-	util "github.com/blendlabs/go-util"
 	"github.com/golang/freetype/truetype"
 	"github.com/wcharczuk/go-chart/drawing"
 )
@@ -20,11 +19,10 @@ func SVG(width, height int) (Renderer, error) {
 	canvas := newCanvas(buffer)
 	canvas.Start(width, height)
 	return &vectorRenderer{
-		b:   buffer,
-		c:   canvas,
-		s:   &Style{},
-		p:   []string{},
-		dpi: DefaultDPI,
+		b: buffer,
+		c: canvas,
+		s: &Style{},
+		p: []string{},
 	}, nil
 }
 
@@ -90,8 +88,8 @@ func (vr *vectorRenderer) QuadCurveTo(cx, cy, x, y int) {
 }
 
 func (vr *vectorRenderer) ArcTo(cx, cy int, rx, ry, startAngle, delta float64) {
-	startAngle = util.Math.RadianAdd(startAngle, _pi2)
-	endAngle := util.Math.RadianAdd(startAngle, delta)
+	startAngle = Math.RadianAdd(startAngle, _pi2)
+	endAngle := Math.RadianAdd(startAngle, delta)
 
 	startx := cx + int(rx*math.Sin(startAngle))
 	starty := cy - int(ry*math.Cos(startAngle))
@@ -105,14 +103,9 @@ func (vr *vectorRenderer) ArcTo(cx, cy int, rx, ry, startAngle, delta float64) {
 	endx := cx + int(rx*math.Sin(endAngle))
 	endy := cy - int(ry*math.Cos(endAngle))
 
-	dd := util.Math.RadiansToDegrees(delta)
+	dd := Math.RadiansToDegrees(delta)
 
-	largeArcFlag := 0
-	if delta > _pi {
-		largeArcFlag = 1
-	}
-
-	vr.p = append(vr.p, fmt.Sprintf("A %d %d %0.2f %d 1 %d %d", int(rx), int(ry), dd, largeArcFlag, endx, endy))
+	vr.p = append(vr.p, fmt.Sprintf("A %d %d %0.2f 0 1 %d %d", int(rx), int(ry), dd, endx, endy))
 }
 
 // Close closes a shape.
@@ -182,7 +175,7 @@ func (vr *vectorRenderer) MeasureText(body string) (box Box) {
 		if vr.c.textTheta == nil {
 			return
 		}
-		box = box.Corners().Rotate(util.Math.RadiansToDegrees(*vr.c.textTheta)).Box()
+		box = box.Corners().Rotate(Math.RadiansToDegrees(*vr.c.textTheta)).Box()
 	}
 	return
 }
@@ -206,8 +199,7 @@ func (vr *vectorRenderer) Save(w io.Writer) error {
 
 func newCanvas(w io.Writer) *canvas {
 	return &canvas{
-		w:   w,
-		dpi: DefaultDPI,
+		w: w,
 	}
 }
 
@@ -230,20 +222,20 @@ func (c *canvas) Path(d string, style Style) {
 	if len(style.StrokeDashArray) > 0 {
 		strokeDashArrayProperty = c.getStrokeDashArray(style)
 	}
-	c.w.Write([]byte(fmt.Sprintf(`<path %s d="%s" style="%s"/>`, strokeDashArrayProperty, d, c.styleAsSVG(style))))
+	c.w.Write([]byte(fmt.Sprintf(`<path %s d="%s" style="%s"/>\n`, strokeDashArrayProperty, d, c.styleAsSVG(style))))
 }
 
 func (c *canvas) Text(x, y int, body string, style Style) {
 	if c.textTheta == nil {
 		c.w.Write([]byte(fmt.Sprintf(`<text x="%d" y="%d" style="%s">%s</text>`, x, y, c.styleAsSVG(style), body)))
 	} else {
-		transform := fmt.Sprintf(` transform="rotate(%0.2f,%d,%d)"`, util.Math.RadiansToDegrees(*c.textTheta), x, y)
+		transform := fmt.Sprintf(` transform="rotate(%0.2f,%d,%d)"`, Math.RadiansToDegrees(*c.textTheta), x, y)
 		c.w.Write([]byte(fmt.Sprintf(`<text x="%d" y="%d" style="%s"%s>%s</text>`, x, y, c.styleAsSVG(style), transform, body)))
 	}
 }
 
 func (c *canvas) Circle(x, y, r int, style Style) {
-	c.w.Write([]byte(fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" style="%s"/>`, x, y, r, c.styleAsSVG(style))))
+	c.w.Write([]byte(fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" style="%s">`, x, y, r, c.styleAsSVG(style))))
 }
 
 func (c *canvas) End() {
@@ -282,34 +274,30 @@ func (c *canvas) styleAsSVG(s Style) string {
 	fs := s.FontSize
 	fnc := s.FontColor
 
-	var pieces []string
-
+	strokeWidthText := "stroke-width:0"
 	if sw != 0 {
-		pieces = append(pieces, "stroke-width:"+fmt.Sprintf("%d", int(sw)))
-	} else {
-		pieces = append(pieces, "stroke-width:0")
+		strokeWidthText = "stroke-width:" + fmt.Sprintf("%d", int(sw))
 	}
 
+	strokeText := "stroke:none"
 	if !sc.IsZero() {
-		pieces = append(pieces, "stroke:"+sc.String())
-	} else {
-		pieces = append(pieces, "stroke:none")
+		strokeText = "stroke:" + sc.String()
+	}
+
+	fillText := "fill:none"
+	if !fc.IsZero() {
+		fillText = "fill:" + fc.String()
+	}
+
+	fontSizeText := ""
+	if fs != 0 {
+		fontSizeText = "font-size:" + fmt.Sprintf("%.1fpx", drawing.PointsToPixels(c.dpi, fs))
 	}
 
 	if !fnc.IsZero() {
-		pieces = append(pieces, "fill:"+fnc.String())
-	} else if !fc.IsZero() {
-		pieces = append(pieces, "fill:"+fc.String())
-	} else {
-		pieces = append(pieces, "fill:none")
+		fillText = "fill:" + fnc.String()
 	}
 
-	if fs != 0 {
-		pieces = append(pieces, "font-size:"+fmt.Sprintf("%.1fpx", drawing.PointsToPixels(c.dpi, fs)))
-	}
-
-	if s.Font != nil {
-		pieces = append(pieces, c.getFontFace(s))
-	}
-	return strings.Join(pieces, ";")
+	fontText := c.getFontFace(s)
+	return strings.Join([]string{strokeWidthText, strokeText, fillText, fontSizeText, fontText}, ";")
 }

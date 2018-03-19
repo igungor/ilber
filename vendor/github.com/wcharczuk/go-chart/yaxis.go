@@ -2,8 +2,7 @@ package chart
 
 import (
 	"math"
-
-	util "github.com/wcharczuk/go-chart/util"
+	"sort"
 )
 
 // YAxis is a veritcal rule of the range.
@@ -16,8 +15,7 @@ type YAxis struct {
 
 	Zero GridLine
 
-	AxisType  YAxisType
-	Ascending bool
+	AxisType YAxisType
 
 	ValueFormatter ValueFormatter
 	Range          Range
@@ -43,14 +41,6 @@ func (ya YAxis) GetNameStyle() Style {
 // GetStyle returns the style.
 func (ya YAxis) GetStyle() Style {
 	return ya.Style
-}
-
-// GetValueFormatter returns the value formatter for the axis.
-func (ya YAxis) GetValueFormatter() ValueFormatter {
-	if ya.ValueFormatter != nil {
-		return ya.ValueFormatter
-	}
-	return FloatValueFormatter
 }
 
 // GetTickStyle returns the tick style.
@@ -84,6 +74,8 @@ func (ya YAxis) GetGridLines(ticks []Tick) []GridLine {
 
 // Measure returns the bounds of the axis.
 func (ya YAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, ticks []Tick) Box {
+	sort.Sort(Ticks(ticks))
+
 	var tx int
 	if ya.AxisType == YAxisPrimary {
 		tx = canvasBox.Right + DefaultYAxisMargin
@@ -105,18 +97,18 @@ func (ya YAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, tic
 			finalTextX = tx - tb.Width()
 		}
 
-		maxTextHeight = util.Math.MaxInt(tb.Height(), maxTextHeight)
+		maxTextHeight = Math.MaxInt(tb.Height(), maxTextHeight)
 
 		if ya.AxisType == YAxisPrimary {
 			minx = canvasBox.Right
-			maxx = util.Math.MaxInt(maxx, tx+tb.Width())
+			maxx = Math.MaxInt(maxx, tx+tb.Width())
 		} else if ya.AxisType == YAxisSecondary {
-			minx = util.Math.MinInt(minx, finalTextX)
-			maxx = util.Math.MaxInt(maxx, tx)
+			minx = Math.MinInt(minx, finalTextX)
+			maxx = Math.MaxInt(maxx, tx)
 		}
 
-		miny = util.Math.MinInt(miny, ly-tbh2)
-		maxy = util.Math.MaxInt(maxy, ly+tbh2)
+		miny = Math.MinInt(miny, ly-tbh2)
+		maxy = Math.MaxInt(maxy, ly+tbh2)
 	}
 
 	if ya.NameStyle.Show && len(ya.Name) > 0 {
@@ -135,6 +127,8 @@ func (ya YAxis) Measure(r Renderer, canvasBox Box, ra Range, defaults Style, tic
 func (ya YAxis) Render(r Renderer, canvasBox Box, ra Range, defaults Style, ticks []Tick) {
 	tickStyle := ya.TickStyle.InheritFrom(ya.Style.InheritFrom(defaults))
 	tickStyle.WriteToRenderer(r)
+
+	sort.Sort(Ticks(ticks))
 
 	sw := tickStyle.GetStrokeWidth(defaults.StrokeWidth)
 

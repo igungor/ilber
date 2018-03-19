@@ -99,7 +99,7 @@ func (e *Ex) MarshalJSON() ([]byte, error) {
 	values["Class"] = e.class
 	values["Message"] = e.message
 	if e.stack != nil {
-		values["Stack"] = e.StackTrace()
+		values["Stack"] = e.StackTrace().AsStringSlice()
 	}
 	if e.inner != nil {
 		innerJSON, err := json.Marshal(e.inner)

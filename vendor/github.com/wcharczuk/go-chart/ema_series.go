@@ -1,7 +1,5 @@
 package chart
 
-import "fmt"
-
 const (
 	// DefaultEMAPeriod is the default EMA period used in the sigma calculation.
 	DefaultEMAPeriod = 12
@@ -14,7 +12,7 @@ type EMASeries struct {
 	YAxis YAxisType
 
 	Period      int
-	InnerSeries ValuesProvider
+	InnerSeries ValueProvider
 
 	cache []float64
 }
@@ -52,23 +50,23 @@ func (ema EMASeries) GetSigma() float64 {
 	return 2.0 / (float64(ema.GetPeriod()) + 1)
 }
 
-// GetValues gets a value at a given index.
-func (ema *EMASeries) GetValues(index int) (x, y float64) {
+// GetValue gets a value at a given index.
+func (ema *EMASeries) GetValue(index int) (x, y float64) {
 	if ema.InnerSeries == nil {
 		return
 	}
 	if len(ema.cache) == 0 {
 		ema.ensureCachedValues()
 	}
-	vx, _ := ema.InnerSeries.GetValues(index)
+	vx, _ := ema.InnerSeries.GetValue(index)
 	x = vx
 	y = ema.cache[index]
 	return
 }
 
-// GetLastValues computes the last moving average value but walking back window size samples,
+// GetLastValue computes the last moving average value but walking back window size samples,
 // and recomputing the last moving average chunk.
-func (ema *EMASeries) GetLastValues() (x, y float64) {
+func (ema *EMASeries) GetLastValue() (x, y float64) {
 	if ema.InnerSeries == nil {
 		return
 	}
@@ -76,7 +74,7 @@ func (ema *EMASeries) GetLastValues() (x, y float64) {
 		ema.ensureCachedValues()
 	}
 	lastIndex := ema.InnerSeries.Len() - 1
-	x, _ = ema.InnerSeries.GetValues(lastIndex)
+	x, _ = ema.InnerSeries.GetValue(lastIndex)
 	y = ema.cache[lastIndex]
 	return
 }
@@ -86,7 +84,7 @@ func (ema *EMASeries) ensureCachedValues() {
 	ema.cache = make([]float64, seriesLength)
 	sigma := ema.GetSigma()
 	for x := 0; x < seriesLength; x++ {
-		_, y := ema.InnerSeries.GetValues(x)
+		_, y := ema.InnerSeries.GetValue(x)
 		if x == 0 {
 			ema.cache[x] = y
 			continue
@@ -100,12 +98,4 @@ func (ema *EMASeries) ensureCachedValues() {
 func (ema *EMASeries) Render(r Renderer, canvasBox Box, xrange, yrange Range, defaults Style) {
 	style := ema.Style.InheritFrom(defaults)
 	Draw.LineSeries(r, canvasBox, xrange, yrange, style, ema)
-}
-
-// Validate validates the series.
-func (ema *EMASeries) Validate() error {
-	if ema.InnerSeries == nil {
-		return fmt.Errorf("ema series requires InnerSeries to be set")
-	}
-	return nil
 }

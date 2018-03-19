@@ -3,7 +3,7 @@ package chart
 import "fmt"
 
 // LastValueAnnotation returns an annotation series of just the last value of a value provider.
-func LastValueAnnotation(innerSeries ValuesProvider, vfs ...ValueFormatter) AnnotationSeries {
+func LastValueAnnotation(innerSeries ValueProvider, vfs ...ValueFormatter) AnnotationSeries {
 	var vf ValueFormatter
 	if len(vfs) > 0 {
 		vf = vfs[0]
@@ -14,11 +14,11 @@ func LastValueAnnotation(innerSeries ValuesProvider, vfs ...ValueFormatter) Anno
 	}
 
 	var lastValue Value2
-	if typed, isTyped := innerSeries.(LastValuesProvider); isTyped {
-		lastValue.XValue, lastValue.YValue = typed.GetLastValues()
+	if typed, isTyped := innerSeries.(LastValueProvider); isTyped {
+		lastValue.XValue, lastValue.YValue = typed.GetLastValue()
 		lastValue.Label = vf(lastValue.YValue)
 	} else {
-		lastValue.XValue, lastValue.YValue = innerSeries.GetValues(innerSeries.Len() - 1)
+		lastValue.XValue, lastValue.YValue = innerSeries.GetValue(innerSeries.Len() - 1)
 		lastValue.Label = vf(lastValue.YValue)
 	}
 

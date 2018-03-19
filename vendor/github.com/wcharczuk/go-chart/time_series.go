@@ -1,11 +1,6 @@
 package chart
 
-import (
-	"fmt"
-	"time"
-
-	util "github.com/wcharczuk/go-chart/util"
-)
+import "time"
 
 // TimeSeries is a line on a chart.
 type TimeSeries struct {
@@ -33,16 +28,16 @@ func (ts TimeSeries) Len() int {
 	return len(ts.XValues)
 }
 
-// GetValues gets a value at a given index.
-func (ts TimeSeries) GetValues(index int) (x, y float64) {
-	x = util.Time.ToFloat64(ts.XValues[index])
+// GetValue gets a value at a given index.
+func (ts TimeSeries) GetValue(index int) (x, y float64) {
+	x = Time.ToFloat64(ts.XValues[index])
 	y = ts.YValues[index]
 	return
 }
 
-// GetLastValues gets the last value.
-func (ts TimeSeries) GetLastValues() (x, y float64) {
-	x = util.Time.ToFloat64(ts.XValues[len(ts.XValues)-1])
+// GetLastValue gets the last value.
+func (ts TimeSeries) GetLastValue() (x, y float64) {
+	x = Time.ToFloat64(ts.XValues[len(ts.XValues)-1])
 	y = ts.YValues[len(ts.YValues)-1]
 	return
 }
@@ -63,16 +58,4 @@ func (ts TimeSeries) GetYAxis() YAxisType {
 func (ts TimeSeries) Render(r Renderer, canvasBox Box, xrange, yrange Range, defaults Style) {
 	style := ts.Style.InheritFrom(defaults)
 	Draw.LineSeries(r, canvasBox, xrange, yrange, style, ts)
-}
-
-// Validate validates the series.
-func (ts TimeSeries) Validate() error {
-	if len(ts.XValues) == 0 {
-		return fmt.Errorf("time series must have xvalues set")
-	}
-
-	if len(ts.YValues) == 0 {
-		return fmt.Errorf("time series must have yvalues set")
-	}
-	return nil
 }

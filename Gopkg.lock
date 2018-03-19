@@ -14,28 +14,31 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
-  branch = "master"
   name = "github.com/blendlabs/go-exception"
   packages = ["."]
-  revision = "8d6614c6a381fe586fa618174af22043ff966730"
+  revision = "1eb19b172d7ccae9d5ec8cb4b02529cf3c69ccbd"
+  version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/blendlabs/go-util"
+  name = "github.com/burntsushi/toml"
   packages = ["."]
-  revision = "2c7d65aea8a7c990256546ff01ad6a2d9679514d"
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/golang/freetype"
-  packages = ["raster","truetype"]
+  packages = [
+    "raster",
+    "truetype"
+  ]
   revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -51,7 +54,10 @@
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus","prometheus/promhttp"]
+  packages = [
+    "prometheus",
+    "prometheus/promhttp"
+  ]
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
 
@@ -59,47 +65,74 @@
   branch = "master"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
-  revision = "6f3806018612930941127f2a7c6c453ba2c527d2"
+  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/common"
-  packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
-  revision = "1bab55dd05dbff384524a6a1c99006d9eb5f139b"
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model"
+  ]
+  revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
-  packages = [".","xfs"]
-  revision = "a6e9df898b1336106c743392c48ee0b71f5c4efa"
+  packages = [
+    ".",
+    "internal/util",
+    "nfs",
+    "xfs"
+  ]
+  revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
 
 [[projects]]
-  branch = "master"
   name = "github.com/wcharczuk/go-chart"
-  packages = [".","drawing","matrix","roboto","seq","util"]
-  revision = "f72f7fd57b99907bc56d34b7071656c83dbf0a16"
+  packages = [
+    ".",
+    "drawing"
+  ]
+  revision = "fc2973067ce43455507ea5f9aa9814aabbf8f2ca"
+  version = "v2.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/image"
-  packages = ["draw","font","math/f64","math/fixed"]
-  revision = "f7e31b4ea2e3413ab91b4e7d2dc83e5f8d19a44c"
+  packages = [
+    "draw",
+    "font",
+    "math/f64",
+    "math/fixed"
+  ]
+  revision = "f3a9b89b59def9194717c1d0bd4c0d08fa1afa7b"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp"]
-  revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "24dd3780ca4f75fed9f321890729414a4b5d3f13"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["customsearch/v1","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","youtube/v3"]
-  revision = "292d630dd6cbaf326d3ca4009e294654554f70fb"
+  packages = [
+    "customsearch/v1",
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
+    "googleapi/transport",
+    "youtube/v3"
+  ]
+  revision = "55e9fb4044f4757138d4273ace23060d022d18f9"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f0db39f6097bc2a163e43588e8fd0427aba89b97943aff10da31c990fa1cfcb2"
+  inputs-digest = "4b3faba53644c3ff14ec9930fa2c06af4f03437582431f270d6dc90692315b01"
   solver-name = "gps-cdcl"
   solver-version = 1

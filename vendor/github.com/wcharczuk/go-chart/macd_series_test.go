@@ -65,7 +65,7 @@ var (
 func TestMACDSeries(t *testing.T) {
 	assert := assert.New(t)
 
-	mockSeries := mockValuesProvider{
+	mockSeries := mockValueProvider{
 		emaXValues,
 		emaYValues,
 	}
@@ -77,7 +77,7 @@ func TestMACDSeries(t *testing.T) {
 
 	var yvalues []float64
 	for x := 0; x < mas.Len(); x++ {
-		_, y := mas.GetValues(x)
+		_, y := mas.GetValue(x)
 		yvalues = append(yvalues, y)
 	}
 

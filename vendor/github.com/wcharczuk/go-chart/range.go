@@ -20,7 +20,7 @@ type Stringable interface {
 	String() string
 }
 
-// Range is a common interface for a range of values.
+// Range is a
 type Range interface {
 	Stringable
 	IsZeroable
@@ -35,8 +35,6 @@ type Range interface {
 
 	GetDomain() int
 	SetDomain(domain int)
-
-	IsDescending() bool
 
 	// Translate the range to the domain.
 	Translate(value float64) int

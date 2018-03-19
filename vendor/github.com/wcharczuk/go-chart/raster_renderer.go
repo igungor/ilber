@@ -6,7 +6,6 @@ import (
 	"io"
 	"math"
 
-	util "github.com/blendlabs/go-util"
 	"github.com/golang/freetype/truetype"
 	"github.com/wcharczuk/go-chart/drawing"
 )
@@ -117,16 +116,17 @@ func (rr *rasterRenderer) FillStroke() {
 	rr.gc.FillStroke()
 }
 
-// Circle fully draws a circle at a given point but does not apply the fill or stroke.
+// Circle implements the interface method.
 func (rr *rasterRenderer) Circle(radius float64, x, y int) {
 	xf := float64(x)
 	yf := float64(y)
-
-	rr.gc.MoveTo(xf-radius, yf)                            //9
-	rr.gc.QuadCurveTo(xf-radius, yf-radius, xf, yf-radius) //12
-	rr.gc.QuadCurveTo(xf+radius, yf-radius, xf+radius, yf) //3
-	rr.gc.QuadCurveTo(xf+radius, yf+radius, xf, yf+radius) //6
-	rr.gc.QuadCurveTo(xf-radius, yf+radius, xf-radius, yf) //9
+	rr.gc.MoveTo(xf-radius, yf)              //9
+	rr.gc.QuadCurveTo(xf, yf, xf, yf-radius) //12
+	rr.gc.QuadCurveTo(xf, yf, xf+radius, yf) //3
+	rr.gc.QuadCurveTo(xf, yf, xf, yf+radius) //6
+	rr.gc.QuadCurveTo(xf, yf, xf-radius, yf) //9
+	rr.gc.Close()
+	rr.gc.FillStroke()
 }
 
 // SetFont implements the interface method.
@@ -192,7 +192,7 @@ func (rr *rasterRenderer) MeasureText(body string) Box {
 		return textBox
 	}
 
-	return textBox.Corners().Rotate(util.Math.RadiansToDegrees(*rr.rotateRadians)).Box()
+	return textBox.Corners().Rotate(Math.RadiansToDegrees(*rr.rotateRadians)).Box()
 }
 
 // SetTextRotation sets a text rotation.

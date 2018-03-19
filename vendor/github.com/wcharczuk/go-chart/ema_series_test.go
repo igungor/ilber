@@ -4,11 +4,10 @@ import (
 	"testing"
 
 	"github.com/blendlabs/go-assert"
-	"github.com/wcharczuk/go-chart/seq"
 )
 
 var (
-	emaXValues = seq.Range(1.0, 50.0)
+	emaXValues = Sequence.Float64(1.0, 50.0)
 	emaYValues = []float64{
 		1, 2, 3, 4, 5, 4, 3, 2,
 		1, 2, 3, 4, 5, 4, 3, 2,
@@ -76,7 +75,7 @@ var (
 func TestEMASeries(t *testing.T) {
 	assert := assert.New(t)
 
-	mockSeries := mockValuesProvider{
+	mockSeries := mockValueProvider{
 		emaXValues,
 		emaYValues,
 	}
@@ -92,7 +91,7 @@ func TestEMASeries(t *testing.T) {
 
 	var yvalues []float64
 	for x := 0; x < ema.Len(); x++ {
-		_, y := ema.GetValues(x)
+		_, y := ema.GetValue(x)
 		yvalues = append(yvalues, y)
 	}
 
@@ -100,7 +99,7 @@ func TestEMASeries(t *testing.T) {
 		assert.InDelta(yv, emaExpected[index], emaDelta)
 	}
 
-	lvx, lvy := ema.GetLastValues()
+	lvx, lvy := ema.GetLastValue()
 	assert.Equal(50.0, lvx)
 	assert.InDelta(lvy, emaExpected[49], emaDelta)
 }

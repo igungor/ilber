@@ -2,20 +2,16 @@ package chart
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math"
 
 	"github.com/golang/freetype/truetype"
-	util "github.com/wcharczuk/go-chart/util"
 )
 
 // Chart is what we're drawing.
 type Chart struct {
 	Title      string
 	TitleStyle Style
-
-	ColorPalette ColorPalette
 
 	Width  int
 	Height int
@@ -73,12 +69,8 @@ func (c Chart) GetHeight() int {
 // Render renders the chart with the given renderer to the given io.Writer.
 func (c Chart) Render(rp RendererProvider, w io.Writer) error {
 	if len(c.Series) == 0 {
-		return errors.New("please provide at least one series")
+		return errors.New("Please provide at least one series")
 	}
-	if visibleSeriesErr := c.checkHasVisibleSeries(); visibleSeriesErr != nil {
-		return visibleSeriesErr
-	}
-
 	c.YAxisSecondary.AxisType = YAxisSecondary
 
 	r, err := rp(c.GetWidth(), c.GetHeight())
@@ -101,12 +93,10 @@ func (c Chart) Render(rp RendererProvider, w io.Writer) error {
 	xr, yr, yra := c.getRanges()
 	canvasBox := c.getDefaultCanvasBox()
 	xf, yf, yfa := c.getValueFormatters()
-
 	xr, yr, yra = c.setRangeDomains(canvasBox, xr, yr, yra)
 
 	err = c.checkRanges(xr, yr, yra)
 	if err != nil {
-		r.Save(w)
 		return err
 	}
 
@@ -142,30 +132,6 @@ func (c Chart) Render(rp RendererProvider, w io.Writer) error {
 	return r.Save(w)
 }
 
-func (c Chart) checkHasVisibleSeries() error {
-	hasVisibleSeries := false
-	var style Style
-	for _, s := range c.Series {
-		style = s.GetStyle()
-		hasVisibleSeries = hasVisibleSeries || (style.IsZero() || style.Show)
-	}
-	if !hasVisibleSeries {
-		return fmt.Errorf("must have (1) visible series; make sure if you set a style, you set .Show = true")
-	}
-	return nil
-}
-
-func (c Chart) validateSeries() error {
-	var err error
-	for _, s := range c.Series {
-		err = s.Validate()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (c Chart) getRanges() (xrange, yrange, yrangeAlt Range) {
 	var minx, maxx float64 = math.MaxFloat64, -math.MaxFloat64
 	var miny, maxy float64 = math.MaxFloat64, -math.MaxFloat64
@@ -178,10 +144,10 @@ func (c Chart) getRanges() (xrange, yrange, yrangeAlt Range) {
 	for _, s := range c.Series {
 		if s.GetStyle().IsZero() || s.GetStyle().Show {
 			seriesAxis := s.GetYAxis()
-			if bvp, isBoundedValuesProvider := s.(BoundedValuesProvider); isBoundedValuesProvider {
+			if bvp, isBoundedValueProvider := s.(BoundedValueProvider); isBoundedValueProvider {
 				seriesLength := bvp.Len()
 				for index := 0; index < seriesLength; index++ {
-					vx, vy1, vy2 := bvp.GetBoundedValues(index)
+					vx, vy1, vy2 := bvp.GetBoundedValue(index)
 
 					minx = math.Min(minx, vx)
 					maxx = math.Max(maxx, vx)
@@ -199,10 +165,10 @@ func (c Chart) getRanges() (xrange, yrange, yrangeAlt Range) {
 						seriesMappedToSecondaryAxis = true
 					}
 				}
-			} else if vp, isValuesProvider := s.(ValuesProvider); isValuesProvider {
+			} else if vp, isValueProvider := s.(ValueProvider); isValueProvider {
 				seriesLength := vp.Len()
 				for index := 0; index < seriesLength; index++ {
-					vx, vy := vp.GetValues(index)
+					vx, vy := vp.GetValue(index)
 
 					minx = math.Min(minx, vx)
 					maxx = math.Max(maxx, vx)
@@ -263,15 +229,11 @@ func (c Chart) getRanges() (xrange, yrange, yrangeAlt Range) {
 		yrange.SetMin(miny)
 		yrange.SetMax(maxy)
 
-		// only round if we're showing the axis
-		if c.YAxis.Style.Show {
-			delta := yrange.GetDelta()
-			roundTo := util.Math.GetRoundToForDelta(delta)
-			rmin, rmax := util.Math.RoundDown(yrange.GetMin(), roundTo), util.Math.RoundUp(yrange.GetMax(), roundTo)
-
-			yrange.SetMin(rmin)
-			yrange.SetMax(rmax)
-		}
+		delta := yrange.GetDelta()
+		roundTo := Math.GetRoundToForDelta(delta)
+		rmin, rmax := Math.RoundDown(yrange.GetMin(), roundTo), Math.RoundUp(yrange.GetMax(), roundTo)
+		yrange.SetMin(rmin)
+		yrange.SetMax(rmax)
 	}
 
 	if len(c.YAxisSecondary.Ticks) > 0 {
@@ -286,51 +248,26 @@ func (c Chart) getRanges() (xrange, yrange, yrangeAlt Range) {
 		yrangeAlt.SetMin(minya)
 		yrangeAlt.SetMax(maxya)
 
-		if c.YAxisSecondary.Style.Show {
-			delta := yrangeAlt.GetDelta()
-			roundTo := util.Math.GetRoundToForDelta(delta)
-			rmin, rmax := util.Math.RoundDown(yrangeAlt.GetMin(), roundTo), util.Math.RoundUp(yrangeAlt.GetMax(), roundTo)
-			yrangeAlt.SetMin(rmin)
-			yrangeAlt.SetMax(rmax)
-		}
+		delta := yrangeAlt.GetDelta()
+		roundTo := Math.GetRoundToForDelta(delta)
+		rmin, rmax := Math.RoundDown(yrangeAlt.GetMin(), roundTo), Math.RoundUp(yrangeAlt.GetMax(), roundTo)
+		yrangeAlt.SetMin(rmin)
+		yrangeAlt.SetMax(rmax)
 	}
 
 	return
 }
 
 func (c Chart) checkRanges(xr, yr, yra Range) error {
-	xDelta := xr.GetDelta()
-	if math.IsInf(xDelta, 0) {
-		return errors.New("infinite x-range delta")
+	if math.IsInf(xr.GetDelta(), 0) || math.IsNaN(xr.GetDelta()) || xr.GetDelta() == 0 {
+		return errors.New("Invalid (infinite or NaN) x-range delta")
 	}
-	if math.IsNaN(xDelta) {
-		return errors.New("nan x-range delta")
+	if math.IsInf(yr.GetDelta(), 0) || math.IsNaN(yr.GetDelta()) || yr.GetDelta() == 0 {
+		return errors.New("Invalid (infinite or NaN) y-range delta")
 	}
-	if xDelta == 0 {
-		return errors.New("zero x-range delta; there needs to be at least (2) values")
-	}
-
-	yDelta := yr.GetDelta()
-	if math.IsInf(yDelta, 0) {
-		return errors.New("infinite y-range delta")
-	}
-	if math.IsNaN(yDelta) {
-		return errors.New("nan y-range delta")
-	}
-	if yDelta == 0 {
-		return errors.New("zero y-range delta")
-	}
-
 	if c.hasSecondarySeries() {
-		yraDelta := yra.GetDelta()
-		if math.IsInf(yraDelta, 0) {
-			return errors.New("infinite secondary y-range delta")
-		}
-		if math.IsNaN(yraDelta) {
-			return errors.New("nan secondary y-range delta")
-		}
-		if yraDelta == 0 {
-			return errors.New("zero secondary y-range delta")
+		if math.IsInf(yra.GetDelta(), 0) || math.IsNaN(yra.GetDelta()) || yra.GetDelta() == 0 {
+			return errors.New("Invalid (infinite or NaN) y-secondary-range delta")
 		}
 	}
 
@@ -355,13 +292,13 @@ func (c Chart) getValueFormatters() (x, y, ya ValueFormatter) {
 		}
 	}
 	if c.XAxis.ValueFormatter != nil {
-		x = c.XAxis.GetValueFormatter()
+		x = c.XAxis.ValueFormatter
 	}
 	if c.YAxis.ValueFormatter != nil {
-		y = c.YAxis.GetValueFormatter()
+		y = c.YAxis.ValueFormatter
 	}
 	if c.YAxisSecondary.ValueFormatter != nil {
-		ya = c.YAxisSecondary.GetValueFormatter()
+		ya = c.YAxisSecondary.ValueFormatter
 	}
 	return
 }
@@ -493,7 +430,7 @@ func (c Chart) drawSeries(r Renderer, canvasBox Box, xrange, yrange, yrangeAlt R
 func (c Chart) drawTitle(r Renderer) {
 	if len(c.Title) > 0 && c.TitleStyle.Show {
 		r.SetFont(c.TitleStyle.GetFont(c.GetFont()))
-		r.SetFontColor(c.TitleStyle.GetFontColor(c.GetColorPalette().TextColor()))
+		r.SetFontColor(c.TitleStyle.GetFontColor(DefaultTextColor))
 		titleFontSize := c.TitleStyle.GetFontSize(DefaultTitleFontSize)
 		r.SetFontSize(titleFontSize)
 
@@ -511,25 +448,25 @@ func (c Chart) drawTitle(r Renderer) {
 
 func (c Chart) styleDefaultsBackground() Style {
 	return Style{
-		FillColor:   c.GetColorPalette().BackgroundColor(),
-		StrokeColor: c.GetColorPalette().BackgroundStrokeColor(),
-		StrokeWidth: DefaultBackgroundStrokeWidth,
+		FillColor:   DefaultBackgroundColor,
+		StrokeColor: DefaultBackgroundStrokeColor,
+		StrokeWidth: DefaultStrokeWidth,
 	}
 }
 
 func (c Chart) styleDefaultsCanvas() Style {
 	return Style{
-		FillColor:   c.GetColorPalette().CanvasColor(),
-		StrokeColor: c.GetColorPalette().CanvasStrokeColor(),
-		StrokeWidth: DefaultCanvasStrokeWidth,
+		FillColor:   DefaultCanvasColor,
+		StrokeColor: DefaultCanvasStrokeColor,
+		StrokeWidth: DefaultStrokeWidth,
 	}
 }
 
 func (c Chart) styleDefaultsSeries(seriesIndex int) Style {
+	strokeColor := GetDefaultColor(seriesIndex)
 	return Style{
-		DotColor:    c.GetColorPalette().GetSeriesColor(seriesIndex),
-		StrokeColor: c.GetColorPalette().GetSeriesColor(seriesIndex),
-		StrokeWidth: DefaultSeriesLineWidth,
+		StrokeColor: strokeColor,
+		StrokeWidth: DefaultStrokeWidth,
 		Font:        c.GetFont(),
 		FontSize:    DefaultFontSize,
 	}
@@ -538,9 +475,9 @@ func (c Chart) styleDefaultsSeries(seriesIndex int) Style {
 func (c Chart) styleDefaultsAxes() Style {
 	return Style{
 		Font:        c.GetFont(),
-		FontColor:   c.GetColorPalette().TextColor(),
+		FontColor:   DefaultAxisColor,
 		FontSize:    DefaultAxisFontSize,
-		StrokeColor: c.GetColorPalette().AxisStrokeColor(),
+		StrokeColor: DefaultAxisColor,
 		StrokeWidth: DefaultAxisLineWidth,
 	}
 }
@@ -549,14 +486,6 @@ func (c Chart) styleDefaultsElements() Style {
 	return Style{
 		Font: c.GetFont(),
 	}
-}
-
-// GetColorPalette returns the color palette for the chart.
-func (c Chart) GetColorPalette() ColorPalette {
-	if c.ColorPalette != nil {
-		return c.ColorPalette
-	}
-	return DefaultColorPalette
 }
 
 // Box returns the chart bounds as a box.

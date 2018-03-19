@@ -1,12 +1,6 @@
 package chart
 
-import (
-	"fmt"
-	"math"
-	"strings"
-
-	util "github.com/wcharczuk/go-chart/util"
-)
+import "math"
 
 // TicksProvider is a type that provides ticks.
 type TicksProvider interface {
@@ -37,81 +31,52 @@ func (t Ticks) Less(i, j int) bool {
 	return t[i].Value < t[j].Value
 }
 
-// String returns a string representation of the set of ticks.
-func (t Ticks) String() string {
-	var values []string
-	for i, tick := range t {
-		values = append(values, fmt.Sprintf("[%d: %s]", i, tick.Label))
-	}
-	return strings.Join(values, ", ")
-}
-
 // GenerateContinuousTicks generates a set of ticks.
 func GenerateContinuousTicks(r Renderer, ra Range, isVertical bool, style Style, vf ValueFormatter) []Tick {
 	if vf == nil {
-		vf = FloatValueFormatter
+		panic("vf is nil; did you remember to set a default value formatter?")
 	}
 
 	var ticks []Tick
 	min, max := ra.GetMin(), ra.GetMax()
 
-	if ra.IsDescending() {
-		ticks = append(ticks, Tick{
-			Value: max,
-			Label: vf(max),
-		})
-	} else {
-		ticks = append(ticks, Tick{
-			Value: min,
-			Label: vf(min),
-		})
-	}
+	ticks = append(ticks, Tick{
+		Value: min,
+		Label: vf(min),
+	})
 
 	minLabel := vf(min)
 	style.GetTextOptions().WriteToRenderer(r)
 	labelBox := r.MeasureText(minLabel)
 
-	var tickSize float64
+	var tickSize int
 	if isVertical {
-		tickSize = float64(labelBox.Height() + DefaultMinimumTickVerticalSpacing)
+		tickSize = labelBox.Height() + DefaultMinimumTickVerticalSpacing
 	} else {
-		tickSize = float64(labelBox.Width() + DefaultMinimumTickHorizontalSpacing)
+		tickSize = labelBox.Width() + DefaultMinimumTickHorizontalSpacing
 	}
 
-	domain := float64(ra.GetDomain())
-	domainRemainder := domain - (tickSize * 2)
+	domainRemainder := (ra.GetDomain()) - (tickSize * 2)
 	intermediateTickCount := int(math.Floor(float64(domainRemainder) / float64(tickSize)))
 
-	rangeDelta := math.Abs(max - min)
+	rangeDelta := max - min
 	tickStep := rangeDelta / float64(intermediateTickCount)
 
-	roundTo := util.Math.GetRoundToForDelta(rangeDelta) / 10
-	intermediateTickCount = util.Math.MinInt(intermediateTickCount, DefaultTickCountSanityCheck)
+	roundTo := Math.GetRoundToForDelta(rangeDelta) / 10
+	intermediateTickCount = Math.MinInt(intermediateTickCount, 1<<10)
 
 	for x := 1; x < intermediateTickCount; x++ {
-		var tickValue float64
-		if ra.IsDescending() {
-			tickValue = max - util.Math.RoundUp(tickStep*float64(x), roundTo)
-		} else {
-			tickValue = min + util.Math.RoundUp(tickStep*float64(x), roundTo)
-		}
+		tickValue := min + Math.RoundUp(tickStep*float64(x), roundTo)
 		ticks = append(ticks, Tick{
 			Value: tickValue,
 			Label: vf(tickValue),
 		})
 	}
 
-	if ra.IsDescending() {
-		ticks = append(ticks, Tick{
-			Value: min,
-			Label: vf(min),
-		})
-	} else {
-		ticks = append(ticks, Tick{
-			Value: max,
-			Label: vf(max),
-		})
-	}
+	ticks = append(ticks, Tick{
+		Value: max,
+		Label: vf(max),
+	})
 
 	return ticks
 }

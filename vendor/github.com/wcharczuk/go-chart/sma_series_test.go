@@ -4,24 +4,22 @@ import (
 	"testing"
 
 	"github.com/blendlabs/go-assert"
-	"github.com/wcharczuk/go-chart/seq"
-	"github.com/wcharczuk/go-chart/util"
 )
 
-type mockValuesProvider struct {
+type mockValueProvider struct {
 	X []float64
 	Y []float64
 }
 
-func (m mockValuesProvider) Len() int {
-	return util.Math.MinInt(len(m.X), len(m.Y))
+func (m mockValueProvider) Len() int {
+	return Math.MinInt(len(m.X), len(m.Y))
 }
 
-func (m mockValuesProvider) GetValues(index int) (x, y float64) {
+func (m mockValueProvider) GetValue(index int) (x, y float64) {
 	if index < 0 {
 		panic("negative index at GetValue()")
 	}
-	if index >= util.Math.MinInt(len(m.X), len(m.Y)) {
+	if index > Math.MinInt(len(m.X), len(m.Y)) {
 		panic("index is outside the length of m.X or m.Y")
 	}
 	x = m.X[index]
@@ -32,9 +30,9 @@ func (m mockValuesProvider) GetValues(index int) (x, y float64) {
 func TestSMASeriesGetValue(t *testing.T) {
 	assert := assert.New(t)
 
-	mockSeries := mockValuesProvider{
-		seq.Range(1.0, 10.0),
-		seq.Range(10, 1.0),
+	mockSeries := mockValueProvider{
+		Sequence.Float64(1.0, 10.0),
+		Sequence.Float64(10, 1.0),
 	}
 	assert.Equal(10, mockSeries.Len())
 
@@ -45,7 +43,7 @@ func TestSMASeriesGetValue(t *testing.T) {
 
 	var yvalues []float64
 	for x := 0; x < mas.Len(); x++ {
-		_, y := mas.GetValues(x)
+		_, y := mas.GetValue(x)
 		yvalues = append(yvalues, y)
 	}
 
@@ -63,9 +61,9 @@ func TestSMASeriesGetValue(t *testing.T) {
 func TestSMASeriesGetLastValueWindowOverlap(t *testing.T) {
 	assert := assert.New(t)
 
-	mockSeries := mockValuesProvider{
-		seq.Range(1.0, 10.0),
-		seq.Range(10, 1.0),
+	mockSeries := mockValueProvider{
+		Sequence.Float64(1.0, 10.0),
+		Sequence.Float64(10, 1.0),
 	}
 	assert.Equal(10, mockSeries.Len())
 
@@ -76,11 +74,11 @@ func TestSMASeriesGetLastValueWindowOverlap(t *testing.T) {
 
 	var yvalues []float64
 	for x := 0; x < mas.Len(); x++ {
-		_, y := mas.GetValues(x)
+		_, y := mas.GetValue(x)
 		yvalues = append(yvalues, y)
 	}
 
-	lx, ly := mas.GetLastValues()
+	lx, ly := mas.GetLastValue()
 	assert.Equal(10.0, lx)
 	assert.Equal(5.5, ly)
 	assert.Equal(yvalues[len(yvalues)-1], ly)
@@ -89,9 +87,9 @@ func TestSMASeriesGetLastValueWindowOverlap(t *testing.T) {
 func TestSMASeriesGetLastValue(t *testing.T) {
 	assert := assert.New(t)
 
-	mockSeries := mockValuesProvider{
-		seq.Range(1.0, 100.0),
-		seq.Range(100, 1.0),
+	mockSeries := mockValueProvider{
+		Sequence.Float64(1.0, 100.0),
+		Sequence.Float64(100, 1.0),
 	}
 	assert.Equal(100, mockSeries.Len())
 
@@ -102,11 +100,11 @@ func TestSMASeriesGetLastValue(t *testing.T) {
 
 	var yvalues []float64
 	for x := 0; x < mas.Len(); x++ {
-		_, y := mas.GetValues(x)
+		_, y := mas.GetValue(x)
 		yvalues = append(yvalues, y)
 	}
 
-	lx, ly := mas.GetLastValues()
+	lx, ly := mas.GetLastValue()
 	assert.Equal(100.0, lx)
 	assert.Equal(6, ly)
 	assert.Equal(yvalues[len(yvalues)-1], ly)

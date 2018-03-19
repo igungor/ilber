@@ -1,46 +1,35 @@
 package chart
 
-import "github.com/wcharczuk/go-chart/drawing"
-
-// ValuesProvider is a type that produces values.
-type ValuesProvider interface {
+// ValueProvider is a type that produces values.
+type ValueProvider interface {
 	Len() int
-	GetValues(index int) (float64, float64)
+	GetValue(index int) (float64, float64)
 }
 
-// BoundedValuesProvider allows series to return a range.
-type BoundedValuesProvider interface {
+// BoundedValueProvider allows series to return a range.
+type BoundedValueProvider interface {
 	Len() int
-	GetBoundedValues(index int) (x, y1, y2 float64)
+	GetBoundedValue(index int) (x, y1, y2 float64)
 }
 
-// LastValuesProvider is a special type of value provider that can return it's (potentially computed) last value.
-type LastValuesProvider interface {
-	GetLastValues() (x, y float64)
+// LastValueProvider is a special type of value provider that can return it's (potentially computed) last value.
+type LastValueProvider interface {
+	GetLastValue() (x, y float64)
 }
 
-// BoundedLastValuesProvider is a special type of value provider that can return it's (potentially computed) bounded last value.
-type BoundedLastValuesProvider interface {
-	GetBoundedLastValues() (x, y1, y2 float64)
+// BoundedLastValueProvider is a special type of value provider that can return it's (potentially computed) bounded last value.
+type BoundedLastValueProvider interface {
+	GetBoundedLastValue() (x, y1, y2 float64)
 }
 
-// FullValuesProvider is an interface that combines `ValuesProvider` and `LastValuesProvider`
-type FullValuesProvider interface {
-	ValuesProvider
-	LastValuesProvider
+// FullValueProvider is an interface that combines `ValueProvider` and `LastValueProvider`
+type FullValueProvider interface {
+	ValueProvider
+	LastValueProvider
 }
 
-// FullBoundedValuesProvider is an interface that combines `BoundedValuesProvider` and `BoundedLastValuesProvider`
-type FullBoundedValuesProvider interface {
-	BoundedValuesProvider
-	BoundedLastValuesProvider
+// FullBoundedValueProvider is an interface that combines `BoundedValueProvider` and `BoundedLastValueProvider`
+type FullBoundedValueProvider interface {
+	BoundedValueProvider
+	BoundedLastValueProvider
 }
-
-// SizeProvider is a provider for integer size.
-type SizeProvider func(xrange, yrange Range, index int, x, y float64) float64
-
-// ColorProvider is a general provider for color ranges based on values.
-type ColorProvider func(v, vmin, vmax float64) drawing.Color
-
-// DotColorProvider is a provider for dot color.
-type DotColorProvider func(xrange, yrange Range, index int, x, y float64) drawing.Color

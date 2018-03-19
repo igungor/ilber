@@ -1,6 +1,7 @@
 package exception
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"path"
@@ -102,6 +103,20 @@ func (st StackTrace) Format(s fmt.State, verb rune) {
 	case 's':
 		fmt.Fprintf(s, "%s", []Frame(st))
 	}
+}
+
+// AsStringSlice dereferences the StackTrace as a string slice
+func (st StackTrace) AsStringSlice() []string {
+	res := make([]string, len(st))
+	for i, frame := range st {
+		res[i] = fmt.Sprintf("%+v", frame)
+	}
+	return res
+}
+
+//MarshalJSON is a custom json marshaler.
+func (st StackTrace) MarshalJSON() ([]byte, error) {
+	return json.Marshal(st.AsStringSlice())
 }
 
 // stack represents a stack of program counters.

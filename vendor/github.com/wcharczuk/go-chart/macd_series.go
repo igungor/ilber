@@ -1,7 +1,5 @@
 package chart
 
-import "fmt"
-
 const (
 	// DefaultMACDPeriodPrimary is the long window.
 	DefaultMACDPeriodPrimary = 26
@@ -17,7 +15,7 @@ type MACDSeries struct {
 	Name        string
 	Style       Style
 	YAxis       YAxisType
-	InnerSeries ValuesProvider
+	InnerSeries ValueProvider
 
 	PrimaryPeriod   int
 	SecondaryPeriod int
@@ -25,24 +23,6 @@ type MACDSeries struct {
 
 	signal *MACDSignalSeries
 	macdl  *MACDLineSeries
-}
-
-// Validate validates the series.
-func (macd MACDSeries) Validate() error {
-	var err error
-	if macd.signal != nil {
-		err = macd.signal.Validate()
-	}
-	if err != nil {
-		return err
-	}
-	if macd.macdl != nil {
-		err = macd.macdl.Validate()
-	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // GetPeriods returns the primary and secondary periods.
@@ -89,8 +69,8 @@ func (macd MACDSeries) Len() int {
 	return macd.InnerSeries.Len()
 }
 
-// GetValues gets a value at a given index. For MACD it is the signal value.
-func (macd *MACDSeries) GetValues(index int) (x float64, y float64) {
+// GetValue gets a value at a given index. For MACD it is the signal value.
+func (macd *MACDSeries) GetValue(index int) (x float64, y float64) {
 	if macd.InnerSeries == nil {
 		return
 	}
@@ -99,10 +79,10 @@ func (macd *MACDSeries) GetValues(index int) (x float64, y float64) {
 		macd.ensureChildSeries()
 	}
 
-	_, lv := macd.macdl.GetValues(index)
-	_, sv := macd.signal.GetValues(index)
+	_, lv := macd.macdl.GetValue(index)
+	_, sv := macd.signal.GetValue(index)
 
-	x, _ = macd.InnerSeries.GetValues(index)
+	x, _ = macd.InnerSeries.GetValue(index)
 	y = lv - sv
 
 	return
@@ -130,21 +110,13 @@ type MACDSignalSeries struct {
 	Name        string
 	Style       Style
 	YAxis       YAxisType
-	InnerSeries ValuesProvider
+	InnerSeries ValueProvider
 
 	PrimaryPeriod   int
 	SecondaryPeriod int
 	SignalPeriod    int
 
 	signal *EMASeries
-}
-
-// Validate validates the series.
-func (macds MACDSignalSeries) Validate() error {
-	if macds.signal != nil {
-		return macds.signal.Validate()
-	}
-	return nil
 }
 
 // GetPeriods returns the primary and secondary periods.
@@ -191,8 +163,8 @@ func (macds *MACDSignalSeries) Len() int {
 	return macds.InnerSeries.Len()
 }
 
-// GetValues gets a value at a given index. For MACD it is the signal value.
-func (macds *MACDSignalSeries) GetValues(index int) (x float64, y float64) {
+// GetValue gets a value at a given index. For MACD it is the signal value.
+func (macds *MACDSignalSeries) GetValue(index int) (x float64, y float64) {
 	if macds.InnerSeries == nil {
 		return
 	}
@@ -200,8 +172,8 @@ func (macds *MACDSignalSeries) GetValues(index int) (x float64, y float64) {
 	if macds.signal == nil {
 		macds.ensureSignal()
 	}
-	x, _ = macds.InnerSeries.GetValues(index)
-	_, y = macds.signal.GetValues(index)
+	x, _ = macds.InnerSeries.GetValue(index)
+	_, y = macds.signal.GetValue(index)
 	return
 }
 
@@ -229,7 +201,7 @@ type MACDLineSeries struct {
 	Name        string
 	Style       Style
 	YAxis       YAxisType
-	InnerSeries ValuesProvider
+	InnerSeries ValueProvider
 
 	PrimaryPeriod   int
 	SecondaryPeriod int
@@ -238,27 +210,6 @@ type MACDLineSeries struct {
 	ema2 *EMASeries
 
 	Sigma float64
-}
-
-// Validate validates the series.
-func (macdl MACDLineSeries) Validate() error {
-	var err error
-	if macdl.ema1 != nil {
-		err = macdl.ema1.Validate()
-	}
-	if err != nil {
-		return err
-	}
-	if macdl.ema2 != nil {
-		err = macdl.ema2.Validate()
-	}
-	if err != nil {
-		return err
-	}
-	if macdl.InnerSeries == nil {
-		return fmt.Errorf("MACDLineSeries: must provide an inner series")
-	}
-	return nil
 }
 
 // GetName returns the name of the time series.
@@ -300,8 +251,8 @@ func (macdl *MACDLineSeries) Len() int {
 	return macdl.InnerSeries.Len()
 }
 
-// GetValues gets a value at a given index. For MACD it is the signal value.
-func (macdl *MACDLineSeries) GetValues(index int) (x float64, y float64) {
+// GetValue gets a value at a given index. For MACD it is the signal value.
+func (macdl *MACDLineSeries) GetValue(index int) (x float64, y float64) {
 	if macdl.InnerSeries == nil {
 		return
 	}
@@ -309,10 +260,10 @@ func (macdl *MACDLineSeries) GetValues(index int) (x float64, y float64) {
 		macdl.ensureEMASeries()
 	}
 
-	x, _ = macdl.InnerSeries.GetValues(index)
+	x, _ = macdl.InnerSeries.GetValue(index)
 
-	_, emav1 := macdl.ema1.GetValues(index)
-	_, emav2 := macdl.ema2.GetValues(index)
+	_, emav1 := macdl.ema1.GetValue(index)
+	_, emav2 := macdl.ema2.GetValue(index)
 
 	y = emav2 - emav1
 	return

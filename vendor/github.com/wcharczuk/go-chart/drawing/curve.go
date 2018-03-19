@@ -1,6 +1,8 @@
 package drawing
 
-import "math"
+import (
+	"math"
+)
 
 const (
 	// CurveRecursionLimit represents the maximum recursion that is really necessary to subsivide a curve into straight lines
@@ -96,60 +98,31 @@ func SubdivideQuad(c, c1, c2 []float64) {
 	return
 }
 
-func traceWindowIndices(i int) (startAt, endAt int) {
-	startAt = i * 6
-	endAt = startAt + 6
-	return
-}
-
-func traceCalcDeltas(c []float64) (dx, dy, d float64) {
-	dx = c[4] - c[0]
-	dy = c[5] - c[1]
-	d = math.Abs(((c[2]-c[4])*dy - (c[3]-c[5])*dx))
-	return
-}
-
-func traceIsFlat(dx, dy, d, threshold float64) bool {
-	return (d * d) < threshold*(dx*dx+dy*dy)
-}
-
-func traceGetWindow(curves []float64, i int) []float64 {
-	startAt, endAt := traceWindowIndices(i)
-	return curves[startAt:endAt]
-}
-
 // TraceQuad generate lines subdividing the curve using a Liner
 // flattening_threshold helps determines the flattening expectation of the curve
 func TraceQuad(t Liner, quad []float64, flatteningThreshold float64) {
-	const curveLen = CurveRecursionLimit * 6
-	const curveEndIndex = curveLen - 1
-	const lastIteration = CurveRecursionLimit - 1
-
 	// Allocates curves stack
-	curves := make([]float64, curveLen)
-
-	// copy 6 elements from the quad path to the stack
+	var curves [CurveRecursionLimit * 6]float64
 	copy(curves[0:6], quad[0:6])
-
-	var i int
+	i := 0
+	// current curve
 	var c []float64
 	var dx, dy, d float64
 
 	for i >= 0 {
-		c = traceGetWindow(curves, i)
-		dx, dy, d = traceCalcDeltas(c)
+		c = curves[i*6:]
+		dx = c[4] - c[0]
+		dy = c[5] - c[1]
 
-		// bail early if the distance is 0
-		if d == 0 {
-			return
-		}
+		d = math.Abs(((c[2]-c[4])*dy - (c[3]-c[5])*dx))
 
 		// if it's flat then trace a line
-		if traceIsFlat(dx, dy, d, flatteningThreshold) || i == lastIteration {
+		if (d*d) < flatteningThreshold*(dx*dx+dy*dy) || i == len(curves)-1 {
 			t.LineTo(c[4], c[5])
 			i--
 		} else {
-			SubdivideQuad(c, traceGetWindow(curves, i+1), traceGetWindow(curves, i))
+			// second half of bezier go lower onto the stack
+			SubdivideQuad(c, curves[(i+1)*6:], curves[i*6:])
 			i++
 		}
 	}

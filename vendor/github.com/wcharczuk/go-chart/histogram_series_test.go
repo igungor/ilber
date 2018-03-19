@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	assert "github.com/blendlabs/go-assert"
-	"github.com/wcharczuk/go-chart/seq"
 )
 
 func TestHistogramSeries(t *testing.T) {
@@ -12,8 +11,8 @@ func TestHistogramSeries(t *testing.T) {
 
 	cs := ContinuousSeries{
 		Name:    "Test Series",
-		XValues: seq.Range(1.0, 20.0),
-		YValues: seq.Range(10.0, -10.0),
+		XValues: Sequence.Float64(1.0, 20.0),
+		YValues: Sequence.Float64(10.0, -10.0),
 	}
 
 	hs := HistogramSeries{
@@ -21,8 +20,8 @@ func TestHistogramSeries(t *testing.T) {
 	}
 
 	for x := 0; x < hs.Len(); x++ {
-		csx, csy := cs.GetValues(0)
-		hsx, hsy1, hsy2 := hs.GetBoundedValues(0)
+		csx, csy := cs.GetValue(0)
+		hsx, hsy1, hsy2 := hs.GetBoundedValue(0)
 		assert.Equal(csx, hsx)
 		assert.True(hsy1 > 0)
 		assert.True(hsy2 <= 0)

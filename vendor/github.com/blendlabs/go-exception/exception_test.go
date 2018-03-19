@@ -1,6 +1,7 @@
 package exception
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"testing"
@@ -144,4 +145,27 @@ func TestNestNil(t *testing.T) {
 	err := Nest(ex1, ex2, ex3)
 	a.Nil(err)
 	a.Equal(nil, err)
+}
+
+func TestMarshalJSON(t *testing.T) {
+	type ReadableStackTrace struct {
+		Class   string   `json:"Class"`
+		Message string   `json:"Message"`
+		Stack   []string `json:"Stack"`
+	}
+
+	a := assert.New(t)
+	ex := New("new test error")
+	a.NotNil(ex)
+	stackTrace := ex.StackTrace()
+	stackDepth := len(stackTrace)
+
+	jsonErr, err := json.Marshal(ex)
+	a.Nil(err)
+	a.NotNil(jsonErr)
+
+	ex2 := &ReadableStackTrace{}
+	err = json.Unmarshal(jsonErr, ex2)
+	a.Nil(err)
+	a.Len(ex2.Stack, stackDepth)
 }

@@ -46,25 +46,12 @@ func ColorFromHex(hex string) Color {
 	return c
 }
 
-// ColorFromAlphaMixedRGBA returns the system alpha mixed rgba values.
-func ColorFromAlphaMixedRGBA(r, g, b, a uint32) Color {
-	fa := float64(a) / 255.0
-	var c Color
-	c.R = uint8(float64(r) / fa)
-	c.G = uint8(float64(g) / fa)
-	c.B = uint8(float64(b) / fa)
-	c.A = uint8(a | (a >> 8))
-	return c
-}
-
-// ColorChannelFromFloat returns a normalized byte from a given float value.
-func ColorChannelFromFloat(v float64) uint8 {
-	return uint8(v * 255)
-}
-
 // Color is our internal color type because color.Color is bullshit.
 type Color struct {
-	R, G, B, A uint8
+	R uint8
+	G uint8
+	B uint8
+	A uint8
 }
 
 // RGBA returns the color as a pre-alpha mixed color set.
@@ -98,24 +85,6 @@ func (c Color) WithAlpha(a uint8) Color {
 		G: c.G,
 		B: c.B,
 		A: a,
-	}
-}
-
-// Equals returns true if the color equals another.
-func (c Color) Equals(other Color) bool {
-	return c.R == other.R &&
-		c.G == other.G &&
-		c.B == other.B &&
-		c.A == other.A
-}
-
-// AverageWith averages two colors.
-func (c Color) AverageWith(other Color) Color {
-	return Color{
-		R: (c.R + other.R) >> 1,
-		G: (c.G + other.G) >> 1,
-		B: (c.B + other.B) >> 1,
-		A: c.A,
 	}
 }
 

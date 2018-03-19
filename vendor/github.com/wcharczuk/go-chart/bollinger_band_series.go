@@ -1,10 +1,6 @@
 package chart
 
-import (
-	"fmt"
-
-	"github.com/wcharczuk/go-chart/seq"
-)
+import "math"
 
 // BollingerBandsSeries draws bollinger bands for an inner series.
 // Bollinger bands are defined by two lines, one at SMA+k*stddev, one at SMA-k*stdev.
@@ -15,9 +11,9 @@ type BollingerBandsSeries struct {
 
 	Period      int
 	K           float64
-	InnerSeries ValuesProvider
+	InnerSeries ValueProvider
 
-	valueBuffer *seq.Buffer
+	valueBuffer *RingBuffer
 }
 
 // GetName returns the name of the time series.
@@ -43,9 +39,7 @@ func (bbs BollingerBandsSeries) GetPeriod() int {
 	return bbs.Period
 }
 
-// GetK returns the K value, or the number of standard deviations above and below
-// to band the simple moving average with.
-// Typical K value is 2.0.
+// GetK returns the K value.
 func (bbs BollingerBandsSeries) GetK(defaults ...float64) float64 {
 	if bbs.K == 0 {
 		if len(defaults) > 0 {
@@ -57,35 +51,35 @@ func (bbs BollingerBandsSeries) GetK(defaults ...float64) float64 {
 }
 
 // Len returns the number of elements in the series.
-func (bbs BollingerBandsSeries) Len() int {
+func (bbs *BollingerBandsSeries) Len() int {
 	return bbs.InnerSeries.Len()
 }
 
-// GetBoundedValues gets the bounded value for the series.
-func (bbs *BollingerBandsSeries) GetBoundedValues(index int) (x, y1, y2 float64) {
+// GetBoundedValue gets the bounded value for the series.
+func (bbs *BollingerBandsSeries) GetBoundedValue(index int) (x, y1, y2 float64) {
 	if bbs.InnerSeries == nil {
 		return
 	}
 	if bbs.valueBuffer == nil || index == 0 {
-		bbs.valueBuffer = seq.NewBufferWithCapacity(bbs.GetPeriod())
+		bbs.valueBuffer = NewRingBufferWithCapacity(bbs.GetPeriod())
 	}
 	if bbs.valueBuffer.Len() >= bbs.GetPeriod() {
 		bbs.valueBuffer.Dequeue()
 	}
-	px, py := bbs.InnerSeries.GetValues(index)
+	px, py := bbs.InnerSeries.GetValue(index)
 	bbs.valueBuffer.Enqueue(py)
 	x = px
 
-	ay := seq.New(bbs.valueBuffer).Average()
-	std := seq.New(bbs.valueBuffer).StdDev()
+	ay := bbs.getAverage(bbs.valueBuffer)
+	std := bbs.getStdDev(bbs.valueBuffer)
 
 	y1 = ay + (bbs.GetK() * std)
 	y2 = ay - (bbs.GetK() * std)
 	return
 }
 
-// GetBoundedLastValues returns the last bounded value for the series.
-func (bbs *BollingerBandsSeries) GetBoundedLastValues() (x, y1, y2 float64) {
+// GetBoundedLastValue returns the last bounded value for the series.
+func (bbs *BollingerBandsSeries) GetBoundedLastValue() (x, y1, y2 float64) {
 	if bbs.InnerSeries == nil {
 		return
 	}
@@ -96,15 +90,15 @@ func (bbs *BollingerBandsSeries) GetBoundedLastValues() (x, y1, y2 float64) {
 		startAt = 0
 	}
 
-	vb := seq.NewBufferWithCapacity(period)
+	vb := NewRingBufferWithCapacity(period)
 	for index := startAt; index < seriesLength; index++ {
-		xn, yn := bbs.InnerSeries.GetValues(index)
+		xn, yn := bbs.InnerSeries.GetValue(index)
 		vb.Enqueue(yn)
 		x = xn
 	}
 
-	ay := seq.Seq{Provider: vb}.Average()
-	std := seq.Seq{Provider: vb}.StdDev()
+	ay := bbs.getAverage(vb)
+	std := bbs.getStdDev(vb)
 
 	y1 = ay + (bbs.GetK() * std)
 	y2 = ay - (bbs.GetK() * std)
@@ -123,10 +117,33 @@ func (bbs *BollingerBandsSeries) Render(r Renderer, canvasBox Box, xrange, yrang
 	Draw.BoundedSeries(r, canvasBox, xrange, yrange, s, bbs, bbs.GetPeriod())
 }
 
-// Validate validates the series.
-func (bbs BollingerBandsSeries) Validate() error {
-	if bbs.InnerSeries == nil {
-		return fmt.Errorf("bollinger bands series requires InnerSeries to be set")
+func (bbs BollingerBandsSeries) getAverage(valueBuffer *RingBuffer) float64 {
+	var accum float64
+	valueBuffer.Each(func(v interface{}) {
+		if typed, isTyped := v.(float64); isTyped {
+			accum += typed
+		}
+	})
+	return accum / float64(valueBuffer.Len())
+}
+
+func (bbs BollingerBandsSeries) getVariance(valueBuffer *RingBuffer) float64 {
+	if valueBuffer.Len() == 0 {
+		return 0
 	}
-	return nil
+
+	var variance float64
+	m := bbs.getAverage(valueBuffer)
+
+	valueBuffer.Each(func(v interface{}) {
+		if n, isTyped := v.(float64); isTyped {
+			variance += (float64(n) - m) * (float64(n) - m)
+		}
+	})
+
+	return variance / float64(valueBuffer.Len())
+}
+
+func (bbs BollingerBandsSeries) getStdDev(valueBuffer *RingBuffer) float64 {
+	return math.Pow(bbs.getVariance(valueBuffer), 0.5)
 }

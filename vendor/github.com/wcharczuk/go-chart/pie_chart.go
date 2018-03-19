@@ -2,26 +2,15 @@ package chart
 
 import (
 	"errors"
-	"fmt"
 	"io"
-	"math"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/wcharczuk/go-chart/util"
-)
-
-const (
-	_pi  = math.Pi
-	_pi2 = math.Pi / 2.0
-	_pi4 = math.Pi / 4.0
 )
 
 // PieChart is a chart that draws sections of a circle based on percentages.
 type PieChart struct {
 	Title      string
 	TitleStyle Style
-
-	ColorPalette ColorPalette
 
 	Width  int
 	Height int
@@ -76,7 +65,7 @@ func (pc PieChart) GetHeight() int {
 // Render renders the chart with the given renderer to the given io.Writer.
 func (pc PieChart) Render(rp RendererProvider, w io.Writer) error {
 	if len(pc.Values) == 0 {
-		return errors.New("please provide at least one value")
+		return errors.New("Please provide at least one value.")
 	}
 
 	r, err := rp(pc.GetWidth(), pc.GetHeight())
@@ -99,10 +88,7 @@ func (pc PieChart) Render(rp RendererProvider, w io.Writer) error {
 	pc.drawBackground(r)
 	pc.drawCanvas(r, canvasBox)
 
-	finalValues, err := pc.finalizeValues(pc.Values)
-	if err != nil {
-		return err
-	}
+	finalValues := pc.finalizeValues(pc.Values)
 	pc.drawSlices(r, canvasBox, finalValues)
 	pc.drawTitle(r)
 	for _, a := range pc.Elements {
@@ -131,7 +117,7 @@ func (pc PieChart) drawTitle(r Renderer) {
 
 func (pc PieChart) drawSlices(r Renderer, canvasBox Box, values []Value) {
 	cx, cy := canvasBox.Center()
-	diameter := util.Math.MinInt(canvasBox.Width(), canvasBox.Height())
+	diameter := Math.MinInt(canvasBox.Width(), canvasBox.Height())
 	radius := float64(diameter >> 1)
 	labelRadius := (radius * 2.0) / 3.0
 
@@ -142,8 +128,8 @@ func (pc PieChart) drawSlices(r Renderer, canvasBox Box, values []Value) {
 		v.Style.InheritFrom(pc.stylePieChartValue(index)).WriteToRenderer(r)
 
 		r.MoveTo(cx, cy)
-		rads = util.Math.PercentToRadians(total)
-		delta = util.Math.PercentToRadians(v.Value)
+		rads = Math.PercentToRadians(total)
+		delta = Math.PercentToRadians(v.Value)
 
 		r.ArcTo(cx, cy, radius, radius, rads, delta)
 
@@ -158,9 +144,9 @@ func (pc PieChart) drawSlices(r Renderer, canvasBox Box, values []Value) {
 	for index, v := range values {
 		v.Style.InheritFrom(pc.stylePieChartValue(index)).WriteToRenderer(r)
 		if len(v.Label) > 0 {
-			delta2 = util.Math.PercentToRadians(total + (v.Value / 2.0))
-			delta2 = util.Math.RadianAdd(delta2, _pi2)
-			lx, ly = util.Math.CirclePoint(cx, cy, labelRadius, delta2)
+			delta2 = Math.PercentToRadians(total + (v.Value / 2.0))
+			delta2 = Math.RadianAdd(delta2, _pi2)
+			lx, ly = Math.CirclePoint(cx, cy, labelRadius, delta2)
 
 			tb := r.MeasureText(v.Label)
 			lx = lx - (tb.Width() >> 1)
@@ -172,12 +158,8 @@ func (pc PieChart) drawSlices(r Renderer, canvasBox Box, values []Value) {
 	}
 }
 
-func (pc PieChart) finalizeValues(values []Value) ([]Value, error) {
-	finalValues := Values(values).Normalize()
-	if len(finalValues) == 0 {
-		return nil, fmt.Errorf("pie chart must contain at least (1) non-zero value")
-	}
-	return finalValues, nil
+func (pc PieChart) finalizeValues(values []Value) []Value {
+	return Values(values).Normalize()
 }
 
 func (pc PieChart) getDefaultCanvasBox() Box {
@@ -185,7 +167,7 @@ func (pc PieChart) getDefaultCanvasBox() Box {
 }
 
 func (pc PieChart) getCircleAdjustedCanvasBox(canvasBox Box) Box {
-	circleDiameter := util.Math.MinInt(canvasBox.Width(), canvasBox.Height())
+	circleDiameter := Math.MinInt(canvasBox.Width(), canvasBox.Height())
 
 	square := Box{
 		Right:  circleDiameter,
@@ -205,17 +187,17 @@ func (pc PieChart) getCanvasStyle() Style {
 
 func (pc PieChart) styleDefaultsCanvas() Style {
 	return Style{
-		FillColor:   pc.GetColorPalette().CanvasColor(),
-		StrokeColor: pc.GetColorPalette().CanvasStrokeColor(),
+		FillColor:   DefaultCanvasColor,
+		StrokeColor: DefaultCanvasStrokeColor,
 		StrokeWidth: DefaultStrokeWidth,
 	}
 }
 
 func (pc PieChart) styleDefaultsPieChartValue() Style {
 	return Style{
-		StrokeColor: pc.GetColorPalette().TextColor(),
+		StrokeColor: ColorWhite,
 		StrokeWidth: 5.0,
-		FillColor:   pc.GetColorPalette().TextColor(),
+		FillColor:   ColorWhite,
 	}
 }
 
@@ -223,15 +205,15 @@ func (pc PieChart) stylePieChartValue(index int) Style {
 	return pc.SliceStyle.InheritFrom(Style{
 		StrokeColor: ColorWhite,
 		StrokeWidth: 5.0,
-		FillColor:   pc.GetColorPalette().GetSeriesColor(index),
+		FillColor:   GetAlternateColor(index),
 		FontSize:    pc.getScaledFontSize(),
-		FontColor:   pc.GetColorPalette().TextColor(),
+		FontColor:   ColorWhite,
 		Font:        pc.GetFont(),
 	})
 }
 
 func (pc PieChart) getScaledFontSize() float64 {
-	effectiveDimension := util.Math.MinInt(pc.GetWidth(), pc.GetHeight())
+	effectiveDimension := Math.MinInt(pc.GetWidth(), pc.GetHeight())
 	if effectiveDimension >= 2048 {
 		return 48.0
 	} else if effectiveDimension >= 1024 {
@@ -246,8 +228,8 @@ func (pc PieChart) getScaledFontSize() float64 {
 
 func (pc PieChart) styleDefaultsBackground() Style {
 	return Style{
-		FillColor:   pc.GetColorPalette().BackgroundColor(),
-		StrokeColor: pc.GetColorPalette().BackgroundStrokeColor(),
+		FillColor:   DefaultBackgroundColor,
+		StrokeColor: DefaultBackgroundStrokeColor,
 		StrokeWidth: DefaultStrokeWidth,
 	}
 }
@@ -260,7 +242,7 @@ func (pc PieChart) styleDefaultsElements() Style {
 
 func (pc PieChart) styleDefaultsTitle() Style {
 	return pc.TitleStyle.InheritFrom(Style{
-		FontColor:           pc.GetColorPalette().TextColor(),
+		FontColor:           ColorWhite,
 		Font:                pc.GetFont(),
 		FontSize:            pc.getTitleFontSize(),
 		TextHorizontalAlign: TextHorizontalAlignCenter,
@@ -270,7 +252,7 @@ func (pc PieChart) styleDefaultsTitle() Style {
 }
 
 func (pc PieChart) getTitleFontSize() float64 {
-	effectiveDimension := util.Math.MinInt(pc.GetWidth(), pc.GetHeight())
+	effectiveDimension := Math.MinInt(pc.GetWidth(), pc.GetHeight())
 	if effectiveDimension >= 2048 {
 		return 48
 	} else if effectiveDimension >= 1024 {
@@ -281,14 +263,6 @@ func (pc PieChart) getTitleFontSize() float64 {
 		return 12
 	}
 	return 10
-}
-
-// GetColorPalette returns the color palette for the chart.
-func (pc PieChart) GetColorPalette() ColorPalette {
-	if pc.ColorPalette != nil {
-		return pc.ColorPalette
-	}
-	return AlternateColorPalette
 }
 
 // Box returns the chart bounds as a box.
