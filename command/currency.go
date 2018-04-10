@@ -152,9 +152,15 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 		result := response.Chart.Result
 		quote := result[len(result)-1].Indicators.Quote
 		close := quote[len(quote)-1].Close
+		prevClose := result[len(result)-1].Meta.PreviousClose
 
 		if len(close) == 0 {
-			return 0, fmt.Errorf("yahoo: no value found for %q", q)
+			// some currencies are not available in 'close data', such as BGN.
+			// dont let people down.
+			if prevClose != 0 {
+				return prevClose, nil
+			}
+			return 0, fmt.Errorf("yahoo: no value found for %v", q)
 		}
 
 		var rates []float64
@@ -284,6 +290,7 @@ type yahooFinanceResponse struct {
 	Chart struct {
 		Error  interface{} `json:"error"`
 		Result []struct {
+			Timestamp  []int64 `json:"timestamp"`
 			Indicators struct {
 				Quote []struct {
 					Close  []interface{} `json:"close"`
@@ -293,7 +300,9 @@ type yahooFinanceResponse struct {
 					Volume []interface{} `json:"volume"`
 				} `json:"quote"`
 			} `json:"indicators"`
-			Timestamp []int64 `json:"timestamp"`
+			Meta struct {
+				PreviousClose float64 `json:"previousClose"`
+			} `json:"meta"`
 		} `json:"result"`
 	} `json:"chart"`
 }
