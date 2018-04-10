@@ -153,6 +153,10 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 		quote := result[len(result)-1].Indicators.Quote
 		close := quote[len(quote)-1].Close
 
+		if len(close) == 0 {
+			return 0, fmt.Errorf("yahoo: no value found for %q", q)
+		}
+
 		var rates []float64
 		for _, v := range close {
 			rate, ok := v.(float64)

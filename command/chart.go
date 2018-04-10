@@ -122,7 +122,7 @@ func runChart(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		if duration <= 2*24*time.Hour {
 			return chart.TimeHourValueFormatter(v)
 		}
-		return chart.TimeValueFormatterWithFormat("01-02 03:04PM")(v)
+		return chart.TimeValueFormatterWithFormat(v, "01-02 03:04PM")
 	}
 
 	priceSeries := chart.TimeSeries{
