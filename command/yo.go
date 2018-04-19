@@ -63,4 +63,5 @@ var yoExamples = []string{
 	"sipirmin",
 	"lanet olsun sana",
 	"flemenko",
+	"anamı karıştırma",
 }
