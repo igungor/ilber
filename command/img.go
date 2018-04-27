@@ -36,7 +36,9 @@ func runImg(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 		b.Logger.Printf("Error while searching image. Err: %v\n", err)
 		if err == errSearchQuotaExceeded {
 			_, _ = b.SendMessage(msg.Chat.ID, emojiShrug)
+			return
 		}
+		_, _ = b.SendMessage(msg.Chat.ID, "bulamadım :'(")
 		return
 	}
 
