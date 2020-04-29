@@ -26,7 +26,6 @@ var cmdCurrency = &Command{
 
 const (
 	yahooFinanceURL = "https://query1.finance.yahoo.com/v8/finance/chart/"
-	alphavantageURL = "https://www.alphavantage.co/query"
 )
 
 func defaultCurrencies() []query {
@@ -46,9 +45,8 @@ func runCurrency(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	queries := parseMessage(msg.Args())
 
 	var errs []error
-	// FIXME(ig): enable yahoo later
-	for _, fn := range []queryfunc{queryYahooFinance, queryAlphaVantage} {
-		s, err := fn(queries, b.Config.AlphaVantageToken)
+	for _, fn := range []queryfunc{queryYahooFinance} {
+		s, err := fn(queries)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -119,9 +117,9 @@ type query struct {
 	isCalc bool
 }
 
-type queryfunc func([]query, string) (string, error)
+type queryfunc func([]query) (string, error)
 
-func queryYahooFinance(queries []query, token string) (string, error) {
+func queryYahooFinance(queries []query) (string, error) {
 	if len(queries) == 0 {
 		return "", fmt.Errorf("yahoo: no query found")
 	}
@@ -208,82 +206,6 @@ func queryYahooFinance(queries []query, token string) (string, error) {
 		)
 	}
 	return buf.String(), nil
-}
-
-func queryAlphaVantage(queries []query, token string) (string, error) {
-	if len(queries) == 0 {
-		return "", fmt.Errorf("av: no query found")
-	}
-
-	request := func(q query) (float64, error) {
-		u, _ := url.Parse(alphavantageURL)
-		params := u.Query()
-		params.Set("function", "CURRENCY_EXCHANGE_RATE")
-		params.Set("from_currency", q.from)
-		params.Set("to_currency", q.to)
-		params.Set("apikey", token)
-		u.RawQuery = params.Encode()
-
-		resp, err := httpclient.Get(u.String())
-		if err != nil {
-			return 0, fmt.Errorf("av: could not fetch response: %v", err)
-		}
-		defer resp.Body.Close()
-
-		var response alphavantageResponse
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		if err != nil {
-			return 0, fmt.Errorf("av: could not parse json: %v", err)
-		}
-
-		return strconv.ParseFloat(response.Realtime_Currency_Exchange_Rate.Rate, 64)
-	}
-
-	if len(queries) == 1 && queries[0].isCalc {
-		q := queries[0]
-		rate, err := request(q)
-		if err != nil {
-			return "", err
-		}
-		return fmt.Sprintf(
-			"%4.2f %v = %4.4f %v",
-			q.amount,
-			normalize(q.from),
-			q.amount*rate,
-			normalize(q.to),
-		), nil
-	}
-
-	var rates []float64
-	for _, q := range queries {
-		rate, err := request(q)
-		if err != nil {
-			return "", err
-		}
-		rates = append(rates, rate)
-	}
-
-	var buf bytes.Buffer
-	for i, rate := range rates {
-		fmt.Fprintf(&buf, "%v = %4.4f %v\n",
-			normalize(queries[i].from),
-			rate,
-			normalize(queries[i].to),
-		)
-	}
-	return buf.String(), nil
-}
-
-type alphavantageResponse struct {
-	Realtime_Currency_Exchange_Rate struct {
-		From string `json:"1. From_Currency Code"`
-		_    string `json:"2. From_Currency Name"`
-		To   string `json:"3. To_Currency Code"`
-		_    string `json:"4. To_Currency Name"`
-		Rate string `json:"5. Exchange Rate"`
-		_    string `json:"6. Last Refreshed"`
-		_    string `json:"7. Time Zone"`
-	} `json:"Realtime Currency Exchange Rate"`
 }
 
 type yahooFinanceResponse struct {

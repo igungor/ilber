@@ -5,3 +5,4 @@ debian/
 cmd/ilber/ilber
 ilber.conf
 deploy.retry
+ilber.local.toml
