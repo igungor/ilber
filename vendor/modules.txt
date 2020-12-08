@@ -8,6 +8,8 @@ github.com/burntsushi/toml
 github.com/golang/protobuf/proto
 # github.com/igungor/telegram v0.0.0-20170723120259-1b4b07524109
 github.com/igungor/telegram
+# github.com/kelseyhightower/envconfig v1.4.0
+github.com/kelseyhightower/envconfig
 # github.com/matttproud/golang_protobuf_extensions v1.0.0
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/prometheus/client_golang v0.8.0

@@ -8,6 +8,7 @@ require (
 	github.com/burntsushi/toml v0.3.0
 	github.com/golang/protobuf v1.0.0 // indirect
 	github.com/igungor/telegram v0.0.0-20170723120259-1b4b07524109
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/matttproud/golang_protobuf_extensions v1.0.0 // indirect
 	github.com/prometheus/client_golang v0.8.0
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect

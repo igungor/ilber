@@ -26,15 +26,12 @@ func usage() {
 }
 
 func main() {
-	var (
-		flagConfig = flag.String("c", "ilber.toml", "Path to configuration file")
-	)
 	flag.Usage = usage
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
 
-	b, err := bot.New(*flagConfig, logger)
+	b, err := bot.NewFromEnv(logger)
 	if err != nil {
 		logger.Fatalf("Could not initialize the bot: %v\n", err)
 	}

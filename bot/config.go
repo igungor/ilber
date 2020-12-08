@@ -5,19 +5,18 @@ import (
 	"net"
 
 	"github.com/burntsushi/toml"
+	"github.com/kelseyhightower/envconfig"
 )
 
 type Config struct {
-	Token        string `toml:"token"`
-	Webhook      string `toml:"webhook"`
-	Addr         string `toml:"addr"`
-	Debug        bool   `toml:"debug"`
-	DatabasePath string `toml:"database-path"`
+	Token   string `toml:"token"`
+	Webhook string `toml:"webhook"`
+	Addr    string `toml:"addr"`
+	Debug   bool   `toml:"debug"`
 
-	GoogleAPIKey         string `toml:"google-api-key"`
-	GoogleSearchEngineID string `toml:"google-search-engine-id"`
-	OpenweathermapAppID  string `toml:"openweathermap-app-id"`
-	AlphaVantageToken    string `toml:"alphavantage-token"`
+	GoogleAPIKey         string `toml:"google-api-key" envconfig:"google_api_key"`
+	GoogleSearchEngineID string `toml:"google-search-engine-id" envconfig:"google_search_engine_id"`
+	OpenweathermapAppID  string `toml:"openweathermap-app-id" envconfig:"openweathermap_app_id"`
 }
 
 func (c Config) validate() error {
@@ -45,6 +44,19 @@ func Load(path string) (Config, error) {
 	_, err := toml.DecodeFile(path, &cfg)
 	if err != nil {
 		return Config{}, fmt.Errorf("could not decode config file: %v", err)
+	}
+
+	if err := cfg.validate(); err != nil {
+		return Config{}, err
+	}
+	return cfg, nil
+}
+
+func LoadFromEnv() (Config, error) {
+	var cfg Config
+	err := envconfig.Process("ilber", &cfg)
+	if err != nil {
+		return Config{}, fmt.Errorf("process config: %v", err)
 	}
 
 	if err := cfg.validate(); err != nil {
