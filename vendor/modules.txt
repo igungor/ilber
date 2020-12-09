@@ -1,7 +1,5 @@
 # github.com/aaron-lebo/ocd v0.0.0-20140809093605-ee9a3f6eca21
 github.com/aaron-lebo/ocd/feeds/atom
-# github.com/burntsushi/toml v0.3.0
-github.com/burntsushi/toml
 # github.com/igungor/telegram v0.0.0-20170723120259-1b4b07524109
 github.com/igungor/telegram
 # github.com/kelseyhightower/envconfig v1.4.0

@@ -1,7 +1,5 @@
 github.com/aaron-lebo/ocd v0.0.0-20140809093605-ee9a3f6eca21 h1:bGmKZVRtq0HGehDgBg3HkEfSqLP2YXyoq0+j0HtLoOE=
 github.com/aaron-lebo/ocd v0.0.0-20140809093605-ee9a3f6eca21/go.mod h1:Fcv1e5y8FvM73lK5IP2nNWWV2dIw8Oa6G98tCC3ka3Y=
-github.com/burntsushi/toml v0.3.0 h1:7xSK9KkjYhUFUrcGkb57k/zXyeo8yshRmbFS2P1mQT0=
-github.com/burntsushi/toml v0.3.0/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
 github.com/igungor/telegram v0.0.0-20170723120259-1b4b07524109 h1:RBd8Tv73VFUBehkW12uZ9WsenSRl4GEniQ3GBL78IO8=
 github.com/igungor/telegram v0.0.0-20170723120259-1b4b07524109/go.mod h1:iXQDrkBihQDrhL4kexDy9ZbORZK8pYfvu4EEMfrvDW8=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
