@@ -13,6 +13,15 @@ release:
 	@goxc
 	@rmdir debian/
 
+deploy:
+	gcloud functions deploy ilber \
+		--entry-point MainHandler \
+		--trigger-http \
+		--region europe-west3 \
+		--runtime go113 \
+		--env-vars-file .env.yaml \
+		--allow-unauthenticated
+
 issues:
 	@hub issue
 	@ag --ignore=Makefile -s TODO || true
