@@ -48,7 +48,7 @@ func runYoutube(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	}
 
 	qs := strings.Join(args, "+")
-	call := service.Search.List("id").Type("video").Q(qs).MaxResults(1)
+	call := service.Search.List([]string{"id"}).Type("video").Q(qs).MaxResults(1)
 	response, err := call.Do()
 	if err != nil {
 		b.Logger.Printf("Error making youtube search API call: %v", err)

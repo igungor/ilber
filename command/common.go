@@ -38,7 +38,7 @@ func search(apikey, searchEngineID string, searchType string, terms ...string) (
 	cse := customsearch.NewCseService(service)
 
 	const imageCount = 3
-	call := cse.List(keyword).Cx(searchEngineID).Num(imageCount)
+	call := cse.List().Q(keyword).Cx(searchEngineID).Num(imageCount)
 	if searchType == "image" {
 		call = call.SearchType(searchType)
 	}

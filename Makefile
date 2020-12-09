@@ -13,11 +13,6 @@ release:
 	@goxc
 	@rmdir debian/
 
-deploy: release
-	@scp release/0.1/ilber_*.deb do:
-	@ssh do 'sudo dpkg -i ilber_*.deb'
-	@ssh do 'sudo systemctl restart ilber'
-
 issues:
 	@hub issue
 	@ag --ignore=Makefile -s TODO || true
