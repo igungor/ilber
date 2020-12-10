@@ -11,13 +11,10 @@ import (
 	"github.com/igungor/telegram"
 )
 
-var (
-	logger *log.Logger
-	bot    *botpkg.Bot
-)
+var bot *botpkg.Bot
 
 func init() {
-	logger = log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
+	logger := log.New(os.Stdout, "ilber: ", log.LstdFlags|log.Lshortfile)
 	var err error
 	bot, err = botpkg.New(logger)
 	if err != nil {
