@@ -91,7 +91,7 @@ func runArxiv(ctx context.Context, b *bot.Bot, msg *telegram.Message) {
 	buf.WriteString(fmt.Sprintf("*title:* %v\n", entry.Title))
 	buf.WriteString(fmt.Sprintf("*categories:* %v\n", strings.Join(categories, ", ")))
 	buf.WriteString(fmt.Sprintf("*published:* %v\n", entry.Published.Format("2006-01-02")))
-	buf.WriteString(fmt.Sprint("*authors:*\n"))
+	buf.WriteString("*authors:*\n")
 	for _, author := range entry.Authors {
 		buf.WriteString(fmt.Sprintf(" - %v\n", author.Name))
 	}

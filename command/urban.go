@@ -95,7 +95,7 @@ type urbanResponse struct {
 
 func (ur urbanResponse) String() string {
 	if len(ur.List) == 0 {
-		return fmt.Sprintf("UrbanDictonary'de böyle birşey yok")
+		return "UrbanDictonary'de böyle birşey yok"
 	}
 
 	var maxItems int

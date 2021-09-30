@@ -1,7 +1,6 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -19,7 +18,7 @@ func init() {
 
 var httpclient = &http.Client{Timeout: 10 * time.Second}
 
-var errSearchQuotaExceeded = errors.New("Daily Limit Exceeded")
+var errSearchQuotaExceeded = fmt.Errorf("daily limit exceeded")
 
 // search does a Google search with the given terms. searchType could be
 // "image" or empty string.
@@ -33,7 +32,7 @@ func search(apikey, searchEngineID string, searchType string, terms ...string) (
 	imageHTTPClient := &http.Client{Transport: &transport.APIKey{Key: apikey}}
 	service, err := customsearch.New(imageHTTPClient)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating customsearch client: %v", err)
+		return nil, fmt.Errorf("customsearch client: %w", err)
 	}
 	cse := customsearch.NewCseService(service)
 
@@ -49,10 +48,10 @@ func search(apikey, searchEngineID string, searchType string, terms ...string) (
 		if concreteErr.Code == 403 && concreteErr.Message == "Daily Limit Exceeded" {
 			return nil, errSearchQuotaExceeded
 		}
-		return nil, fmt.Errorf("Error making image search API call for the given criteria: %v Err: %v", keyword, err)
+		return nil, fmt.Errorf("image search API call for the given criteria: %v: %w", keyword, err)
 	}
 	if len(resp.Items) == 0 {
-		return nil, fmt.Errorf("Could not find any image based for the given criteria: %v", keyword)
+		return nil, fmt.Errorf("no result for given criteria: %v", keyword)
 	}
 
 	var urls []string
